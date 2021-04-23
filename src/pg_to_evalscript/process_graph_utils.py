@@ -14,7 +14,9 @@ def iterate(obj):
 def get_referenced_nodes(arguments):
     from_nodes = set()
     for k, v in iterate(arguments):
-        if isinstance(v, dict) and len(v) == 1 and "from_node" in v:
+        if isinstance(v, dict) and len(v) == 1 and "process_graph" in v:
+            continue
+        elif isinstance(v, dict) and len(v) == 1 and "from_node" in v:
             from_nodes.add(v["from_node"])
         elif isinstance(v, dict) or isinstance(v, list):
             from_nodes.update(get_referenced_nodes(v))
@@ -56,21 +58,43 @@ def get_dependents(dependencies):
 
 def get_execution_order(dependencies, dependents):
     entry_points = get_entry_points(dependencies)
+    # print("    entry points:::")
+    # print(entry_points)
+    # print("------------")
     execution_order = [entry_point for entry_point in entry_points]
     remaining_nodes = set(dependencies.keys()).difference(execution_order)
 
+    i = 0
+
     while len(remaining_nodes) > 0:
+        if i > 20:
+            break
+        i += 1
+        # print(remaining_nodes)
         for node in execution_order:
+            # print("Running node", node)
             for node_dependency in dependents[node]:
                 if node_dependency in execution_order:
+                    # print(node_dependency, "already in execution_order!")
                     continue
                 can_be_executed = all(
                     [n in execution_order for n in dependencies[node_dependency]]
                 )
 
+                # print(f"""
+                #     -------------------------------------------------------------------------
+                #     Execution order: {execution_order}
+
+                #     Node: {node_dependency} can be executed? {can_be_executed}.
+                #     Dependencies: {dependencies[node]}
+
+                # """)
+                # print(node,"can be executed?",can_be_executed)
+
                 if can_be_executed:
                     execution_order.append(node_dependency)
                     remaining_nodes.remove(node_dependency)
+
                 else:
                     break
     return execution_order

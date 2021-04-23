@@ -1,3 +1,6 @@
+from pprint import pprint
+import os
+
 from process_graph_utils import get_dependencies, get_dependents, get_execution_order
 
 from node import Node
@@ -13,6 +16,9 @@ class Evalscript:
         sample_type="AUTO",
         units=None,
         mosaicking="mosaicking",
+        bands_dimension_name="bands",
+        temporal_dimension_name="t",
+        datacube_definition_directory="./javascript_datacube",
     ):
         self.input_bands = input_bands
         self.nodes = nodes
@@ -21,6 +27,9 @@ class Evalscript:
         self.sample_type = sample_type
         self.units = units
         self.mosaicking = mosaicking
+        self.datacube_definition_directory = datacube_definition_directory
+        self.bands_dimension_name = bands_dimension_name
+        self.temporal_dimension_name = temporal_dimension_name
 
     def write(self):
         newline = "\n"
@@ -34,18 +43,35 @@ function setup() {{
     mosaicking: "{self.mosaicking}"
   }};
 }}
+{self.write_datacube_definition()}
 {newline.join([node.write_function() for node in self.nodes])}
-function evaluatePixel({self.initial_data_name}) {{
+function evaluatePixel(samples) {{
+    {self.write_datacube_creation()}
     {(newline + tab).join([node.write_call() for node in self.nodes])}
     return {self.nodes[-1].node_id}
 }}
 """
 
+    def write_datacube_definition(self):
+        path = f"{self.datacube_definition_directory}/DataCube.js"
+        path = os.path.abspath(path)
+        with open(path, "r") as f:
+            return f.read()
+
+    def write_datacube_creation(self):
+        return f"let {self.initial_data_name} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}')"
+
     @classmethod
     def generate_nodes_from_process_graph(self, process_graph, level=1):
         dependency_graph = get_dependencies(process_graph)
+        # print("dependency_graph   =>")
+        # pprint(dependency_graph)
         dependents = get_dependents(dependency_graph)
+        # print("dependents   =>")
+        # pprint(dependents)
         execution_order = get_execution_order(dependency_graph, dependents)
+        # print("execution_order   =>")
+        # pprint(execution_order)
 
         nodes = []
         input_bands = None
