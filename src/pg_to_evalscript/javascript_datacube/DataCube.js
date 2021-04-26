@@ -1,29 +1,38 @@
 class DataCube {
-  TEMPORAL = "TEMPORAL"
-  BANDS = "BANDS"
-  DIMENSIONS = [this.TEMPORAL, this.BANDS]
-
-  constructor(data, bands_dimension_name, temporal_dimension_name) {
-    this.data = this.makeArrayFromSamples(data)
+  constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples) {
+    this.TEMPORAL = "temporal"
+    this.BANDS = "bands"
+    this.OTHER = "other"
     this.bands_dimension_name = bands_dimension_name;
     this.temporal_dimension_name = temporal_dimension_name;
+    this.dimensions = [{name: this.temporal_dimension_name, labels: [], type: this.TEMPORAL}, {name: this.bands_dimension_name, labels: [], type: this.BANDS}]
+    if (fromSamples) {
+      this.data = this.makeArrayFromSamples(data)
+    }
+    else {
+      this.data = data;
+    }
+  }
+
+  getDimensionByName(name) {
+    return this.dimensions.find(d => d.name === name)
   }
 
   makeArrayFromSamples(samples) {
     if (Array.isArray(samples)) {
       let newData = []
       for (let entry of samples) {
-        if (!this.bands) {
-          this.bands = Object.keys(entry)
+        if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
+          this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(entry)
         }
         newData.push(Object.values(entry))
       }
       return newData
     }
     else {
-      if (!this.bands) {
-        this.bands = Object.keys(samples)
-      }
+      if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
+          this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(samples)
+        }
       return Object.values(samples)
     }
   }
@@ -33,7 +42,7 @@ class DataCube {
   }
 
   getBandIndices(bands) {
-    return bands.map(b => this.bands.indexOf(b))
+    return bands.map(b => this.getDimensionByName(this.bands_dimension_name).labels.indexOf(b))
   }
 
   filterBands(bands) {
@@ -41,42 +50,71 @@ class DataCube {
     for(let i=0; i < this.data.length; i++) {
       this.data[i] = indices.map(ind => this.data[i][ind])
     }
-    this.bands = bands;
+    this.getDimensionByName(this.bands_dimension_name).labels = bands;
   }
 
   removeDimension(dimension) {
-    this.DIMENSIONS = this.DIMENSIONS.filter(d => d !== dimension)
+    this.dimensions = this.dimensions.filter(d => d.name !== dimension)
   }
 
   reduceByDimension(reducer, dimension) {
+    console.dir(this.data)
+    console.dir(this.dimensions)
     const newData = []
+
+    if (this.dimensions.length === 1) {
+      this.data.labels = this.dimensions[0].labels
+      this.data = reducer({data: this.data});
+      console.dir(this.data)
+      console.log("----------------------------------")
+      this.removeDimension(dimension)
+      return
+    }
     if (dimension === this.temporal_dimension_name) {
-      for (let i = 0; i < this.bands.length; i++) {
-        const newValue = reducer({data: selectColumn(i)})
+      console.log("It's temporal")
+      for (let i = 0; i < this.data[0].length; i++) {
+        const newValue = reducer({data: this.selectColumn(i)})
         newData.push(newValue)
       }
-      this.removeDimension(this.TEMPORAL)
+      this.data = newData;
+      console.dir(this.data)
+      console.log("----------------------------------")
+      this.removeDimension(dimension)
     }
-    else if (dimension === this.bands_dimension_names) {
+    else if (dimension === this.bands_dimension_name) {
       for (let i = 0; i < this.data.length; i++) {
+        console.log("It's bands")
         let row = this.data[i]
-        row.labels = [...this.bands]
+        row.labels = this.getDimensionByName(this.bands_dimension_name).labels
         const newValue = reducer({data: row})
         this.data[i] = newValue;
       }
-      this.removeDimension(this.BANDS)
+      console.dir(this.data)
+      console.log("----------------------------------")
+      this.removeDimension(dimension)
     }
   }
 
-  addDimension(data, name, type) {
+  addDimensionToData(data) {
+    if (!Array.isArray(data)) {
+      this.data = [data]
+    }
+    for (let i = 0; i < data.length; i++) {
+      if (Array.isArray(data[i])) {
+        this.addDimensionToData(data[i])
+      }
+      data[i] = [data[i]]
+    }
+  }
+
+  addDimension(name, label, type) {
+    this.addDimensionToData(this.data)
+    this.dimensions.push({name: name, labels: [label], type: type})
   }
 
   clone() {
     const copy = new DataCube(JSON.parse(JSON.stringify(this.data)), this.bands_dimension_name, this.temporal_dimension_name)
-    copy.bands = [...this.bands]
-    copy.DIMENSIONS = [...this.DIMENSIONS]
+    copy.dimensions = JSON.parse(JSON.stringify(this.dimensions))
     return copy
   }
 }
-
-[{B01: 3, B02: 6}, {B01: 2, B02: 1}, {B01: 4, B02: 5}]

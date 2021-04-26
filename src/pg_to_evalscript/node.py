@@ -6,20 +6,20 @@ import json
 from process_graph_utils import iterate, copy_dictionary
 
 
-class Variable:
-    def __init__(self, name):
-        self.name = name
+# class Variable:
+#     def __init__(self, name):
+#         self.name = name
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
-    def __repr__(self):
-        return self.name
+#     def __repr__(self):
+#         return self.name
 
 
-class EncoderWithVariables(json.JSONEncoder):
-    def default(self, o):
-        return o.__repr__
+# class EncoderWithVariables(json.JSONEncoder):
+#     def default(self, o):
+#         return o.__repr__
 
 
 class Node:
@@ -33,6 +33,7 @@ class Node:
         level,
         process_definitions_directory="./javascript_processes",
     ):
+        self.variable_wrapper_string = uuid.uuid4().hex
         self.node_id = node_id
         self.process_id = process_id
         self.dependencies = dependencies
@@ -56,16 +57,29 @@ class Node:
         return textwrap.indent(string, "\t" * self.level)
 
     def prepare_arguments(self, arguments):
-        return self.replace_arguments_source(copy_dictionary(arguments))
+        json_string = json.dumps(
+            self.replace_arguments_source(copy_dictionary(arguments))
+        )
+        return json_string.replace(f'"{self.variable_wrapper_string}', "").replace(
+            f'{self.variable_wrapper_string}"', ""
+        )
 
     def replace_arguments_source(self, arguments):
         for k, v in iterate(arguments):
             if isinstance(v, dict) and len(v) == 1 and "process_graph" in v:
                 continue
             elif isinstance(v, dict) and len(v) == 1 and "from_node" in v:
-                arguments[k] = Variable(v["from_node"])
+                arguments[k] = (
+                    self.variable_wrapper_string
+                    + v["from_node"]
+                    + self.variable_wrapper_string
+                )
             elif isinstance(v, dict) and len(v) == 1 and "from_parameter" in v:
-                arguments[k] = Variable(f'arguments["{v["from_parameter"]}"]')
+                arguments[k] = (
+                    self.variable_wrapper_string
+                    + f'arguments.{v["from_parameter"]}'
+                    + self.variable_wrapper_string
+                )
             elif isinstance(v, dict) or isinstance(v, list):
                 self.replace_arguments_source(v)
         return arguments
@@ -121,7 +135,8 @@ function reduce_dimension(arguments) {{
     }}
 
     const {{data, dimension}} = arguments; 
-    data.reduceByDimension(reducer, dimension)
-    return data;
+    const newData = data.clone()
+    newData.reduceByDimension(reducer, dimension)
+    return newData;
 }}
 """

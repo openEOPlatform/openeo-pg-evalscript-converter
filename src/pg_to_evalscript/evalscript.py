@@ -48,7 +48,7 @@ function setup() {{
 function evaluatePixel(samples) {{
     {self.write_datacube_creation()}
     {(newline + tab).join([node.write_call() for node in self.nodes])}
-    return {self.nodes[-1].node_id}
+    return {self.nodes[-1].node_id}.data
 }}
 """
 
@@ -59,7 +59,7 @@ function evaluatePixel(samples) {{
             return f.read()
 
     def write_datacube_creation(self):
-        return f"let {self.initial_data_name} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}')"
+        return f"let {self.initial_data_name} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true)"
 
     @classmethod
     def generate_nodes_from_process_graph(self, process_graph, level=1):
