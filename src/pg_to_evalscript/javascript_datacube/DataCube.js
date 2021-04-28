@@ -47,8 +47,13 @@ class DataCube {
 
   filterBands(bands) {
     const indices = this.getBandIndices(bands)
-    for(let i=0; i < this.data.length; i++) {
-      this.data[i] = indices.map(ind => this.data[i][ind])
+    if (this.dimensions.length === 1) {
+      this.data = indices.map(i => this.data[i])
+    }
+    else {
+      for(let i=0; i < this.data.length; i++) {
+        this.data[i] = indices.map(ind => this.data[i][ind])
+      }
     }
     this.getDimensionByName(this.bands_dimension_name).labels = bands;
   }

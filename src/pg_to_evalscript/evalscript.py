@@ -15,7 +15,7 @@ class Evalscript:
         n_output_bands=1,
         sample_type="AUTO",
         units=None,
-        mosaicking="mosaicking",
+        mosaicking="ORBIT",
         bands_dimension_name="bands",
         temporal_dimension_name="t",
         datacube_definition_directory="./javascript_datacube",
