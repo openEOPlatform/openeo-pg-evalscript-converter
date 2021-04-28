@@ -58,9 +58,6 @@ def get_dependents(dependencies):
 
 def get_execution_order(dependencies, dependents):
     entry_points = get_entry_points(dependencies)
-    # print("    entry points:::")
-    # print(entry_points)
-    # print("------------")
     execution_order = [entry_point for entry_point in entry_points]
     remaining_nodes = set(dependencies.keys()).difference(execution_order)
 
@@ -70,26 +67,13 @@ def get_execution_order(dependencies, dependents):
         if i > 20:
             break
         i += 1
-        # print(remaining_nodes)
         for node in execution_order:
-            # print("Running node", node)
             for node_dependency in dependents[node]:
                 if node_dependency in execution_order:
-                    # print(node_dependency, "already in execution_order!")
                     continue
                 can_be_executed = all(
                     [n in execution_order for n in dependencies[node_dependency]]
                 )
-
-                # print(f"""
-                #     -------------------------------------------------------------------------
-                #     Execution order: {execution_order}
-
-                #     Node: {node_dependency} can be executed? {can_be_executed}.
-                #     Dependencies: {dependencies[node]}
-
-                # """)
-                # print(node,"can be executed?",can_be_executed)
 
                 if can_be_executed:
                     execution_order.append(node_dependency)

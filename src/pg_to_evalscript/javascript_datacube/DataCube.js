@@ -63,39 +63,29 @@ class DataCube {
   }
 
   reduceByDimension(reducer, dimension) {
-    console.dir(this.data)
-    console.dir(this.dimensions)
     const newData = []
 
     if (this.dimensions.length === 1) {
       this.data.labels = this.dimensions[0].labels
       this.data = reducer({data: this.data});
-      console.dir(this.data)
-      console.log("----------------------------------")
       this.removeDimension(dimension)
       return
     }
     if (dimension === this.temporal_dimension_name) {
-      console.log("It's temporal")
       for (let i = 0; i < this.data[0].length; i++) {
         const newValue = reducer({data: this.selectColumn(i)})
         newData.push(newValue)
       }
       this.data = newData;
-      console.dir(this.data)
-      console.log("----------------------------------")
       this.removeDimension(dimension)
     }
     else if (dimension === this.bands_dimension_name) {
       for (let i = 0; i < this.data.length; i++) {
-        console.log("It's bands")
         let row = this.data[i]
         row.labels = this.getDimensionByName(this.bands_dimension_name).labels
         const newValue = reducer({data: row})
         this.data[i] = newValue;
       }
-      console.dir(this.data)
-      console.log("----------------------------------")
       this.removeDimension(dimension)
     }
   }

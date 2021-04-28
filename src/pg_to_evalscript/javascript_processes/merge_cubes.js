@@ -1,9 +1,6 @@
 function merge_cubes(arguments) {
     const {cube1, cube2} = arguments;
     let overlappingDimension;
-    console.log("In merge cubes!")
-    console.dir(cube1)
-    console.dir(cube2)
 
     for (let dimension of cube1.dimensions) {
         const dimension2 = cube2.getDimensionByName(dimension.name)
@@ -20,8 +17,6 @@ function merge_cubes(arguments) {
 
 function merge(data1, data2, level, levelToMerge) {
     if (level === levelToMerge) {
-        console.dir(data1)
-        console.dir(data2)
         data1.push(...data2)
         return
     }

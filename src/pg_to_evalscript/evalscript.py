@@ -64,14 +64,8 @@ function evaluatePixel(samples) {{
     @classmethod
     def generate_nodes_from_process_graph(self, process_graph, level=1):
         dependency_graph = get_dependencies(process_graph)
-        # print("dependency_graph   =>")
-        # pprint(dependency_graph)
         dependents = get_dependents(dependency_graph)
-        # print("dependents   =>")
-        # pprint(dependents)
         execution_order = get_execution_order(dependency_graph, dependents)
-        # print("execution_order   =>")
-        # pprint(execution_order)
 
         nodes = []
         input_bands = None
