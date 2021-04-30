@@ -86,3 +86,30 @@ def get_execution_order(dependencies, dependents):
 
 def copy_dictionary(d):
     return json.loads(json.dumps(d))
+
+
+def find_all_relatives(node_id, relatives):
+    all_relatives = set()
+    for relative in relatives[node_id]:
+        all_relatives.add(relative)
+        all_relatives.update(find_all_relatives(relative, relatives))
+    return all_relatives
+
+
+def find_all_descendants(node_id, dependents):
+    return find_all_relatives(node_id, dependents)
+
+
+def find_all_ancestors(node_id, dependencies):
+    return find_all_relatives(node_id, dependencies)
+
+
+def generate_subgraph(node_id, dependency_graph, process_graph):
+    subgraph = {}
+
+    all_ancestors = find_all_ancestors(node_id, dependency_graph)
+
+    for ancestor in all_ancestors:
+        subgraph[ancestor] = process_graph[ancestor]
+
+    return subgraph

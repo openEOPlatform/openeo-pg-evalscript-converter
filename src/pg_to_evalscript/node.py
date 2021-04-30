@@ -6,6 +6,13 @@ import json
 from process_graph_utils import iterate, copy_dictionary
 
 
+class ProcessDefinitionMissing(Exception):
+    error_code = "ProcessDefinitionMissing"
+
+    def __init__(self, process_id):
+        super().__init__(f"Process '{process_id}' doesn't have a definition file.")
+
+
 class Node:
     def __init__(
         self,
@@ -19,12 +26,17 @@ class Node:
     ):
         self.variable_wrapper_string = uuid.uuid4().hex
         self.node_id = node_id
-        self.process_id = process_id
+        self.level = level
+        self.process_definitions_directory = process_definitions_directory
+
+        if self.is_process_defined(process_id):
+            self.process_id = process_id
+        else:
+            raise ProcessDefinitionMissing(process_id)
+
         self.dependencies = dependencies
         self.arguments = self.prepare_arguments(arguments)
         self.process_function_name = f"{self.process_id}_{uuid.uuid4().hex}"
-        self.level = level
-        self.process_definitions_directory = process_definitions_directory
 
         if child_nodes is None:
             self.child_nodes = []
@@ -36,6 +48,21 @@ class Node:
 
     def __repr__(self):
         return f"Node {self.node_id} ({self.process_id})"
+
+    def get_process_definition_path(self, process_id):
+        path = f"{self.process_definitions_directory}/{process_id}.js"
+        return os.path.abspath(path)
+
+    def is_process_defined(self, process_id):
+        special_processes_without_definition = [
+            "reduce_dimension",
+            "load_collection",
+            "save_result",
+        ]
+        if process_id in special_processes_without_definition:
+            return True
+        path = self.get_process_definition_path(process_id)
+        return os.path.isfile(path)
 
     def indent_by_level(self, string):
         return textwrap.indent(string, "\t" * self.level)
@@ -69,8 +96,7 @@ class Node:
         return arguments
 
     def load_process_code(self):
-        path = f"{self.process_definitions_directory}/{self.process_id}.js"
-        path = os.path.abspath(path)
+        path = self.get_process_definition_path(self.process_id)
         try:
             with open(path, "r") as f:
                 return f.read()
