@@ -2,6 +2,7 @@ import os
 import uuid
 import textwrap
 import json
+from collections import defaultdict
 
 from process_graph_utils import iterate, copy_dictionary
 
@@ -13,6 +14,10 @@ class ProcessDefinitionMissing(Exception):
         super().__init__(f"Process '{process_id}' doesn't have a definition file.")
 
 
+def pprint_dict(dictionary):
+    return "\n".join("{}\t{}".format(k, v) for k, v in dictionary.items())
+
+
 class Node:
     def __init__(
         self,
@@ -21,6 +26,7 @@ class Node:
         arguments,
         child_nodes,
         dependencies,
+        dependents,
         level,
         process_definitions_directory="./javascript_processes",
     ):
@@ -35,6 +41,8 @@ class Node:
             raise ProcessDefinitionMissing(process_id)
 
         self.dependencies = dependencies
+        self.dependents = dependents
+        self._original_arguments = arguments
         self.arguments = self.prepare_arguments(arguments)
         self.process_function_name = f"{self.process_id}_{uuid.uuid4().hex}"
 
@@ -44,10 +52,12 @@ class Node:
             self.child_nodes = child_nodes
 
     def __str__(self):
-        return f"Node {self.node_id} ({self.process_id})"
+        delimiter = "-" * 80
+        arguments = textwrap.indent(json.dumps(self._original_arguments, indent=4), "\t")
+        return f"{delimiter}\nNode {self.node_id} ({self.process_id})\n\n\tArguments:\n{arguments}\n{delimiter}"
 
     def __repr__(self):
-        return f"Node {self.node_id} ({self.process_id})"
+        return f"Node {self.node_id} ({self.process_id})\n"
 
     def get_process_definition_path(self, process_id):
         path = f"{self.process_definitions_directory}/{process_id}.js"
@@ -68,9 +78,7 @@ class Node:
         return textwrap.indent(string, "\t" * self.level)
 
     def prepare_arguments(self, arguments):
-        json_string = json.dumps(
-            self.replace_arguments_source(copy_dictionary(arguments))
-        )
+        json_string = json.dumps(self.replace_arguments_source(copy_dictionary(arguments)))
         return json_string.replace(f'"{self.variable_wrapper_string}', "").replace(
             f'{self.variable_wrapper_string}"', ""
         )
@@ -80,16 +88,10 @@ class Node:
             if isinstance(v, dict) and len(v) == 1 and "process_graph" in v:
                 continue
             elif isinstance(v, dict) and len(v) == 1 and "from_node" in v:
-                arguments[k] = (
-                    self.variable_wrapper_string
-                    + v["from_node"]
-                    + self.variable_wrapper_string
-                )
+                arguments[k] = self.variable_wrapper_string + v["from_node"] + self.variable_wrapper_string
             elif isinstance(v, dict) and len(v) == 1 and "from_parameter" in v:
                 arguments[k] = (
-                    self.variable_wrapper_string
-                    + f'arguments.{v["from_parameter"]}'
-                    + self.variable_wrapper_string
+                    self.variable_wrapper_string + f'arguments.{v["from_parameter"]}' + self.variable_wrapper_string
                 )
             elif isinstance(v, dict) or isinstance(v, list):
                 self.replace_arguments_source(v)
@@ -117,9 +119,7 @@ class Node:
         return self.indent_by_level(process_definition)
 
     def write_call(self):
-        return self.indent_by_level(
-            f"let {self.node_id} = {self.process_function_name}({self.arguments})"
-        )
+        return self.indent_by_level(f"let {self.node_id} = {self.process_function_name}({self.arguments})")
 
     def write_function(self):
         newline = "\n"
@@ -150,3 +150,35 @@ function reduce_dimension(arguments) {{
     return newData;
 }}
 """
+
+    def get_dimensions_change(self, dimensions_of_inputs):
+        # print(dimensions_of_inputs)
+        def remove_dimension(name, dims):
+            return list(filter(lambda x: x["name"] != name, dims))
+
+        if self.process_id == "reduce_dimension":
+            return remove_dimension(self._original_arguments["dimension"], dimensions_of_inputs[0])
+        elif self.process_id == "add_dimension":
+            return [*dimensions_of_inputs[0], {"name": self._original_arguments["name"], "size": 1}]
+        elif self.process_id == "merge_cubes":
+            """
+            merge_cubes process expects datacubes to have different labels in a single dimension.
+            We can't know which dimension is it and what the new size will be.
+            We can arbitrarily choose one and set its size to the sum, as it might get removed/reduced by later nodes
+            So we set new sizes to the sums for *all* dimensions
+            """
+            dim_size_sums = defaultdict(int)
+
+            for dimensions_of_input in dimensions_of_inputs:
+                for dim in dimensions_of_input:
+                    if dim["size"] is not None:
+                        dim_size_sums[dim["name"]] += dim["size"]
+                    else:
+                        dim_size_sums[dim["name"]] = None
+
+            output_dimensions = []
+            for dim in dim_size_sums:
+                output_dimensions.append({"name": dim, "size": dim_size_sums[dim]})
+
+            return output_dimensions
+        return dimensions_of_inputs[0]

@@ -71,9 +71,7 @@ def get_execution_order(dependencies, dependents):
             for node_dependency in dependents[node]:
                 if node_dependency in execution_order:
                     continue
-                can_be_executed = all(
-                    [n in execution_order for n in dependencies[node_dependency]]
-                )
+                can_be_executed = all([n in execution_order for n in dependencies[node_dependency]])
 
                 if can_be_executed:
                     execution_order.append(node_dependency)
