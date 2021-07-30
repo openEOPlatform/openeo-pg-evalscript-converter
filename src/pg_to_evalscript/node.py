@@ -2,9 +2,10 @@ import os
 import uuid
 import textwrap
 import json
+import pkgutil
 from collections import defaultdict
 
-from process_graph_utils import iterate, copy_dictionary
+from pg_to_evalscript.process_graph_utils import iterate, copy_dictionary
 
 
 class ProcessDefinitionMissing(Exception):
@@ -28,7 +29,7 @@ class Node:
         dependencies,
         dependents,
         level,
-        process_definitions_directory="./javascript_processes",
+        process_definitions_directory="javascript_processes",
     ):
         self.set_appropriate_class(process_id)
         self.variable_wrapper_string = uuid.uuid4().hex
@@ -71,13 +72,8 @@ class Node:
         if class_types_for_process.get(process_id):
             self.__class__ = class_types_for_process[process_id]
 
-    def get_process_definition_path(self, process_id):
-        path = f"{self.process_definitions_directory}/{process_id}.js"
-        return os.path.abspath(path)
-
     def is_process_defined(self, process_id):
-        path = self.get_process_definition_path(process_id)
-        return os.path.isfile(path)
+        return pkgutil.get_data("pg_to_evalscript", f"{self.process_definitions_directory}/{process_id}.js") is not None
 
     def indent_by_level(self, string):
         return textwrap.indent(string, "\t" * self.level)
@@ -103,12 +99,9 @@ class Node:
         return arguments
 
     def load_process_code(self):
-        path = self.get_process_definition_path(self.process_id)
-        try:
-            with open(path, "r") as f:
-                return f.read()
-        except IOError as error:
-            return None
+        return pkgutil.get_data(
+            "pg_to_evalscript", f"{self.process_definitions_directory}/{self.process_id}.js"
+        ).decode("utf-8")
 
     def write_process(self):
         process_definition = self.load_process_code()
