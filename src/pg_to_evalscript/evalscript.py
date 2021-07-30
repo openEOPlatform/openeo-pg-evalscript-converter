@@ -59,7 +59,7 @@ function setup() {{
 function evaluatePixel(samples) {{
     {self.write_datacube_creation()}
     {(newline + tab).join([node.write_call() for node in self.nodes])}
-    return {self.nodes[-1].node_id}.data
+    return {self.nodes[-1].node_id}.encodeData()
 }}
 """
 
@@ -85,10 +85,11 @@ function evaluatePixel(samples) {{
             lambda x, y: x * y, sizes_without_original_temporal_dimensions
         )
         collection_scenes_length = "* collection.scenes.length" * number_of_original_temporal_dimensions
+        number_of_final_dimensions = len(self._output_dimensions)
         return f"""
 function updateOutput(outputs, collection) {{
     Object.values(outputs).forEach((output) => {{
-        output.bands = {size_without_original_temporal_dimensions} {collection_scenes_length};
+        output.bands = {number_of_final_dimensions} + {size_without_original_temporal_dimensions} {collection_scenes_length};
     }});
 }}"""
 
@@ -117,10 +118,10 @@ function updateOutput(outputs, collection) {{
         """
 
         def decode_data(data):
+            n_dimensions = len(self._output_dimensions)
             for i in range(len(data)):
                 for j in range(len(data[0])):
-                    n_dimensions = data[0]
-                    data_start_ind = n_dimensions + 1
+                    data_start_ind = n_dimensions
                     dimension_sizes = data[1:data_start_ind]
                     data_length = reduce(lambda x, y: x * y, dimension_sizes)
                     values = data[data_start_ind : data_start_ind + data_length]

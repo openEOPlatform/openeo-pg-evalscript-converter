@@ -112,4 +112,10 @@ class DataCube {
     copy.dimensions = JSON.parse(JSON.stringify(this.dimensions))
     return copy
   }
+
+  encodeData() {
+    const shape = this.getDataShape();
+    const flattenedData = this.flatten();
+    return [...shape, ...flattenedData]
+  }
 }
