@@ -1,6 +1,17 @@
 import os
 from functools import reduce
 from collections import defaultdict
+from functools import reduce
+from operator import mul
+
+
+def reshape(lst, shape):
+    if len(shape) == 1:
+        if len(lst) != shape[0]:
+            raise Exception("Incorrect shape for input list.")
+        return lst
+    n = reduce(mul, shape[1:])
+    return [reshape(lst[i * n : (i + 1) * n], shape[1:]) for i in range(shape[0])]
 
 
 class Evalscript:
@@ -98,3 +109,22 @@ function updateOutput(outputs, collection) {{
 
     def set_output_dimensions(self, output_dimensions):
         self._output_dimensions = output_dimensions
+
+    def get_decoding_function(self):
+        """
+        Returns a function, which accepts data produced by this evalscript, and converts it to the correct format.
+        This function might change depending on sampleType and other optimisations in the future (not implemented yet).
+        """
+
+        def decode_data(data):
+            for i in range(len(data)):
+                for j in range(len(data[0])):
+                    n_dimensions = data[0]
+                    data_start_ind = n_dimensions + 1
+                    dimension_sizes = data[1:data_start_ind]
+                    data_length = reduce(lambda x, y: x * y, dimension_sizes)
+                    values = data[data_start_ind : data_start_ind + data_length]
+                    data[i][j] = reshape(values, dimension_sizes)
+            return data
+
+        return decode_data
