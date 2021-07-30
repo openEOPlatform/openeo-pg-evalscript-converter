@@ -30,6 +30,7 @@ class Node:
         level,
         process_definitions_directory="./javascript_processes",
     ):
+        self.set_appropriate_class(process_id)
         self.variable_wrapper_string = uuid.uuid4().hex
         self.node_id = node_id
         self.level = level
@@ -59,18 +60,22 @@ class Node:
     def __repr__(self):
         return f"Node {self.node_id} ({self.process_id})\n"
 
+    def set_appropriate_class(self, process_id):
+        class_types_for_process = {
+            "reduce_dimension": ReduceDimensionNode,
+            "add_dimension": AddDimensionNode,
+            "load_collection": LoadCollectionNode,
+            "save_result": SaveResultNode,
+            "merge_cubes": MergeCubesNode,
+        }
+        if class_types_for_process.get(process_id):
+            self.__class__ = class_types_for_process[process_id]
+
     def get_process_definition_path(self, process_id):
         path = f"{self.process_definitions_directory}/{process_id}.js"
         return os.path.abspath(path)
 
     def is_process_defined(self, process_id):
-        special_processes_without_definition = [
-            "reduce_dimension",
-            "load_collection",
-            "save_result",
-        ]
-        if process_id in special_processes_without_definition:
-            return True
         path = self.get_process_definition_path(process_id)
         return os.path.isfile(path)
 
@@ -106,10 +111,7 @@ class Node:
             return None
 
     def write_process(self):
-        if self.process_id == "reduce_dimension":
-            process_definition = self.write_reduce_dimension()
-        else:
-            process_definition = self.load_process_code()
+        process_definition = self.load_process_code()
 
         if process_definition is None:
             return f"""function {self.process_id}(arguments) {{
@@ -133,7 +135,15 @@ function {self.process_function_name}(arguments) {{
 """
         )
 
-    def write_reduce_dimension(self):
+    def get_dimensions_change(self, dimensions_of_inputs):
+        return dimensions_of_inputs[0]
+
+
+class ReduceDimensionNode(Node):
+    def is_process_defined(self, process_id):
+        return True
+
+    def write_process(self):
         newline = "\n"
         tab = "\t"
         return f"""
@@ -152,33 +162,46 @@ function reduce_dimension(arguments) {{
 """
 
     def get_dimensions_change(self, dimensions_of_inputs):
-        # print(dimensions_of_inputs)
         def remove_dimension(name, dims):
             return list(filter(lambda x: x["name"] != name, dims))
 
-        if self.process_id == "reduce_dimension":
-            return remove_dimension(self._original_arguments["dimension"], dimensions_of_inputs[0])
-        elif self.process_id == "add_dimension":
-            return [*dimensions_of_inputs[0], {"name": self._original_arguments["name"], "size": 1}]
-        elif self.process_id == "merge_cubes":
-            """
-            merge_cubes process expects datacubes to have different labels in a single dimension.
-            We can't know which dimension is it and what the new size will be.
-            We can arbitrarily choose one and set its size to the sum, as it might get removed/reduced by later nodes
-            So we set new sizes to the sums for *all* dimensions
-            """
-            dim_size_sums = defaultdict(int)
+        return remove_dimension(self._original_arguments["dimension"], dimensions_of_inputs[0])
 
-            for dimensions_of_input in dimensions_of_inputs:
-                for dim in dimensions_of_input:
-                    if dim["size"] is not None:
-                        dim_size_sums[dim["name"]] += dim["size"]
-                    else:
-                        dim_size_sums[dim["name"]] = None
 
-            output_dimensions = []
-            for dim in dim_size_sums:
-                output_dimensions.append({"name": dim, "size": dim_size_sums[dim]})
+class LoadCollectionNode(Node):
+    def is_process_defined(self, process_id):
+        return True
 
-            return output_dimensions
-        return dimensions_of_inputs[0]
+
+class SaveResultNode(Node):
+    def is_process_defined(self, process_id):
+        return True
+
+
+class AddDimensionNode(Node):
+    def get_dimensions_change(self, dimensions_of_inputs):
+        return [*dimensions_of_inputs[0], {"name": self._original_arguments["name"], "size": 1}]
+
+
+class MergeCubesNode(Node):
+    def get_dimensions_change(self, dimensions_of_inputs):
+        """
+        merge_cubes process expects datacubes to have different labels in a single dimension.
+        We can't know which dimension is it and what the new size will be.
+        We can arbitrarily choose one and set its size to the sum, as it might get removed/reduced by later nodes
+        So we set new sizes to the sums for *all* dimensions
+        """
+        dim_size_sums = defaultdict(int)
+
+        for dimensions_of_input in dimensions_of_inputs:
+            for dim in dimensions_of_input:
+                if dim["size"] is not None:
+                    dim_size_sums[dim["name"]] += dim["size"]
+                else:
+                    dim_size_sums[dim["name"]] = None
+
+        output_dimensions = []
+        for dim in dim_size_sums:
+            output_dimensions.append({"name": dim, "size": dim_size_sums[dim]})
+
+        return output_dimensions
