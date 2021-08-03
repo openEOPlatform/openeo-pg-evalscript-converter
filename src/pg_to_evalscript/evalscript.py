@@ -1,6 +1,18 @@
 import os
+import pkgutil
 from functools import reduce
 from collections import defaultdict
+from functools import reduce
+from operator import mul
+
+
+def reshape(lst, shape):
+    if len(shape) == 1:
+        if len(lst) != shape[0]:
+            raise Exception("Incorrect shape for input list.")
+        return lst
+    n = reduce(mul, shape[1:])
+    return [reshape(lst[i * n : (i + 1) * n], shape[1:]) for i in range(shape[0])]
 
 
 class Evalscript:
@@ -15,7 +27,7 @@ class Evalscript:
         mosaicking="ORBIT",
         bands_dimension_name="bands",
         temporal_dimension_name="t",
-        datacube_definition_directory="./javascript_datacube",
+        datacube_definition_directory="javascript_datacube",
         output_dimensions=None,
     ):
         self.input_bands = input_bands
@@ -48,15 +60,12 @@ function setup() {{
 function evaluatePixel(samples) {{
     {self.write_datacube_creation()}
     {(newline + tab).join([node.write_call() for node in self.nodes])}
-    return {self.nodes[-1].node_id}.data
+    return {self.nodes[-1].node_id}.encodeData()
 }}
 """
 
     def write_datacube_definition(self):
-        path = f"{self.datacube_definition_directory}/DataCube.js"
-        path = os.path.abspath(path)
-        with open(path, "r") as f:
-            return f.read()
+        return pkgutil.get_data("pg_to_evalscript", f"{self.datacube_definition_directory}/DataCube.js").decode("utf-8")
 
     def write_datacube_creation(self):
         return f"let {self.initial_data_name} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true)"
@@ -74,10 +83,11 @@ function evaluatePixel(samples) {{
             lambda x, y: x * y, sizes_without_original_temporal_dimensions
         )
         collection_scenes_length = "* collection.scenes.length" * number_of_original_temporal_dimensions
+        number_of_final_dimensions = len(self._output_dimensions)
         return f"""
 function updateOutput(outputs, collection) {{
     Object.values(outputs).forEach((output) => {{
-        output.bands = {size_without_original_temporal_dimensions} {collection_scenes_length};
+        output.bands = {number_of_final_dimensions} + {size_without_original_temporal_dimensions} {collection_scenes_length};
     }});
 }}"""
 
@@ -98,3 +108,22 @@ function updateOutput(outputs, collection) {{
 
     def set_output_dimensions(self, output_dimensions):
         self._output_dimensions = output_dimensions
+
+    def get_decoding_function(self):
+        """
+        Returns a function, which accepts data produced by this evalscript, and converts it to the correct format.
+        This function might change depending on sampleType and other optimisations in the future (not implemented yet).
+        """
+
+        def decode_data(data):
+            n_dimensions = len(self._output_dimensions)
+            for i in range(len(data)):
+                for j in range(len(data[0])):
+                    data_start_ind = n_dimensions
+                    dimension_sizes = data[1:data_start_ind]
+                    data_length = reduce(lambda x, y: x * y, dimension_sizes)
+                    values = data[data_start_ind : data_start_ind + data_length]
+                    data[i][j] = reshape(values, dimension_sizes)
+            return data
+
+        return decode_data
