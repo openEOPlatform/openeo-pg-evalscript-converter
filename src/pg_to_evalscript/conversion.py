@@ -34,9 +34,7 @@ def validate_nodes(
             valid = False
 
         try:
-            node = Node(
-                node_id, process_id, arguments, [], dependency_graph[node_id], 0
-            )
+            node = Node(node_id, process_id, arguments, [], dependency_graph[node_id], dependents[node_id], 0)
         except ProcessDefinitionMissing as e:
             valid = False
 
@@ -50,9 +48,7 @@ def validate_nodes(
     return all_nodes_valid, valid_subgraphs
 
 
-def check_validity_and_subgraphs(
-    process_graph, temporal_dimension_name, bands_dimension_name
-):
+def check_validity_and_subgraphs(process_graph, temporal_dimension_name, bands_dimension_name):
     dependency_graph = get_dependencies(process_graph)
     dependents = get_dependents(dependency_graph)
     execution_order = get_execution_order(dependency_graph, dependents)
@@ -81,16 +77,19 @@ def convert_from_process_graph(
         nodes, input_bands, initial_data_name = generate_nodes_from_process_graph(
             process_graph, bands_dimension_name, temporal_dimension_name, level=1
         )
+        evalscript = Evalscript(
+            input_bands,
+            nodes,
+            initial_data_name,
+            n_output_bands=n_output_bands,
+            sample_type=sample_type,
+            units=units,
+        )
+        output_dimensions = evalscript.determine_output_dimensions()
+        evalscript.set_output_dimensions(output_dimensions)
         return [
             {
-                "evalscript": Evalscript(
-                    input_bands,
-                    nodes,
-                    initial_data_name,
-                    n_output_bands=n_output_bands,
-                    sample_type=sample_type,
-                    units=units,
-                ),
+                "evalscript": evalscript,
                 "invalid_node_id": None,
             }
         ]
@@ -103,25 +102,26 @@ def convert_from_process_graph(
                 temporal_dimension_name,
                 level=1,
             )
+            evalscript = Evalscript(
+                input_bands,
+                nodes,
+                initial_data_name,
+                n_output_bands=n_output_bands,
+                sample_type=sample_type,
+                units=units,
+            )
+            output_dimensions = evalscript.determine_output_dimensions()
+            evalscript.set_output_dimensions(output_dimensions)
             evalscripts.append(
                 {
-                    "evalscript": Evalscript(
-                        input_bands,
-                        nodes,
-                        initial_data_name,
-                        n_output_bands=n_output_bands,
-                        sample_type=sample_type,
-                        units=units,
-                    ),
+                    "evalscript": evalscript,
                     "invalid_node_id": subgraph["node"],
                 }
             )
         return evalscripts
 
 
-def generate_nodes_from_process_graph(
-    process_graph, bands_dimension_name, temporal_dimension_name, level=1
-):
+def generate_nodes_from_process_graph(process_graph, bands_dimension_name, temporal_dimension_name, level=1):
     dependency_graph = get_dependencies(process_graph)
     dependents = get_dependents(dependency_graph)
     execution_order = get_execution_order(dependency_graph, dependents)
@@ -163,6 +163,7 @@ def generate_nodes_from_process_graph(
             arguments,
             child_nodes,
             dependency_graph[node_id],
+            dependents[node_id],
             level,
         )
         nodes.append(node)

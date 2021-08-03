@@ -14,5 +14,5 @@ def load_pg_json(path):
 pg = load_pg_json("../../tests/process_graphs/gee_uc1_pol.json")
 
 evalscripts = convert_from_process_graph(pg)
-print(evalscripts)
+# evalscripts[0]['evalscript'].determine_output_dimensions()
 print(evalscripts[0]["evalscript"].write())
