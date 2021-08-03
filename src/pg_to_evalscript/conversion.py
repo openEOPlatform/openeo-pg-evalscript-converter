@@ -1,5 +1,5 @@
-from evalscript import Evalscript
-from process_graph_utils import (
+from pg_to_evalscript.evalscript import Evalscript
+from pg_to_evalscript.process_graph_utils import (
     get_dependencies,
     get_dependents,
     get_execution_order,
@@ -8,7 +8,7 @@ from process_graph_utils import (
     generate_subgraph,
 )
 
-from node import Node, ProcessDefinitionMissing
+from pg_to_evalscript.node import Node, ProcessDefinitionMissing
 
 
 def validate_nodes(

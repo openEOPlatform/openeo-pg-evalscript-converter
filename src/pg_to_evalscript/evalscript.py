@@ -1,4 +1,5 @@
 import os
+import pkgutil
 from functools import reduce
 from collections import defaultdict
 from functools import reduce
@@ -26,7 +27,7 @@ class Evalscript:
         mosaicking="ORBIT",
         bands_dimension_name="bands",
         temporal_dimension_name="t",
-        datacube_definition_directory="./javascript_datacube",
+        datacube_definition_directory="javascript_datacube",
         output_dimensions=None,
     ):
         self.input_bands = input_bands
@@ -64,10 +65,7 @@ function evaluatePixel(samples) {{
 """
 
     def write_datacube_definition(self):
-        path = f"{self.datacube_definition_directory}/DataCube.js"
-        path = os.path.abspath(path)
-        with open(path, "r") as f:
-            return f.read()
+        return pkgutil.get_data("pg_to_evalscript", f"{self.datacube_definition_directory}/DataCube.js").decode("utf-8")
 
     def write_datacube_creation(self):
         return f"let {self.initial_data_name} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true)"
