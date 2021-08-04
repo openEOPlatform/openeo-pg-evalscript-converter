@@ -65,7 +65,7 @@ def check_validity_and_subgraphs(process_graph, temporal_dimension_name, bands_d
 def convert_from_process_graph(
     process_graph,
     n_output_bands=1,
-    sample_type="AUTO",
+    sample_type="FLOAT32",
     units=None,
     bands_dimension_name="bands",
     temporal_dimension_name="t",
@@ -133,8 +133,6 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
         temporal_dimension_name,
         bands_dimension_name,
     )
-    print("All nodes valid?", all_nodes_valid)
-    print(subgraphs)
 
     nodes = []
     input_bands = None
