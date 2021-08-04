@@ -79,8 +79,10 @@ function evaluatePixel(samples) {{
         sizes_without_original_temporal_dimensions = [
             dim["size"] for dim in self._output_dimensions if not dim.get("original_temporal", False)
         ]
+        print(self._output_dimensions)
+        print(number_of_original_temporal_dimensions, sizes_without_original_temporal_dimensions)
         size_without_original_temporal_dimensions = reduce(
-            lambda x, y: x * y, sizes_without_original_temporal_dimensions
+            lambda x, y: x * y, sizes_without_original_temporal_dimensions, 1
         )
         collection_scenes_length = "* collection.scenes.length" * number_of_original_temporal_dimensions
         number_of_final_dimensions = len(self._output_dimensions)

@@ -133,6 +133,8 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
         temporal_dimension_name,
         bands_dimension_name,
     )
+    print("All nodes valid?", all_nodes_valid)
+    print(subgraphs)
 
     nodes = []
     input_bands = None

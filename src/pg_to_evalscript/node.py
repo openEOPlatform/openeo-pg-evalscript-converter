@@ -68,15 +68,25 @@ class Node:
             "load_collection": LoadCollectionNode,
             "save_result": SaveResultNode,
             "merge_cubes": MergeCubesNode,
+            "if": IfNode,
         }
         if class_types_for_process.get(process_id):
             self.__class__ = class_types_for_process[process_id]
 
     def is_process_defined(self, process_id):
-        return pkgutil.get_data("pg_to_evalscript", f"{self.process_definitions_directory}/{process_id}.js") is not None
+        try:
+            return (
+                pkgutil.get_data("pg_to_evalscript", f"{self.process_definitions_directory}/{process_id}.js")
+                is not None
+            )
+        except:
+            return False
 
     def indent_by_level(self, string):
         return textwrap.indent(string, "\t" * self.level)
+
+    def get_process_function_name(self):
+        return self.process_id
 
     def prepare_arguments(self, arguments):
         json_string = json.dumps(self.replace_arguments_source(copy_dictionary(arguments)))
@@ -106,11 +116,11 @@ class Node:
     def write_process(self):
         process_definition = self.load_process_code()
 
-        if process_definition is None:
-            return f"""function {self.process_id}(arguments) {{
-    const {{lmao}} = arguments;
-    return lmao + 42;
-}}"""
+        #         if process_definition is None:
+        #             return f"""function {self.get_process_function_name()}(arguments) {{
+        #     const {{lmao}} = arguments;
+        #     return lmao + 42;
+        # }}"""
         return self.indent_by_level(process_definition)
 
     def write_call(self):
@@ -123,7 +133,7 @@ class Node:
             f"""
 function {self.process_function_name}(arguments) {{
 {self.write_process()}
-    return {self.process_id}(arguments)
+    return {self.get_process_function_name()}(arguments)
 }}
 """
         )
@@ -198,3 +208,8 @@ class MergeCubesNode(Node):
             output_dimensions.append({"name": dim, "size": dim_size_sums[dim]})
 
         return output_dimensions
+
+
+class IfNode(Node):
+    def get_process_function_name(self):
+        return "_if"
