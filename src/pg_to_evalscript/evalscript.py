@@ -2,7 +2,6 @@ import os
 import pkgutil
 from functools import reduce
 from collections import defaultdict
-from functools import reduce
 from operator import mul
 
 
@@ -80,7 +79,7 @@ function evaluatePixel(samples) {{
             dim["size"] for dim in self._output_dimensions if not dim.get("original_temporal", False)
         ]
         size_without_original_temporal_dimensions = reduce(
-            lambda x, y: x * y, sizes_without_original_temporal_dimensions
+            lambda x, y: x * y, sizes_without_original_temporal_dimensions, 1
         )
         collection_scenes_length = "* collection.scenes.length" * number_of_original_temporal_dimensions
         number_of_final_dimensions = len(self._output_dimensions)
@@ -120,9 +119,9 @@ function updateOutput(outputs, collection) {{
             for i in range(len(data)):
                 for j in range(len(data[0])):
                     data_start_ind = n_dimensions
-                    dimension_sizes = data[1:data_start_ind]
-                    data_length = reduce(lambda x, y: x * y, dimension_sizes)
-                    values = data[data_start_ind : data_start_ind + data_length]
+                    dimension_sizes = data[i][j][0:data_start_ind]
+                    data_length = int(reduce(lambda x, y: x * y, dimension_sizes))
+                    values = data[i][j][data_start_ind : data_start_ind + data_length]
                     data[i][j] = reshape(values, dimension_sizes)
             return data
 

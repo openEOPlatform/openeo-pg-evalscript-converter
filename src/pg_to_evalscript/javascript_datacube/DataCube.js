@@ -75,8 +75,9 @@ class DataCube {
 
     encodeData() {
         const shape = this.getDataShape();
-        const flattenedData = this.flatten();
-        return [...shape, ...flattenedData]
+        let flattenedData = this.flatten();
+        flattenedData = Array.isArray(flattenedData) ? flattenedData : [flattenedData]
+        return [...shape,  ...flattenedData];
     }
 
 
