@@ -10,6 +10,7 @@ notebook = "*"
 sentinelhub = "*"
 numpy = "*"
 matplotlib = "*"
+jsbeautifier = "*"
 
 [packages]
 
