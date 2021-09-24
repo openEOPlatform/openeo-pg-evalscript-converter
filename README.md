@@ -1,5 +1,7 @@
 # openEO process graph to evalscript converter
-This repository contains a library for converting openEO process graphs to [Sentinel Hub evalscripts](https://docs.sentinel-hub.com/api/latest/evalscript/v3/).
+This repository contains a library for converting [openEO process graphs](https://api.openeo.org/#section/Processes/Process-Graphs) to [Sentinel Hub evalscripts](https://docs.sentinel-hub.com/api/latest/evalscript/v3/).
+
+The motivation behind this library is to reduce the data transfer between the SH backend and the openEO backend and to move part of the processing directly to backend where the data is stored.
 
 ## API
 
