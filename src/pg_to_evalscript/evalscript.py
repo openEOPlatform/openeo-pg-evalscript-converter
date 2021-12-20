@@ -61,7 +61,7 @@ function setup() {{
 function evaluatePixel(samples) {{
     {self.write_datacube_creation()}
     {(newline + tab).join([node.write_call() for node in self.nodes])}
-    return {self.nodes[-1].node_id}{".encodeData()" if self.encode_result else ''}
+    return {self.nodes[-1].node_id}{".encodeData()" if self.encode_result else '.flattenToArray()'}
 }}
 """
 
