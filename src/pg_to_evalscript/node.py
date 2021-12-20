@@ -36,6 +36,7 @@ class Node:
         self.node_id = node_id
         self.level = level
         self.process_definitions_directory = process_definitions_directory
+        self.node_varname_prefix = "node_"
 
         if self.is_process_defined(process_id):
             self.process_id = process_id
@@ -99,7 +100,12 @@ class Node:
             if isinstance(v, dict) and len(v) == 1 and "process_graph" in v:
                 continue
             elif isinstance(v, dict) and len(v) == 1 and "from_node" in v:
-                arguments[k] = self.variable_wrapper_string + v["from_node"] + self.variable_wrapper_string
+                arguments[k] = (
+                    self.variable_wrapper_string
+                    + self.node_varname_prefix
+                    + v["from_node"]
+                    + self.variable_wrapper_string
+                )
             elif isinstance(v, dict) and len(v) == 1 and "from_parameter" in v:
                 arguments[k] = (
                     self.variable_wrapper_string + f'arguments.{v["from_parameter"]}' + self.variable_wrapper_string
@@ -124,7 +130,9 @@ class Node:
         return self.indent_by_level(process_definition)
 
     def write_call(self):
-        return self.indent_by_level(f"let {self.node_id} = {self.process_function_name}({self.arguments})")
+        return self.indent_by_level(
+            f"let {self.node_varname_prefix}{self.node_id} = {self.process_function_name}({self.arguments})"
+        )
 
     def write_function(self):
         newline = "\n"
