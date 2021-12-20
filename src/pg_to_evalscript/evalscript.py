@@ -28,6 +28,7 @@ class Evalscript:
         temporal_dimension_name="t",
         datacube_definition_directory="javascript_datacube",
         output_dimensions=None,
+        encode_result=True,
     ):
         self.input_bands = input_bands
         self.nodes = nodes
@@ -40,6 +41,7 @@ class Evalscript:
         self.bands_dimension_name = bands_dimension_name
         self.temporal_dimension_name = temporal_dimension_name
         self._output_dimensions = output_dimensions
+        self.encode_result = encode_result
 
     def write(self):
         newline = "\n"
@@ -59,7 +61,7 @@ function setup() {{
 function evaluatePixel(samples) {{
     {self.write_datacube_creation()}
     {(newline + tab).join([node.write_call() for node in self.nodes])}
-    return {self.nodes[-1].node_id}.encodeData()
+    return {self.nodes[-1].node_id}{".encodeData()" if self.encode_result else ''}
 }}
 """
 
@@ -113,6 +115,9 @@ function updateOutput(outputs, collection) {{
         Returns a function, which accepts data produced by this evalscript, and converts it to the correct format.
         This function might change depending on sampleType and other optimisations in the future (not implemented yet).
         """
+
+        if not self.encode_result:
+            return lambda x: x
 
         def decode_data(data):
             n_dimensions = len(self._output_dimensions)

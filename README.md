@@ -44,6 +44,10 @@ convert_from_process_graph(
 
     Name of the default dimension of type `temporal` of the datacube, as set in `load_collection` and referred to in the openEO process graph.
 
+* **`encode_result`**: *bool, optional*. Default: `True`
+
+    Should the result of the evalscript be encoded with the dimensions of the data or returned as is.
+
 ###### Output
 
 * **`evalscripts`**: *list of dicts*
@@ -105,6 +109,10 @@ convert_from_process_graph(
     - `name`: name of the dimension,
     - `size`: size (length) of the dimension,
     - `original_temporal`, optional: boolean, should be `True` if this is the temporal dimension generated in the initial `load_collection` node.
+
+* **`encode_result`**: *bool, optional*. Default: `True`
+
+    Should the result of the evalscript be encoded with the dimensions of the data or returned as is.
 
 ###### Methods
 
