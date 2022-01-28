@@ -224,3 +224,9 @@ pipenv shell
 cd tests
 pytest
 ```
+
+## Linting
+
+```
+pipenv run black -l 120 .
+```
