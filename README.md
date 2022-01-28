@@ -203,3 +203,24 @@ Start the notebooks
 cd notebooks
 pipenv run jupyter notebook
 ```
+
+
+## Running tests
+
+#### Using Docker
+
+```
+docker build -t tests .
+docker run tests
+```
+
+#### Directly
+
+Tests require a NodeJS environment. 
+
+```
+pipenv install
+pipenv shell
+cd tests
+pytest
+```

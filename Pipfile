@@ -13,6 +13,8 @@ matplotlib = "*"
 jsbeautifier = "*"
 
 [packages]
+pytest = "*"
+pg-to-evalscript = {path = "."}
 
 [requires]
 python_version = "3.8"
