@@ -1,6 +1,7 @@
 __pycache__
 dist
 build
+src/pg_to_evalscript.egg-info
 
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
