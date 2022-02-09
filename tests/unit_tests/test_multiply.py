@@ -6,7 +6,7 @@ from tests.utils import load_process_code, run_process
 
 
 @pytest.fixture
-def divide_process_code():
+def multiply_process_code():
     return load_process_code("multiply")
 
 
@@ -24,7 +24,7 @@ def divide_process_code():
         ({"x": 1, "y": 4}, 4),
     ],
 )
-def test_multiply(divide_process_code, example_input, expected_output):
-    output = run_process(divide_process_code, "multiply", example_input)
+def test_multiply(multiply_process_code, example_input, expected_output):
+    output = run_process(multiply_process_code, "multiply", example_input)
     output = json.loads(output)
     assert pytest.approx(output) == expected_output

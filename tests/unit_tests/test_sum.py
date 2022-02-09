@@ -6,7 +6,7 @@ from tests.utils import load_process_code, run_process
 
 
 @pytest.fixture
-def mean_process_code():
+def sum_process_code():
     return load_process_code("sum")
 
 
@@ -26,7 +26,7 @@ def mean_process_code():
         ({}, None),
     ],
 )
-def test_mean(mean_process_code, example_input, expected_output):
-    output = run_process(mean_process_code, "sum", example_input)
+def test_sum(sum_process_code, example_input, expected_output):
+    output = run_process(sum_process_code, "sum", example_input)
     output = json.loads(output)
     assert output == expected_output

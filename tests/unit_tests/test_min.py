@@ -6,7 +6,7 @@ from tests.utils import load_process_code, run_process
 
 
 @pytest.fixture
-def mean_process_code():
+def min_process_code():
     return load_process_code("min")
 
 
@@ -24,7 +24,7 @@ def mean_process_code():
         ({}, None),
     ],
 )
-def test_mean(mean_process_code, example_input, expected_output):
-    output = run_process(mean_process_code, "min", example_input)
+def test_min(min_process_code, example_input, expected_output):
+    output = run_process(min_process_code, "min", example_input)
     output = json.loads(output)
     assert output == expected_output
