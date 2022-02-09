@@ -1,9 +1,9 @@
 function _add_dimension(arguments) {
-  const { data, name, label, type } = arguments;
+  const { data } = arguments;
   const dataCube = new DataCube(data, "bands_name", "temporal_name");
 
   try {
-    return add_dimension({ data: dataCube, name, label, type });
+    return add_dimension({ ...arguments, data: dataCube });
   } catch (e) {
     return e.message;
   }
