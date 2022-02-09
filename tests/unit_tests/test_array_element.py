@@ -24,6 +24,11 @@ def array_element_process_code():
         ({'data': [5,'ABC',True,None], 'labels': ['number','string','bool','null'], 'label': 'null'}, None),
         ({'data': [5,'ABC',True,None], 'labels': ['number','string','bool','null'], 'label': 'True', 'return_nodata': True}, None),
         ({'data': [5,'ABC', {'name': 'John', 'age': 27}, [1, True, False, None]], 'index': 3}, [1, True, False, None]),
+        ({'data': [1,2,3]}, "The process `array_element` requires either the `index` or `labels` parameter to be set."),
+        ({'data': [1,2,3], 'index': 2, 'label': 'two'}, "The process `array_element` only allows that either the `index` or the `labels` parameter is set."),
+        ({'data': [1,2,3], 'index': 4}, "The array has no element with the specified index or label."),
+        ({'data': [1,2,3], 'label': 'two'}, "The array is not a labeled array, but the `label` parameter is set. Use the `index` instead."),
+        ({'data': [1,2,3], 'labels': ['one','two','three'], 'label':'four'}, 'The array has no element with the specified index or label.'),
     ]
 )
 def test_array_element(array_element_process_code, example_input, expected_output ):
