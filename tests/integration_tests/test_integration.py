@@ -11,6 +11,8 @@ from tests.utils import get_process_graph_json, run_evalscript
     [
         ("test_graph_1", [{"B01": 3, "B02": 3}, {"B01": 5, "B02": 1}], [4, 2]),
         ("reduce_mean_one_band", [{"B01": 3}, {"B01": 5}], [4]),
+        ("reduce_mean_one_band", [{"B01": 3}], [3]),
+        ("reduce_mean_one_band", [{"B01": 3}, {"B01": 5}, {"B01": 10}, {"B01": 6}], [6])
     ],
 )
 def test_convertable_process_graphs(pg_name, example_input, expected_output):
