@@ -8,7 +8,10 @@ from tests.utils import get_process_graph_json, run_evalscript
 
 @pytest.mark.parametrize(
     "pg_name,example_input,expected_output",
-    [("test_graph_1", [{"B01": 3, "B02": 3}, {"B01": 5, "B02": 1}], [4, 2])],
+    [
+        ("test_graph_1", [{"B01": 3, "B02": 3}, {"B01": 5, "B02": 1}], [4, 2]),
+        ("reduce_mean_one_band", [{"B01": 3}, {"B01": 5}], [4]),
+    ],
 )
 def test_convertable_process_graphs(pg_name, example_input, expected_output):
     process_graph = get_process_graph_json(pg_name)
