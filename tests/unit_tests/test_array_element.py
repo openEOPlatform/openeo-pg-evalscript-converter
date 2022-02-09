@@ -27,6 +27,6 @@ def array_element_process_code():
     ]
 )
 def test_array_element(array_element_process_code, example_input, expected_output ):
-    output = run_process(array_element_process_code, "array_element", example_input)
+    output = run_process(array_element_process_code, "_array_element", example_input)
     output = json.loads(output)
     assert output == expected_output

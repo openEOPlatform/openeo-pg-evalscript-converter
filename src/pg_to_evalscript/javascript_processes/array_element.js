@@ -1,8 +1,12 @@
+function _array_element(arguments) {
+  const { data, labels, index, label, return_nodata } = arguments;
+  data.labels = labels;
+  return array_element({ data, index, label, return_nodata });
+}
+
 function array_element(arguments) {
-  const { data, labels, index, label, return_nodata = false } = arguments;
-  if (!data.labels) {
-    data.labels = labels;
-  }
+  const { data, index, label, return_nodata = false } = arguments;
+
   if (index === undefined && label === undefined) {
     throw "The process `array_element` requires either the `index` or `labels` parameter to be set.";
   }
