@@ -106,7 +106,7 @@ function updateOutput(outputs, collection) {{
 
         if len(self.nodes) == 0:
             return initial_output_dimensions
-        
+
         dimensions_of_inputs_per_node[self.nodes[0].node_id].append(initial_output_dimensions)
 
         for node in self.nodes:
