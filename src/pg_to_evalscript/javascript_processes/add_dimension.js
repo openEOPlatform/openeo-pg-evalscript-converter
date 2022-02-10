@@ -92,7 +92,10 @@ class DataCube {
       (e) => e.name === this.bands_dimension_name
     );
     this.data = this._filter(this.data, axis, indices);
-    this.getDimensionByName(this.bands_dimension_name).labels = bands;
+    this.getDimensionByName(this.bands_dimension_name).labels =
+      this.getDimensionByName(this.bands_dimension_name).labels.filter((lab) =>
+        bands.includes(lab)
+      );
   }
 
   removeDimension(dimension) {

@@ -48,11 +48,14 @@ class DataCube {
     }
 
     filterBands(bands) {
-        const indices = this.getBandIndices(bands)
-        const axis = this.dimensions.findIndex(e => e.name === this.bands_dimension_name)
-        this.data = this._filter(this.data, axis, indices)
-        this.getDimensionByName(this.bands_dimension_name).labels = bands;
-    }
+        const indices = this.getBandIndices(bands);
+        const axis = this.dimensions.findIndex((e) => e.name === this.bands_dimension_name);
+        this.data = this._filter(this.data, axis, indices);
+        this.getDimensionByName(this.bands_dimension_name).labels =
+          this.getDimensionByName(this.bands_dimension_name).labels.filter((lab) =>
+            bands.includes(lab)
+          );
+      }
 
     removeDimension(dimension) {
         this.dimensions = this.dimensions.filter(d => d.name !== dimension)
