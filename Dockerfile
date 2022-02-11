@@ -4,7 +4,7 @@ ADD . .
 
 RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools
-RUN pip  install -e .
+RUN pip  install .
 RUN pip install pytest
 
 WORKDIR /tests/
