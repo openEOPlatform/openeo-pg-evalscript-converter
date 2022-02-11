@@ -31,6 +31,8 @@ jobs:
         --user
 
     - name: Build a binary wheel and a source tarball
+      env:
+          PG_TO_EVALSCRIPT_VERSION: ${{ github.ref }}
       run: >-
         python -m
         build
