@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process_with_datacube
 
 
 @pytest.fixture
@@ -25,14 +25,6 @@ def filter_bands_process_code():
                 'bands': []
             }, 
             'The process `filter_bands` requires any of the parameters `bands`, `common_names` or `wavelengths` to be set.'
-        ),
-        (
-            {
-                'data': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
-                'bands': ['B01','B02'],
-                'shouldRemoveBandsDim': True 
-            }, 
-            'A band dimension is missing.'
         ),
         (
             {
@@ -100,10 +92,10 @@ def filter_bands_process_code():
                     {'labels': ['B03'], 'name': 'bands_name', 'type': 'bands'}],
                 'data': [[3],[6],[9]]
             }
-        ),
-    ],
+        )
+    ]
 )
 def test_filter_bands(filter_bands_process_code, example_input, expected_output):
-    output = run_process(filter_bands_process_code, "_filter_bands", example_input)
+    output = run_process_with_datacube(filter_bands_process_code, "filter_bands", example_input)
     output = json.loads(output)
     assert output == expected_output

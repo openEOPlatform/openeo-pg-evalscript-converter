@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process_with_datacube
 
 
 @pytest.fixture
@@ -15,49 +15,20 @@ def rename_labels_process_code():
     [
         (
             {
-                'data': [1,2,3],
-                'dimension': 'test_dimension',
-                'label': 'test_label',
-                'target': ['new_test_label'],
+                'data': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
+                'dimension': 'bands_name',
+                'label': 'B01',
+                'target': ['B02'],
             }, 
             "The number of labels in the parameters `source` and `target` don't match."
         ),
         (
             {
-                'data': [1,2,3],
-                'dimension': 'test_dimension',
-                'label': 'test_label',
-                'should_corrupt_labels': True,
-            }, 
-            "The dimension labels are not enumerated."
-        ),
-        (
-            {
-                'data': [1,2,3],
-                'dimension': 'test_dimension',
-                'label': 'test_label',
-                'target': ['test_label'],
-                'source': ['test_label']
-            },  
-            "A label with the specified name exists."
-        ),
-        (
-            {
-                'data': [1,2,3],
-                'dimension': 'test_dimension',
-                'label': 'test_label',
-                'target': ['new_test_label'],
-                'source': ['fake_test_label']
-            }, 
-            "A label with the specified name does not exist."
-        ),
-        (
-            {
-                'data': [1,2,3],
-                'dimension': 'test_dimension',
-                'label': 'test_label',
-                'target': ['new_test_label'],
-                'source': ['test_label']
+                'data': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
+                'dimension': 'bands_name',
+                'label': 'B01',
+                'target': ['A123'],
+                'source': ['B01']
             }, 
             {
                 'BANDS': 'bands', 
@@ -66,15 +37,34 @@ def rename_labels_process_code():
                 'bands_dimension_name': 'bands_name', 
                 'temporal_dimension_name': 'temporal_name',
                 'dimensions': [
-                    {'labels': ['new_test_label'], 'name': 'test_dimension', 'type': 'other'},
                     {'labels': [], 'name': 'temporal_name', 'type': 'temporal'},
-                    {'labels': [], 'name': 'bands_name', 'type': 'bands'}],
-                'data': [[1,2,3]]
+                    {'labels': ['A123','B02','B03'], 'name': 'bands_name', 'type': 'bands'}],
+                'data': [[1,2,3],[4,5,6],[7,8,9]]
+            }
+        ),
+        (
+            {
+                'data': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
+                'dimension': 'bands_name',
+                'label': 'B03',
+                'target': ['A123456'],
+                'source': ['B03']
+            }, 
+            {
+                'BANDS': 'bands', 
+                'OTHER': 'other', 
+                'TEMPORAL': 'temporal', 
+                'bands_dimension_name': 'bands_name', 
+                'temporal_dimension_name': 'temporal_name',
+                'dimensions': [
+                    {'labels': [], 'name': 'temporal_name', 'type': 'temporal'},
+                    {'labels': ['B01','B02','A123456'], 'name': 'bands_name', 'type': 'bands'}],
+                'data': [[1,2,3],[4,5,6],[7,8,9]]
             }
         ),
     ],
 )
 def test_rename_labels(rename_labels_process_code, example_input, expected_output):
-    output = run_process(rename_labels_process_code, "_rename_labels", example_input)
+    output = run_process_with_datacube(rename_labels_process_code, "rename_labels", example_input)
     output = json.loads(output)
     assert output == expected_output

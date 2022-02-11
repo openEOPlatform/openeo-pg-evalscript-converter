@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process_with_datacube
 
 
 @pytest.fixture
@@ -41,8 +41,7 @@ def merge_cubes_process_code():
             {
                 'cube1': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
                 'cube2': {'B04':[11,12,13],'B05':[14,15,16],'B06':[17,18,19]},
-                'should_use_overlap_resolver': True,
-                'overlap_resolver_code': '({x,y}) => { if ((x*3) >= y) { return x; } return y; }'
+                'overlap_resolver': '({x,y}) => { if ((x*3) >= y) { return x; } return y; }'
             }, 
             {
                 'BANDS': 'bands', 
@@ -60,8 +59,7 @@ def merge_cubes_process_code():
             {
                 'cube1': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
                 'cube2': {'B04':[11,12,13],'B05':[14,15,16],'B06':[17,18,19]},
-                'should_use_overlap_resolver': True,
-                'overlap_resolver_code': '({x,y}) => { return y; }'
+                'overlap_resolver': '({x,y}) => { return y; }'
             }, 
             {
                 'BANDS': 'bands', 
@@ -78,6 +76,6 @@ def merge_cubes_process_code():
     ],
 )
 def test_merge_cubes(merge_cubes_process_code, example_input, expected_output):
-    output = run_process(merge_cubes_process_code, "_merge_cubes", example_input)
+    output = run_process_with_datacube(merge_cubes_process_code, "merge_cubes", example_input)
     output = json.loads(output)
     assert output == expected_output
