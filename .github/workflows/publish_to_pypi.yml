@@ -17,12 +17,6 @@ jobs:
       with:
         python-version: 3.8
 
-    - name: Set tag as enviroment variable
-      env:
-        GITHUB_REF_TAG: ${{ github.ref }}
-      run: >-
-        export PG_TO_EVALSCRIPT_VERSION=$GITHUB_REF_TAG
-
     - name: Install pypa/build
       run: >-
         python -m
@@ -32,14 +26,11 @@ jobs:
 
     - name: Build a binary wheel and a source tarball
       env:
-          PG_TO_EVALSCRIPT_VERSION: ${{ github.ref }}
-      run: >-
-        python -m
-        build
-        --sdist
-        --wheel
-        --outdir dist/
-        .
+          GITHUB_REF_TAG: ${{ github.ref }}
+      run: |
+        echo "Extracting version from GITHUB_REF_TAG: $GITHUB_REF_TAG"
+        export PG_TO_EVALSCRIPT_VERSION=$(echo "$GITHUB_REF_TAG" | sed -e "s#^refs/tags/##")
+        python -m build --sdist --wheel --outdir dist/ .
 
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
