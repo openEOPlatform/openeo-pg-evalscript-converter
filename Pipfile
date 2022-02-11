@@ -15,6 +15,7 @@ jsbeautifier = "*"
 [packages]
 pytest = "*"
 pg-to-evalscript = {path = "."}
+versiontag = "*"
 
 [requires]
 python_version = "3.8"

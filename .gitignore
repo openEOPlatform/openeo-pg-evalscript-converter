@@ -7,5 +7,6 @@ src/pg_to_evalscript.egg-info
 */.ipynb_checkpoints/*
 */.egg-info/*
 Pipfile.lock
+version.txt
 
 
