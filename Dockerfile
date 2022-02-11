@@ -2,9 +2,9 @@ FROM nikolaik/python-nodejs:latest
 
 ADD . .
 
-RUN pip3 install --upgrade pip
-RUN pip3  install -e .
-RUN pip3 install pytest
+RUN pip install --upgrade pip
+RUN pip  install -e .
+RUN pip install pytest
 
 WORKDIR /tests/
 
