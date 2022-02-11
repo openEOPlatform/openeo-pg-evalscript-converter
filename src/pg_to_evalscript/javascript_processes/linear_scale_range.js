@@ -1,8 +1,12 @@
 function linear_scale_range(arguments) {
   const { x, inputMin, inputMax, outputMin = 0, outputMax = 1 } = arguments;
 
-  if (x === null || x === undefined) {
+  if (x === null) {
     return null;
+  }
+
+  if (x === undefined) {
+    throw Error("Process linear_scale_range requires argument x.");
   }
 
   if (inputMin === null || inputMin === undefined) {

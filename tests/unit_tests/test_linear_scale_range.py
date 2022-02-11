@@ -13,7 +13,7 @@ def linear_scale_range_process_code():
 @pytest.mark.parametrize(
     "example_input,raises_exception,error_message",
     [
-        ({}, False, None),
+        ({}, True, "Process linear_scale_range requires argument x."),
         ({"x": None}, False, None),
         ({"x": 0.3, "inputMin": 0, "inputMax": 1}, False, None),
         ({"x": 0.3}, True, "Process linear_scale_range requires argument inputMin."),
