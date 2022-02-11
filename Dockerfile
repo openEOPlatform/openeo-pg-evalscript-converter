@@ -2,10 +2,9 @@ FROM nikolaik/python-nodejs:latest
 
 ADD . .
 
-RUN pip install --upgrade pip
-RUN pip install --upgrade setuptools
-RUN pip  install . --no-use-pep517
-RUN pip install pytest
+RUN pip3 install --upgrade pip
+RUN pip3  install -e .
+RUN pip3 install pytest
 
 WORKDIR /tests/
 
