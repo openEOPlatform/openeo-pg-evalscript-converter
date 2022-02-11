@@ -16,13 +16,6 @@ def merge_cubes_process_code():
         (
             {
                 'cube1': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
-                'cube2': {'B04':[11,12,13],'B05':[14,15,16],'B06':[17,18,19]}
-            }, 
-            'Overlapping data cubes, but no overlap resolver has been specified.'
-        ),
-        (
-            {
-                'cube1': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
                 'cube2': {'B01':[11,12,13],'B02':[14,15,16],'B03':[17,18,19]}
             }, 
             {
@@ -79,3 +72,34 @@ def test_merge_cubes(merge_cubes_process_code, example_input, expected_output):
     output = run_process_with_datacube(merge_cubes_process_code, "merge_cubes", example_input)
     output = json.loads(output)
     assert output == expected_output
+
+
+@pytest.mark.parametrize(
+    "example_input,raises_exception,error_message",
+    [
+        (
+            {
+                'cube1': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
+                'cube2': {'B04':[11,12,13],'B05':[14,15,16],'B06':[17,18,19]}
+            }, 
+            True,
+            'Overlapping data cubes, but no overlap resolver has been specified.'
+        ),
+        (
+            {
+                'cube1': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
+                'cube2': {'B01':[11,12,13],'B02':[14,15,16],'B03':[17,18,19]}
+            }, 
+            False,
+            None
+        ),
+    ],
+)
+def test_merge_cubes_exceptions(merge_cubes_process_code, example_input, raises_exception, error_message):
+    if raises_exception:
+        with pytest.raises(Exception) as exc:
+            run_process_with_datacube(merge_cubes_process_code, "merge_cubes", example_input)
+        assert error_message in str(exc.value)
+
+    else:
+        run_process_with_datacube(merge_cubes_process_code, "merge_cubes", example_input)

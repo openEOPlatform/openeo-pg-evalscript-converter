@@ -7,7 +7,7 @@ function rename_labels(arguments) {
 
   if (target.length !== source.length) {
     throw new Error(
-      "The number of labels in the parameters `source` and `target` don't match."
+      "The number of labels in the parameters `source` and `target` do not match."
     );
   }
 

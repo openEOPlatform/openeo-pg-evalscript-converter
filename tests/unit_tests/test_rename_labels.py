@@ -18,15 +18,6 @@ def rename_labels_process_code():
                 'data': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
                 'dimension': 'bands_name',
                 'label': 'B01',
-                'target': ['B02'],
-            }, 
-            "The number of labels in the parameters `source` and `target` don't match."
-        ),
-        (
-            {
-                'data': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
-                'dimension': 'bands_name',
-                'label': 'B01',
                 'target': ['A123'],
                 'source': ['B01']
             }, 
@@ -68,3 +59,40 @@ def test_rename_labels(rename_labels_process_code, example_input, expected_outpu
     output = run_process_with_datacube(rename_labels_process_code, "rename_labels", example_input)
     output = json.loads(output)
     assert output == expected_output
+
+
+@pytest.mark.parametrize(
+    "example_input,raises_exception,error_message",
+    [
+        (
+            {
+                'data': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
+                'dimension': 'bands_name',
+                'label': 'B01',
+                'target': ['A123'],
+                'source': ['B01']
+            }, 
+            False,
+            None
+        ),
+        (
+            {
+                'data': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
+                'dimension': 'bands_name',
+                'label': 'B01',
+                'target': ['A123'],
+                'source': []
+            },
+            True,
+            "The number of labels in the parameters `source` and `target` do not match."
+        )
+    ],
+)
+def test_rename_labels_exceptions(rename_labels_process_code, example_input, raises_exception, error_message):
+    if raises_exception:
+        with pytest.raises(Exception) as exc:
+            run_process_with_datacube(rename_labels_process_code, "rename_labels", example_input)
+        assert error_message in str(exc.value)
+
+    else:
+        run_process_with_datacube(rename_labels_process_code, "rename_labels", example_input)
