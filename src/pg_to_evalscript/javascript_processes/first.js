@@ -5,7 +5,7 @@ function first(arguments) {
     throw new Error("Mandatory argument `data` is either null or not defined.");
   }
 
-  if (data.length === 0) {
+  if (data.length === 0 || data.every((x) => x === null)) {
     return null;
   }
 

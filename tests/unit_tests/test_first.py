@@ -22,7 +22,9 @@ def first_process_code():
         ({'data': [None,1,2,3], 'ignore_nodata': False}, None),
         ({'data': [[1,2],[3,4]]}, [1,2]),
         ({'data': [1,2,None]}, 1),
-        ({'data': [{"a":"b"},{"c":"d"}]}, {"a":"b"})
+        ({'data': [{"a":"b"},{"c":"d"}]}, {"a":"b"}),
+        ({'data': [None, None, None]}, None),
+        ({'data': [None, None, None], 'ignore_nodata': False}, None)
     ],
 )
 def test_first(first_process_code, example_input, expected_output):

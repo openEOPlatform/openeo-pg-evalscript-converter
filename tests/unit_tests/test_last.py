@@ -22,7 +22,9 @@ def last_process_code():
         ({'data': [1,2,3,None], 'ignore_nodata': False}, None),
         ({'data': [[1,2],[3,4]]}, [3,4]),
         ({'data': [None,1,2]}, 2),
-        ({'data': [{"a":"b"},{"c":"d"}]}, {"c":"d"})
+        ({'data': [{"a":"b"},{"c":"d"}]}, {"c":"d"}),
+        ({'data': [None, None, None]}, None),
+        ({'data': [None, None, None], 'ignore_nodata': False}, None)
     ],
 )
 def test_last(last_process_code, example_input, expected_output):
