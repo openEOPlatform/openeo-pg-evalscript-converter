@@ -184,17 +184,7 @@ convert_from_process_graph(
 ## Running notebooks
 
 ```
-pipenv install --dev
-```
- 
-Black will fail, run
-
-```
-pipenv lock --pre
-```
-
-```
-pipenv run setup.py install
+pipenv install --dev --pre
 ```
 
 Start the notebooks
@@ -203,7 +193,6 @@ Start the notebooks
 cd notebooks
 pipenv run jupyter notebook
 ```
-
 
 ## Running tests
 
