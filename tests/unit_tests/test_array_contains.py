@@ -35,7 +35,8 @@ def test_array_contains(array_contains_process_code, example_input, expected_out
         ({'data': [1,2,3], 'value': 2}, False, None),
         ({'value': 2}, True, 'Mandatory argument `data` is either null or not defined.'),
         ({'data': None, 'value': 2}, True, 'Mandatory argument `data` is either null or not defined.'),
-        ({'data': [1,2,3]}, True, 'Mandatory argument `value` is not defined.')
+        ({'data': [1,2,3]}, True, 'Mandatory argument `value` is not defined.'),
+        ({'data': "[1,2,3]", 'value': 2}, True, "Argument `data` is not an array.")
     ]
 )
 def test_array_contains_exceptions(array_contains_process_code, example_input, raises_exception, error_message):
