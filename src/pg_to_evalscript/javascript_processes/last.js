@@ -13,5 +13,5 @@ function last(arguments) {
     return [...data].reverse().find((x) => x !== null);
   }
 
-  return [...data].reverse()[0];
+  return [...data].pop();
 }
