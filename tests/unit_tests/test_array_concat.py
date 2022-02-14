@@ -52,6 +52,8 @@ def test_array_concat(array_concat_process_code, example_input, expected_output)
         ({'array1': None, 'array2': [1,2,3]}, True, 'Mandatory argument `array1` is either null or not defined.'),
         ({'array1': [1,2,3]}, True, 'Mandatory argument `array2` is either null or not defined.'),
         ({'array1': [1,2,3], 'array2': None}, True, 'Mandatory argument `array2` is either null or not defined.'),
+        ({'array1': [1,2,3], 'array2': "[4,5,6]"}, True, 'Argument `array1` or `array2` is not an array.'),
+        ({'array1': '[1,2,3]', 'array2': [4,5,6]}, True, "Argument `array1` or `array2` is not an array.")
     ]
 )
 def test_array_concat_exceptions(array_concat_process_code, example_input, raises_exception, error_message):

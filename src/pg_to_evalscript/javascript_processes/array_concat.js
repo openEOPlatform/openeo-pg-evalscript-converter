@@ -10,5 +10,8 @@ function array_concat(arguments) {
       "Mandatory argument `array2` is either null or not defined."
     );
   }
+  if (!Array.isArray(array1) || !Array.isArray(array2)) {
+    throw new Error("Argument `array1` or `array2` is not an array.");
+  }
   return [...array1, ...array2];
 }
