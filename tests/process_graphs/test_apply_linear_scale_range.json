@@ -1,0 +1,37 @@
+{
+    "loadcollection1": {
+      "process_id": "load_collection",
+      "arguments": {
+        "spatial_extent": null,
+        "id": "S2",
+        "temporal_extent": null,
+        "bands": ["B01", "B02"]
+      }
+    },
+    "apply_lsr": {
+      "process_id": "apply",
+      "arguments": {
+        "data": {
+          "from_node": "loadcollection1"
+        },
+        "process": {
+          "process_graph": {
+            "lsr": {
+              "process_id": "linear_scale_range",
+              "arguments": {
+                "x": {
+                  "from_parameter": "x"
+                },
+                "inputMin": 0.0,
+                "inputMax": 1.0,
+                "outputMin": 0.0,
+                "outputMax": 2.0
+              },
+              "result": true
+            }
+          }
+        }
+      },
+      "result": true
+    }   
+  }
