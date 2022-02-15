@@ -3,7 +3,7 @@ function merge_cubes(arguments) {
   let overlappingDimension;
 
   if (overlap_resolver && context) {
-    overlap_resolver.context = { ...overlap_resolver.context, ...context };
+    overlap_resolver.context = { ...context, ...overlap_resolver.context };
   }
 
   for (let dimension of cube1.dimensions) {
