@@ -15,63 +15,66 @@ def add_dimension_process_code():
     [
         (
             {
-                'data': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]}, 
-                'name': 'test_new_dimension', 
-                'label': 'test_new_label'
-            }, 
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "name": "test_new_dimension",
+                "label": "test_new_label",
+            },
             {
-                'BANDS': 'bands', 
-                'OTHER': 'other', 
-                'TEMPORAL': 'temporal', 
-                'bands_dimension_name': 'bands_name', 
-                'temporal_dimension_name': 'temporal_name',
-                'dimensions': [
-                    {'labels': ['test_new_label'], 'name': 'test_new_dimension', 'type': 'other'},
-                    {'labels': [], 'name': 'temporal_name', 'type': 'temporal'},
-                    {'labels': ['B01','B02','B03'], 'name': 'bands_name', 'type': 'bands'}],
-                'data': [[[1,2,3],[4,5,6],[7,8,9]]]
-            }
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands_name",
+                "temporal_dimension_name": "temporal_name",
+                "dimensions": [
+                    {"labels": ["test_new_label"], "name": "test_new_dimension", "type": "other"},
+                    {"labels": [], "name": "temporal_name", "type": "temporal"},
+                    {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
+                ],
+                "data": [[[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
+            },
         ),
         (
             {
-                'data': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
-                'name': 'test_bands_name', 
-                'label': 'test_new_label',
-                'type': 'bands'
-            }, 
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "name": "test_bands_name",
+                "label": "test_new_label",
+                "type": "bands",
+            },
             {
-                'BANDS': 'bands', 
-                'OTHER': 'other', 
-                'TEMPORAL': 'temporal', 
-                'bands_dimension_name': 'bands_name', 
-                'temporal_dimension_name': 'temporal_name',
-                'dimensions': [
-                    {'labels': ['test_new_label'], 'name': 'test_bands_name', 'type': 'bands'},
-                    {'labels': [], 'name': 'temporal_name', 'type': 'temporal'},
-                    {'labels': ['B01','B02','B03'], 'name': 'bands_name', 'type': 'bands'}],
-                'data': [[[1,2,3],[4,5,6],[7,8,9]]]
-            }
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands_name",
+                "temporal_dimension_name": "temporal_name",
+                "dimensions": [
+                    {"labels": ["test_new_label"], "name": "test_bands_name", "type": "bands"},
+                    {"labels": [], "name": "temporal_name", "type": "temporal"},
+                    {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
+                ],
+                "data": [[[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
+            },
         ),
         (
             {
-                'data': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
-                'name': 'test_spatial_name', 
-                'label': 23,
-                'type': 'spatial'
-            }, 
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "name": "test_spatial_name",
+                "label": 23,
+                "type": "spatial",
+            },
             {
-                'BANDS': 'bands', 
-                'OTHER': 'other', 
-                'TEMPORAL': 'temporal', 
-                'bands_dimension_name': 'bands_name', 
-                'temporal_dimension_name': 'temporal_name',
-                'dimensions': [
-                    {'labels': [23], 'name': 'test_spatial_name', 'type': 'spatial'},
-                    {'labels': [], 'name': 'temporal_name', 'type': 'temporal'},
-                    {'labels': ['B01','B02','B03'], 'name': 'bands_name', 'type': 'bands'}],
-                'data': [[[1,2,3],[4,5,6],[7,8,9]]]
-            }
-        )
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands_name",
+                "temporal_dimension_name": "temporal_name",
+                "dimensions": [
+                    {"labels": [23], "name": "test_spatial_name", "type": "spatial"},
+                    {"labels": [], "name": "temporal_name", "type": "temporal"},
+                    {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
+                ],
+                "data": [[[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
+            },
+        ),
     ],
 )
 def test_add_dimension(add_dimension_process_code, example_input, expected_output):
@@ -85,23 +88,23 @@ def test_add_dimension(add_dimension_process_code, example_input, expected_outpu
     [
         (
             {
-                'data': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
-                'name': 'test_spatial_name', 
-                'label': 23,
-                'type': 'spatial'
-            }, 
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "name": "test_spatial_name",
+                "label": 23,
+                "type": "spatial",
+            },
             False,
-            None
+            None,
         ),
         (
             {
-                'data': {'B01':[1,2,3],'B02':[4,5,6],'B03':[7,8,9]},
-                'name': 'temporal_name', 
-                'label': 23,
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "name": "temporal_name",
+                "label": 23,
             },
-            True, 
-            'A dimension with the specified name already exists.'
-        )
+            True,
+            "A dimension with the specified name already exists.",
+        ),
     ],
 )
 def test_add_dimension_exceptions(add_dimension_process_code, example_input, raises_exception, error_message):
