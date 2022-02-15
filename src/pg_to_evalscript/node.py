@@ -234,14 +234,14 @@ class ApplyNode(Node):
         return f"""
 function apply(arguments) {{  
 
-   function apply_function(arguments) {{
+   function process(arguments) {{
     {newline.join(node.write_function() for node in self.child_nodes)}
     {newline.join(node.write_call() for node in self.child_nodes)}
         return {self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id};
     }}
     const {{data, dimension}} = arguments; 
     const newData = data.clone()
-    newData.apply(apply_function)
+    newData.apply(process)
     return newData;
 }}
 """
