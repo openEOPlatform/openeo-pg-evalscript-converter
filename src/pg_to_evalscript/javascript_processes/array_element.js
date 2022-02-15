@@ -1,15 +1,9 @@
-function _array_element(arguments) {
-  const { data, labels, index, label, return_nodata } = arguments;
-  data.labels = labels;
-  try {
-    return array_element({ data, index, label, return_nodata });
-  } catch (e) {
-    return e.message;
-  }
-}
-
 function array_element(arguments) {
   const { data, index, label, return_nodata = false } = arguments;
+
+  if (data === null || data === undefined) {
+    throw new Error("Mandatory argument `data` is either null or not defined.");
+  }
 
   if (index === undefined && label === undefined) {
     throw new Error(
