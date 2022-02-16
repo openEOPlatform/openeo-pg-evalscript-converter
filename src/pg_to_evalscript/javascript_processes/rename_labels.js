@@ -1,8 +1,16 @@
 function rename_labels(arguments) {
   const { data, dimension, target, source = [] } = arguments;
 
-  if (!Array.isArray(data.getDimensionByName(dimension).labels) && !target) {
+  if (
+    !Array.isArray(data.getDimensionByName(dimension).labels) &&
+    source.length === 0
+  ) {
     throw new Error("The dimension labels are not enumerated.");
+  }
+
+  if (source.length === 0) {
+    data.getDimensionByName(dimension).labels = target;
+    return data;
   }
 
   if (target.length !== source.length) {
@@ -15,10 +23,12 @@ function rename_labels(arguments) {
     if (data.getDimensionByName(dimension).labels.includes(target[i])) {
       throw new Error("A label with the specified name exists.");
     }
+
     const ind = data.getDimensionByName(dimension).labels.indexOf(source[i]);
     if (ind < 0) {
       throw new Error("A label with the specified name does not exist.");
     }
+
     data.getDimensionByName(dimension).labels[ind] = target[i];
   }
   return data;
