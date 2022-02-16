@@ -43,7 +43,6 @@ def run_process_with_additional_js_code(
 
 
 def run_javacript(javascript_code):
-    print(javascript_code)
     return subprocess.check_output(["node", "-e", javascript_code])
 
 
