@@ -13,18 +13,18 @@ def first_process_code():
 @pytest.mark.parametrize(
     "example_input,expected_output",
     [
-        ({'data': []}, None),
-        ({'data': [1,2,3]}, 1),
-        ({'data': [10,0,3,2]}, 10),
-        ({'data': [None, "A","B","C"]}, "A"),
-        ({'data': [None, "A","B","C"], 'ignore_nodata': False}, None),
-        ({'data': [None,1,2,3]}, 1),
-        ({'data': [None,1,2,3], 'ignore_nodata': False}, None),
-        ({'data': [[1,2],[3,4]]}, [1,2]),
-        ({'data': [1,2,None]}, 1),
-        ({'data': [{"a":"b"},{"c":"d"}]}, {"a":"b"}),
-        ({'data': [None, None, None]}, None),
-        ({'data': [None, None, None], 'ignore_nodata': False}, None)
+        ({"data": []}, None),
+        ({"data": [1, 2, 3]}, 1),
+        ({"data": [10, 0, 3, 2]}, 10),
+        ({"data": [None, "A", "B", "C"]}, "A"),
+        ({"data": [None, "A", "B", "C"], "ignore_nodata": False}, None),
+        ({"data": [None, 1, 2, 3]}, 1),
+        ({"data": [None, 1, 2, 3], "ignore_nodata": False}, None),
+        ({"data": [[1, 2], [3, 4]]}, [1, 2]),
+        ({"data": [1, 2, None]}, 1),
+        ({"data": [{"a": "b"}, {"c": "d"}]}, {"a": "b"}),
+        ({"data": [None, None, None]}, None),
+        ({"data": [None, None, None], "ignore_nodata": False}, None),
     ],
 )
 def test_first(first_process_code, example_input, expected_output):
@@ -32,13 +32,14 @@ def test_first(first_process_code, example_input, expected_output):
     output = json.loads(output)
     assert output == expected_output
 
+
 @pytest.mark.parametrize(
     "example_input,raises_exception,error_message",
     [
-        ({'data': [10,0,3,2]}, False, None),
-        ({'data': None}, True, 'Mandatory argument `data` is either null or not defined.'),
-        ({}, True, 'Mandatory argument `data` is either null or not defined.')
-    ]
+        ({"data": [10, 0, 3, 2]}, False, None),
+        ({"data": None}, True, "Mandatory argument `data` is either null or not defined."),
+        ({}, True, "Mandatory argument `data` is either null or not defined."),
+    ],
 )
 def test_first_exceptions(first_process_code, example_input, raises_exception, error_message):
     if raises_exception:

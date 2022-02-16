@@ -13,14 +13,14 @@ def ceil_process_code():
 @pytest.mark.parametrize(
     "example_input,expected_output",
     [
-        ({'x': 0}, 0),
-        ({'x': 3.5}, 4),
-        ({'x': -0.4}, 0),
-        ({'x': -3.5}, -3),
-        ({'x': 0.00001}, 1),
-        ({'x': -0.00001}, 0),
-        ({'x': 0.99999}, 1),
-        ({'x': -0.99999}, 0)
+        ({"x": 0}, 0),
+        ({"x": 3.5}, 4),
+        ({"x": -0.4}, 0),
+        ({"x": -3.5}, -3),
+        ({"x": 0.00001}, 1),
+        ({"x": -0.00001}, 0),
+        ({"x": 0.99999}, 1),
+        ({"x": -0.99999}, 0),
     ],
 )
 def test_ceil(ceil_process_code, example_input, expected_output):
@@ -28,14 +28,15 @@ def test_ceil(ceil_process_code, example_input, expected_output):
     output = json.loads(output)
     assert output == expected_output
 
+
 @pytest.mark.parametrize(
     "example_input,raises_exception,error_message",
     [
-        ({'x': 1}, False, None),
-        ({}, True, 'Mandatory argument `x` is not defined.'),
-        ({'y': 0.5}, True, 'Mandatory argument `x` is not defined.'),
-        ({'x': '0.5'}, True, 'Argument `x` is not a number.')
-    ]
+        ({"x": 1}, False, None),
+        ({}, True, "Mandatory argument `x` is not defined."),
+        ({"y": 0.5}, True, "Mandatory argument `x` is not defined."),
+        ({"x": "0.5"}, True, "Argument `x` is not a number."),
+    ],
 )
 def test_ceil_exceptions(ceil_process_code, example_input, raises_exception, error_message):
     if raises_exception:
