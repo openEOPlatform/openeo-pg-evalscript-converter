@@ -3,7 +3,7 @@ import json
 import pytest
 from pg_to_evalscript import convert_from_process_graph
 
-from tests.utils import get_process_graph_json, run_evalscript
+from tests.utils import get_process_graph_json, run_evalscript, get_evalscript_input_object
 
 
 @pytest.mark.parametrize(
@@ -34,3 +34,34 @@ def test_convertable_process_graphs(pg_name, example_input, expected_output):
     output = run_evalscript(evalscript, example_input)
     output = json.loads(output)
     assert output == expected_output
+
+
+@pytest.mark.parametrize(
+    "new_bands",
+    [["B01", "B02", "B03"]],
+)
+def test_set_input_bands(new_bands):
+    process_graph = get_process_graph_json("bands_null_graph")
+    bands_dimension_name = "bands"
+    result = convert_from_process_graph(process_graph, bands_dimension_name=bands_dimension_name, encode_result=False)
+    evalscript = result[0]["evalscript"]
+
+    assert evalscript.input_bands is None
+    assert (
+        evalscript._output_dimensions[0]["name"] == bands_dimension_name
+        and evalscript._output_dimensions[0]["size"] == 0
+    )
+
+    with pytest.raises(Exception) as exc:
+        evalscript.write()
+    assert "input_bands must be set" in str(exc.value)
+
+    evalscript.set_input_bands(new_bands)
+
+    assert evalscript.input_bands == new_bands
+    assert evalscript._output_dimensions[0]["name"] == bands_dimension_name and evalscript._output_dimensions[0][
+        "size"
+    ] == len(new_bands)
+
+    input_object = get_evalscript_input_object(evalscript.write())
+    assert input_object["input"] == new_bands
