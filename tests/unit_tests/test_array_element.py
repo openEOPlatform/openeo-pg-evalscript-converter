@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_process_with_additional_js_code
 
 
 @pytest.fixture
@@ -35,7 +35,15 @@ def array_element_process_code():
     ],
 )
 def test_array_element(array_element_process_code, example_input, expected_output):
-    output = run_process(array_element_process_code, "array_element", example_input)
+    additional_js_code_to_run = f"const d = {json.dumps(example_input['data'])}; d.labels = {json.dumps(example_input['labels']) if 'labels' in example_input else 'undefined'};"
+    output = run_process_with_additional_js_code(
+        array_element_process_code,
+        "array_element",
+        example_input,
+        False,
+        additional_js_code_to_run,
+        additional_params_in_string="'data': d",
+    )
     output = json.loads(output)
     assert output == expected_output
 
