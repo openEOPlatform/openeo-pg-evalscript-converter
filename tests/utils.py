@@ -26,22 +26,24 @@ def run_process(process_code, process_name, example_input):
     )
 
 
-def run_process_with_datacube(process_code, process_name, example_input):
-    def construct_cube(name, example_input):
-        return f"new DataCube({example_input[name]}, 'bands_name', 'temporal_name', true)" if name in example_input else 'undefined'
-
+def run_process_with_additional_js_code(
+    process_code,
+    process_name,
+    example_input,
+    should_load_datacube,
+    additional_js_code_to_run,
+    additional_params_in_string,
+):
     return run_javacript(
-        load_datacube_code() + 
-        process_code + 
-        f"const d = {construct_cube('data', example_input)};" +
-        f"const c1 = {construct_cube('cube1', example_input)};" +
-        f"const c2 = {construct_cube('cube2', example_input)};" +
-        f"const overlap_resolver = eval({example_input['overlap_resolver'] if 'overlap_resolver' in example_input else ''});" +
-        f"process.stdout.write(JSON.stringify({process_name}({{...{json.dumps(example_input)}, 'data': d, 'cube1': c1, 'cube2': c2, 'overlap_resolver': overlap_resolver}})));"
+        (load_datacube_code() if should_load_datacube else "")
+        + process_code
+        + additional_js_code_to_run
+        + f"process.stdout.write(JSON.stringify({process_name}({{...{json.dumps(example_input)}, {additional_params_in_string}}})));"
     )
 
 
 def run_javacript(javascript_code):
+    print(javascript_code)
     return subprocess.check_output(["node", "-e", javascript_code])
 
 

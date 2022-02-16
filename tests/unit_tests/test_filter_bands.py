@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process_with_datacube
+from tests.utils import load_process_code, run_process_with_additional_js_code
 
 
 @pytest.fixture
@@ -69,7 +69,17 @@ def filter_bands_process_code():
     ],
 )
 def test_filter_bands(filter_bands_process_code, example_input, expected_output):
-    output = run_process_with_datacube(filter_bands_process_code, "filter_bands", example_input)
+    additional_js_code_to_run = (
+        f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
+    )
+    output = run_process_with_additional_js_code(
+        filter_bands_process_code,
+        "filter_bands",
+        example_input,
+        True,
+        additional_js_code_to_run,
+        additional_params_in_string="'data': cube",
+    )
     output = json.loads(output)
     assert output == expected_output
 
@@ -100,10 +110,27 @@ def test_filter_bands(filter_bands_process_code, example_input, expected_output)
     ],
 )
 def test_filter_bands_exceptions(filter_bands_process_code, example_input, raises_exception, error_message):
+    additional_js_code_to_run = (
+        f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
+    )
     if raises_exception:
         with pytest.raises(Exception) as exc:
-            run_process_with_datacube(filter_bands_process_code, "filter_bands", example_input)
+            run_process_with_additional_js_code(
+                filter_bands_process_code,
+                "filter_bands",
+                example_input,
+                True,
+                additional_js_code_to_run,
+                additional_params_in_string="'data': cube",
+            )
         assert error_message in str(exc.value)
 
     else:
-        run_process_with_datacube(filter_bands_process_code, "filter_bands", example_input)
+        run_process_with_additional_js_code(
+            filter_bands_process_code,
+            "filter_bands",
+            example_input,
+            True,
+            additional_js_code_to_run,
+            additional_params_in_string="'data': cube",
+        )
