@@ -1,9 +1,9 @@
 import json
 
 import pytest
-from pg_to_evalscript import convert_from_process_graph
+from pg_to_evalscript import convert_from_process_graph, list_supported_processes
 
-from tests.utils import get_process_graph_json, run_evalscript
+from tests.utils import get_process_graph_json, run_evalscript, get_defined_processes_from_files
 
 
 @pytest.mark.parametrize(
@@ -34,3 +34,16 @@ def test_convertable_process_graphs(pg_name, example_input, expected_output):
     output = run_evalscript(evalscript, example_input)
     output = json.loads(output)
     assert output == expected_output
+
+
+def test_list_supported_processes():
+    known_supported_processes = [
+        "load_collection",
+        "save_result",
+        "reduce_dimension",
+        "apply",
+        *get_defined_processes_from_files(),
+    ]
+    supported_processes = list_supported_processes()
+    assert len(known_supported_processes) == len(supported_processes)
+    assert set(known_supported_processes) == set(supported_processes)
