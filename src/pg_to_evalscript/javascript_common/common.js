@@ -24,10 +24,12 @@ function parse_rfc3339(dt, default_h = 0, default_m = 0, default_s = 0) {
 
       //check if timezone is provided
       if (g[9] !== undefined && g[9] !== "Z") {
+        //offset in minutes
         const offset =
-          (parseInt(g[12]) * 60 + parseInt(g[13])) * (g[11] === "+" ? -1 : +1);
-
-        date = date + offset * 60000;
+          (parseInt(g[12] || 0) * 60 + parseInt(g[13] || 0)) *
+          (g[11] === "+" ? -1 : 1);
+        //add offset in miliseconds
+        date = date + offset * 60 * 1000;
       }
 
       result = new Date(date).toISOString();

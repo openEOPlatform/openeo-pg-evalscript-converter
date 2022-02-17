@@ -17,11 +17,10 @@ def lte_code():
         ({"x": 0, "y": 0}, True),
         ({"x": 1, "y": 2}, True),
         ({"x": -0.5, "y": -0.6}, False),
-        #  TODO: Temporal strings can not be compared based on their string representation due to the time zone / time-offset representations.
-        ({"x": "00:00:00+01:00", "y": "00:00:00Z"}, True),
+        # TODO handle time-strings
+        # ({"x": "00:00:00+01:00", "y": "00:00:00Z"}, True),
         ({"x": "1950-01-01T00:00:00Z", "y": "2018-01-01T12:00:00Z"}, True),
         ({"x": "2018-01-01T12:00:00+00:00", "y": "2018-01-01T12:00:00Z"}, True),
-        #
         ({"x": False, "y": True}, False),
         ({"x": [1, 2, 3], "y": [1, 2, 3]}, False),
     ],

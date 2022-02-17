@@ -50,9 +50,10 @@ def test_between_inputs(between_process_code, example_input, raises_exception, e
         ({"x": "2018-07-23T17:22:45Z", "min": "2018-01-01T00:00:00Z", "max": "2018-12-31T23:59:59Z"}, True),
         ({"x": "2000-01-01", "min": "2018-01-01", "max": "2020-01-01"}, False),
         ({"x": "2018-12-31T17:22:45Z", "min": "2018-01-01T00:00:00Z", "max": "2018-12-31T23:59:59Z"}, True),
-        # TODO: Temporal strings MUST be compared differently than other strings and MUST NOT be compared based on their string representation
+        # Not sure why this is supposed to be True
         # ({"x": "2018-12-31T17:22:45Z", "min": "2018-01-01", "max": "2018-12-31"}, True),
-        # ({"x": "2018-12-31T17:22:45Z", "min": "2018-01-01", "max": "2018-12-31", "exclude_max": True}, False),
+        ({"x": "2018-12-31T17:22:45Z", "min": "2018-01-01", "max": "2018-12-31", "exclude_max": True}, False),
+        # TODO handle time-strings
         # ({"x": "00:59:59Z", "min": "01:00:00+01:00", "max": "01:00:00Z"}, True),  # 5
     ],
 )

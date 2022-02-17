@@ -18,5 +18,12 @@ function lt(arguments) {
   ) {
     return false;
   }
+
+  const xAsISODateString = parse_rfc3339(x);
+  const yAsISODateString = parse_rfc3339(y);
+
+  if (xAsISODateString && yAsISODateString) {
+    return xAsISODateString < yAsISODateString;
+  }
   return x < y;
 }

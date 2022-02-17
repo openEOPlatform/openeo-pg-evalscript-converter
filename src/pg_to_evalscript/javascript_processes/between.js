@@ -1,4 +1,12 @@
 function between(arguments) {
+  const isBetween = (x, min, max, exclude_max) => {
+    let result = x >= min && x <= max;
+    if (exclude_max) {
+      result &= x < max;
+    }
+    return result;
+  };
+
   const { x, min, max, exclude_max = false } = arguments;
 
   if (x === null) {
@@ -21,11 +29,21 @@ function between(arguments) {
     return false;
   }
 
-  let result = x >= min && x <= max;
+  let result = false;
 
-  if (exclude_max) {
-    result &= x < max;
+  const xAsISODateString = parse_rfc3339(x);
+  const minAsISODateString = parse_rfc3339(min);
+  const maxAsISODateString = parse_rfc3339(max);
+
+  if (xAsISODateString && minAsISODateString && maxAsISODateString) {
+    result = isBetween(
+      xAsISODateString,
+      minAsISODateString,
+      maxAsISODateString,
+      exclude_max
+    );
+  } else {
+    result = isBetween(x, min, max, exclude_max);
   }
-
   return result;
 }
