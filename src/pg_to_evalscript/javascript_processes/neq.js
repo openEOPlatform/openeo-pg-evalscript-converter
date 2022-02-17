@@ -27,9 +27,12 @@ function neq(arguments) {
     return Math.abs(x - y) > delta;
   }
 
-  if (typeof x === "string" && !case_sensitive) {
-    return x.toLowerCase() !== y.toLowerCase();
-  }
+  const xAsISODateString = parse_rfc3339(x);
+  const yAsISODateString = parse_rfc3339(y);
 
-  return x !== y;
+  if (xAsISODateString && yAsISODateString) {
+    return xAsISODateString !== yAsISODateString;
+  } else {
+    return case_sensitive ? x !== y : x.toLowerCase() !== y.toLowerCase();
+  }
 }

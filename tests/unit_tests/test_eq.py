@@ -24,10 +24,11 @@ def eq_code():
         ({"x": "Test", "y": "test"}, False),
         ({"x": "Test", "y": "test", "case_sensitive": False}, True),
         ({"x": "Ä", "y": "ä", "case_sensitive": False}, True),
-        # TODO Temporal strings MUST be compared differently than other strings and MUST NOT be compared based on their string representation due to different possible representations
+        # TODO handle time-strings
         # ({"x": "00:00:00+00:00", "y": "00:00:00Z"}, True),
-        # ({"x": "2018-01-01T12:00:00Z", "y": "2018-01-01T12:00:00"}, False),
-        # ({"x": "2018-01-01T00:00:00Z", "y": "2018-01-01T01:00:00+01:00"}, True),
+        ({"x": "2018-01-01T12:00:00Z", "y": "2018-01-01T12:00:00"}, False),
+        ({"x": "2018-01-01T00:00:00Z", "y": "2018-01-01T01:00:00+01:00"}, True),
+        ({"x": "2018-01-01T00:00:00Z", "y": "2018-01-01"}, True),
         ({"x": [1, 2, 3], "y": [1, 2, 3]}, False),
         ({"x": [], "y": []}, False),
         ({"x": {}, "y": {}}, False),
