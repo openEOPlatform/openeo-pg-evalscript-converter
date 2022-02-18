@@ -61,7 +61,7 @@ function setup() {{
 function evaluatePixel(samples) {{
     {self.write_datacube_creation()}
     {(newline + tab).join([node.write_call() for node in self.nodes])}
-    return {self.nodes[-1].node_varname_prefix + self.nodes[-1].node_id}{".encodeData()" if self.encode_result else '.flattenToArray()'}
+    return {self.write_output_variable()}{".encodeData()" if self.encode_result else '.flattenToArray()'}
 }}
 """
 
@@ -92,12 +92,21 @@ function updateOutput(outputs, collection) {{
     }});
 }}"""
 
+    def write_output_variable(self):
+        if len(self.nodes) == 0:
+            return self.initial_data_name
+        return self.nodes[-1].node_varname_prefix + self.nodes[-1].node_id
+
     def determine_output_dimensions(self):
         dimensions_of_inputs_per_node = defaultdict(list)
         initial_output_dimensions = [
             {"name": self.bands_dimension_name, "size": len(self.input_bands)},
             {"name": self.temporal_dimension_name, "size": None, "original_temporal": True},
         ]
+
+        if len(self.nodes) == 0:
+            return initial_output_dimensions
+
         dimensions_of_inputs_per_node[self.nodes[0].node_id].append(initial_output_dimensions)
 
         for node in self.nodes:

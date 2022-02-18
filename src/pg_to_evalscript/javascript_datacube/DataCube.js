@@ -213,4 +213,9 @@ class DataCube {
         }
         return this._iter(arr, exec_filter)
     }
+
+    apply(process) {
+      const newData = this._iter(this.data, x=>process({"x": x}));
+      this.data = newData;
+    }
 }
