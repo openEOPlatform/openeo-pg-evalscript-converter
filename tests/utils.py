@@ -1,5 +1,6 @@
 import os
 import json
+import glob
 import subprocess
 
 
@@ -39,3 +40,10 @@ def load_process_code(process_id):
     abs_file_path = os.path.join(script_dir, f"../src/pg_to_evalscript/javascript_processes/{process_id}.js")
     with open(abs_file_path) as f:
         return f.read()
+
+
+def get_defined_processes_from_files():
+    return [
+        os.path.splitext(os.path.basename(file_path))[0]
+        for file_path in glob.glob(f"../src/pg_to_evalscript/javascript_processes/*.js")
+    ]

@@ -13,18 +13,18 @@ def last_process_code():
 @pytest.mark.parametrize(
     "example_input,expected_output",
     [
-        ({'data': []},None),
-        ({'data': [1,2,3]},3),
-        ({'data': [10,0,3,2]},2),
-        ({'data': ["A","B","C",None]}, "C"),
-        ({'data': ["A","B","C",None], 'ignore_nodata': False}, None),
-        ({'data': [1,2,3,None]}, 3),
-        ({'data': [1,2,3,None], 'ignore_nodata': False}, None),
-        ({'data': [[1,2],[3,4]]}, [3,4]),
-        ({'data': [None,1,2]}, 2),
-        ({'data': [{"a":"b"},{"c":"d"}]}, {"c":"d"}),
-        ({'data': [None, None, None]}, None),
-        ({'data': [None, None, None], 'ignore_nodata': False}, None)
+        ({"data": []}, None),
+        ({"data": [1, 2, 3]}, 3),
+        ({"data": [10, 0, 3, 2]}, 2),
+        ({"data": ["A", "B", "C", None]}, "C"),
+        ({"data": ["A", "B", "C", None], "ignore_nodata": False}, None),
+        ({"data": [1, 2, 3, None]}, 3),
+        ({"data": [1, 2, 3, None], "ignore_nodata": False}, None),
+        ({"data": [[1, 2], [3, 4]]}, [3, 4]),
+        ({"data": [None, 1, 2]}, 2),
+        ({"data": [{"a": "b"}, {"c": "d"}]}, {"c": "d"}),
+        ({"data": [None, None, None]}, None),
+        ({"data": [None, None, None], "ignore_nodata": False}, None),
     ],
 )
 def test_last(last_process_code, example_input, expected_output):
@@ -32,13 +32,14 @@ def test_last(last_process_code, example_input, expected_output):
     output = json.loads(output)
     assert output == expected_output
 
+
 @pytest.mark.parametrize(
     "example_input,raises_exception,error_message",
     [
-        ({'data': [10,0,3,2]}, False, None),
-        ({'data': None}, True, 'Mandatory argument `data` is either null or not defined.'),
-        ({}, True, 'Mandatory argument `data` is either null or not defined.')
-    ]
+        ({"data": [10, 0, 3, 2]}, False, None),
+        ({"data": None}, True, "Mandatory argument `data` is either null or not defined."),
+        ({}, True, "Mandatory argument `data` is either null or not defined."),
+    ],
 )
 def test_last_exceptions(last_process_code, example_input, raises_exception, error_message):
     if raises_exception:

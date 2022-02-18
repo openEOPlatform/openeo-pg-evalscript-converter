@@ -142,6 +142,11 @@ convert_from_process_graph(
     `decode_data` returns a multidimensional Python list.
 
 
+#### list_supported_processes
+
+Returns a list of process ids of supported [openEO processes](https://docs.openeo.cloud/processes).
+
+
 ## Workflow
 
 1. Construct the openEO process graph
@@ -218,4 +223,11 @@ pytest
 
 ```
 pipenv run black -l 120 .
+```
+
+## Developing
+
+Install the package in editable mode so the changes take effect immediately.
+```
+pipenv install -e .
 ```
