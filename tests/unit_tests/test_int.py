@@ -22,10 +22,10 @@ def int_process_code():
         ({"x": -0.00001}, 0),
         ({"x": 0.99999}, 0),
         ({"x": -0.99999}, 0),
-        ({'x': 2.4}, 2),
-        ({'x': 13.0001}, 13),
-        ({'x': 12.9999}, 12),
-        ({'x': None}, None)
+        ({"x": 2.4}, 2),
+        ({"x": 13.0001}, 13),
+        ({"x": 12.9999}, 12),
+        ({"x": None}, None),
     ],
 )
 def test_int(int_process_code, example_input, expected_output):
