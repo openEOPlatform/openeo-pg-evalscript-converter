@@ -29,21 +29,18 @@ function between(arguments) {
     return false;
   }
 
-  let result = false;
-
   const xAsISODateString = parse_rfc3339(x);
   const minAsISODateString = parse_rfc3339(min);
   const maxAsISODateString = parse_rfc3339(max);
 
   if (xAsISODateString && minAsISODateString && maxAsISODateString) {
-    result = isBetween(
+    return isBetween(
       xAsISODateString,
       minAsISODateString,
       maxAsISODateString,
       exclude_max
     );
   } else {
-    result = isBetween(x, min, max, exclude_max);
+    return isBetween(x, min, max, exclude_max);
   }
-  return result;
 }
