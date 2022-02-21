@@ -23,6 +23,13 @@ def gt_code():
         ({"x": "2018-01-01T12:00:00+00:00", "y": "2018-01-01T12:00:00Z"}, False),
         ({"x": True, "y": 0}, False),
         ({"x": True, "y": False}, False),
+        ({"x": "b", "y": "a"}, False),
+        ({"x": "a", "y": "b"}, False),
+        ({"x": "c", "y": "c"}, False),
+ 
+
+
+
     ],
 )
 def test_gt(gt_code, example_input, expected_output):

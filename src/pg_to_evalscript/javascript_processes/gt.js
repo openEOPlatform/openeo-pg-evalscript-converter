@@ -1,5 +1,6 @@
 function gt(arguments) {
   const { x, y } = arguments;
+  const supportedTypes = ["number", "string"];
 
   if (x === undefined) {
     throw Error("Process gt requires argument x.");
@@ -14,10 +15,14 @@ function gt(arguments) {
   }
 
   if (
-    (typeof x !== "number" && typeof x !== "string") ||
-    (typeof y !== "number" && typeof y !== "string")
+    supportedTypes.indexOf(typeof x) === -1 ||
+    supportedTypes.indexOf(typeof y) === -1
   ) {
     return false;
+  }
+
+  if (typeof x === "number" && typeof y === "number") {
+    return x > y;
   }
 
   const xAsISODateString = parse_rfc3339(x);
@@ -27,5 +32,5 @@ function gt(arguments) {
     return xAsISODateString > yAsISODateString;
   }
 
-  return x > y;
+  return false;
 }

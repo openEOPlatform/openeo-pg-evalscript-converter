@@ -23,6 +23,9 @@ def lt_code():
         ({"x": "2018-01-01T12:00:00+00:00", "y": "2018-01-01T12:00:00Z"}, False),
         ({"x": 0, "y": True}, False),
         ({"x": False, "y": True}, False),
+        ({"x": "a", "y": "b"}, False),
+        ({"x": "b", "y": "a"}, False),
+        ({"x": "c", "y": "c"}, False),
     ],
 )
 def test_lt(lt_code, example_input, expected_output):

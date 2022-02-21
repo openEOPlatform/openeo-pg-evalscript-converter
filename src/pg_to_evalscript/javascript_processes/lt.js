@@ -1,5 +1,7 @@
 function lt(arguments) {
   const { x, y } = arguments;
+  const supportedTypes = ["number", "string"];
+
   if (x === undefined) {
     throw Error("Process lt requires argument x.");
   }
@@ -13,10 +15,14 @@ function lt(arguments) {
   }
 
   if (
-    (typeof x !== "number" && typeof x !== "string") ||
-    (typeof y !== "number" && typeof y !== "string")
+    supportedTypes.indexOf(typeof x) === -1 ||
+    supportedTypes.indexOf(typeof y) === -1
   ) {
     return false;
+  }
+
+  if (typeof x === "number" && typeof y === "number") {
+    return x < y;
   }
 
   const xAsISODateString = parse_rfc3339(x);
@@ -25,5 +31,5 @@ function lt(arguments) {
   if (xAsISODateString && yAsISODateString) {
     return xAsISODateString < yAsISODateString;
   }
-  return x < y;
+  return false;
 }
