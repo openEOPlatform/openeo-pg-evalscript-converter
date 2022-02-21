@@ -1,5 +1,6 @@
 import os
 import json
+import glob
 import subprocess
 
 
@@ -42,6 +43,10 @@ def run_process_with_additional_js_code(
     )
 
 
+def get_evalscript_input_object(evalscript):
+    return json.loads(run_javacript(evalscript + f"\nprocess.stdout.write(JSON.stringify(setup()))"))
+
+
 def run_javacript(javascript_code):
     return subprocess.check_output(["node", "-e", javascript_code])
 
@@ -58,3 +63,10 @@ def load_datacube_code():
     abs_file_path = os.path.join(script_dir, f"../src/pg_to_evalscript/javascript_datacube/DataCube.js")
     with open(abs_file_path) as f:
         return f.read()
+
+
+def get_defined_processes_from_files():
+    return [
+        os.path.splitext(os.path.basename(file_path))[0]
+        for file_path in glob.glob(f"../src/pg_to_evalscript/javascript_processes/*.js")
+    ]

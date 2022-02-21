@@ -44,6 +44,8 @@ class Evalscript:
         self.encode_result = encode_result
 
     def write(self):
+        if self.input_bands is None:
+            raise Exception("input_bands must be set!")
         newline = "\n"
         tab = "\t"
         return f"""
@@ -100,7 +102,7 @@ function updateOutput(outputs, collection) {{
     def determine_output_dimensions(self):
         dimensions_of_inputs_per_node = defaultdict(list)
         initial_output_dimensions = [
-            {"name": self.bands_dimension_name, "size": len(self.input_bands)},
+            {"name": self.bands_dimension_name, "size": len(self.input_bands) if self.input_bands is not None else 0},
             {"name": self.temporal_dimension_name, "size": None, "original_temporal": True},
         ]
 
@@ -118,6 +120,11 @@ function updateOutput(outputs, collection) {{
 
     def set_output_dimensions(self, output_dimensions):
         self._output_dimensions = output_dimensions
+
+    def set_input_bands(self, input_bands):
+        self.input_bands = input_bands
+        output_dimensions = self.determine_output_dimensions()
+        self.set_output_dimensions(output_dimensions)
 
     def get_decoding_function(self):
         """

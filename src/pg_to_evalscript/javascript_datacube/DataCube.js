@@ -123,6 +123,9 @@ class DataCube {
         const labels = this.dimensions[axis].labels
 
         while (true) {
+            if (coords[currInd] === null) {
+                currInd++
+            }
             if (currInd >= shape.length) {
                 break;
             }
@@ -134,11 +137,9 @@ class DataCube {
             newData = this._set(newData, newVals, coords)
             if (coords[currInd] + 1 >= shape[currInd]) {
                 currInd++
+            } else {
+                coords[currInd]++
             }
-            if (coords[currInd] === null) {
-                currInd++
-            }
-            coords[currInd]++
         }
         const finalSelectCoords = new Array(shape.length).fill(null);
         finalSelectCoords[axis] = 0;

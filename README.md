@@ -134,12 +134,21 @@ convert_from_process_graph(
     - `size`: size (length) of the dimension,
     - `original_temporal`, optional: boolean, should be `True` if this is the temporal dimension generated in the initial `load_collection` node.
 
+* **`set_input_bands(input_bands)`**:
+
+    Setter for input bands. `input_bands` is an array of strings (band names) or `None`. Output dimensions are recalculated.
+
 * **`get_decoding_function()`**:
 
     Returns a `decode_data` function. The data returned by the evalscript is encoded to contain the information about the datacube dimensions and has to be decoded to obtain the actual data in a ndarray format.
     `decode_data` has the following parameters:
     - `data`: the result of processing of the associated evalscript, it should be a three-dimensional array.
     `decode_data` returns a multidimensional Python list.
+
+
+#### list_supported_processes
+
+Returns a list of process ids of supported [openEO processes](https://docs.openeo.cloud/processes).
 
 
 ## Workflow
@@ -218,4 +227,11 @@ pytest
 
 ```
 pipenv run black -l 120 .
+```
+
+## Developing
+
+Install the package in editable mode so the changes take effect immediately.
+```
+pipenv install -e .
 ```
