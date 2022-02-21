@@ -1,5 +1,7 @@
 function neq(arguments) {
   const { x, y, delta = null, case_sensitive = true } = arguments;
+  const supportedTypes = ["number", "string", "boolean"];
+
   if (x === undefined) {
     throw Error("Process neq requires argument x.");
   }
@@ -17,8 +19,8 @@ function neq(arguments) {
   }
 
   if (
-    (typeof x !== "number" && typeof x !== "string") ||
-    (typeof y !== "number" && typeof y !== "string")
+    supportedTypes.indexOf(typeof x) === -1 ||
+    supportedTypes.indexOf(typeof y) === -1
   ) {
     return false;
   }

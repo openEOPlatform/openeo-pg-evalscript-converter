@@ -34,6 +34,9 @@ def eq_code():
         ({"x": [1, 2, 3], "y": [1, 2, 3]}, False),
         ({"x": [], "y": []}, False),
         ({"x": {}, "y": {}}, False),
+        ({"x": True, "y": True}, True),
+        ({"x": True, "y": False}, False),
+
     ],
 )
 def test_eq(eq_code, example_input, expected_output):
