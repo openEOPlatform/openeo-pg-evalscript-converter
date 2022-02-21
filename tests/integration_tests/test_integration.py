@@ -3,7 +3,7 @@ import json
 import pytest
 from pg_to_evalscript import convert_from_process_graph, list_supported_processes
 
-from tests.utils import get_process_graph_json, run_evalscript, get_defined_processes_from_files
+from tests.utils import get_process_graph_json, run_evalscript, get_defined_processes_from_files, get_evalscript_input_object
 
 
 @pytest.mark.parametrize(
@@ -50,3 +50,34 @@ def test_list_supported_processes():
     supported_processes = list_supported_processes()
     assert len(known_supported_processes) == len(supported_processes)
     assert set(known_supported_processes) == set(supported_processes)
+
+
+@pytest.mark.parametrize(
+    "new_bands",
+    [["B01", "B02", "B03"]],
+)
+def test_set_input_bands(new_bands):
+    process_graph = get_process_graph_json("bands_null_graph")
+    bands_dimension_name = "bands"
+    result = convert_from_process_graph(process_graph, bands_dimension_name=bands_dimension_name, encode_result=False)
+    evalscript = result[0]["evalscript"]
+
+    assert evalscript.input_bands is None
+    assert (
+        evalscript._output_dimensions[0]["name"] == bands_dimension_name
+        and evalscript._output_dimensions[0]["size"] == 0
+    )
+
+    with pytest.raises(Exception) as exc:
+        evalscript.write()
+    assert "input_bands must be set" in str(exc.value)
+
+    evalscript.set_input_bands(new_bands)
+
+    assert evalscript.input_bands == new_bands
+    assert evalscript._output_dimensions[0]["name"] == bands_dimension_name and evalscript._output_dimensions[0][
+        "size"
+    ] == len(new_bands)
+
+    input_object = get_evalscript_input_object(evalscript.write())
+    assert input_object["input"] == new_bands

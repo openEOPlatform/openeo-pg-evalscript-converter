@@ -147,7 +147,7 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
         child_nodes = None
 
         if process_id == "load_collection":
-            input_bands = arguments["bands"]
+            input_bands = arguments.get("bands")
             initial_data_name = "node_" + node_id
             continue
         elif process_id == "save_result":

@@ -27,6 +27,10 @@ def run_process(process_code, process_name, example_input):
     )
 
 
+def get_evalscript_input_object(evalscript):
+    return json.loads(run_javacript(evalscript + f"\nprocess.stdout.write(JSON.stringify(setup()))"))
+
+
 def run_javacript(javascript_code):
     return subprocess.check_output(["node", "-e", javascript_code])
 
