@@ -14,7 +14,7 @@ function sin(arguments) {
   }
 
   // floating point handling in javascript is ... special
-  // sin(n * PI) is not exactly 0 in Javascript (for n = any int value)
+  // sin(n * PI) is not exactly 0 (for n = any int value)
   // TODO
   return Math.sin(x);
 }
