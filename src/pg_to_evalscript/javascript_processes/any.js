@@ -15,15 +15,13 @@ function any(arguments) {
     );
   }
 
-  if (ignore_nodata) {
-    if (data.filter((x) => x !== null).length === 0) {
-      return null;
-    }
-    return data.filter((x) => x !== null).some((x) => x === true);
+  const filteredData = data.filter((x) => x !== null);
+  if (data.length === 0 || filteredData.length === 0) {
+    return null;
   }
 
-  if (data.length === 0) {
-    return null;
+  if (ignore_nodata) {
+    return filteredData.some((x) => x === true);
   }
 
   return data.reduce((x, y) => {
