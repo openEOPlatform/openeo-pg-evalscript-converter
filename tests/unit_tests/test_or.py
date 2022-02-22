@@ -37,9 +37,9 @@ def test_or(or_process_code, example_input, expected_output):
         ({}, True, "Mandatory argument `x` is not defined."),
         ({"x": True}, True, "Mandatory argument `y` is not defined."),
         ({"y": True}, True, "Mandatory argument `x` is not defined."),
-        ({"x": "True", "y": "True"}, True, "Argument `x` is not a boolean."),
-        ({"x": "True", "y": True}, True, "Argument `x` is not a boolean."),
-        ({"x": True, "y": "True"}, True, "Argument `y` is not a boolean."),
+        ({"x": "True", "y": "True"}, True, "Argument `x` is not a boolean or null."),
+        ({"x": "True", "y": True}, True, "Argument `x` is not a boolean or null."),
+        ({"x": True, "y": "True"}, True, "Argument `y` is not a boolean or null."),
     ],
 )
 def test_or_exceptions(or_process_code, example_input, raises_exception, error_message):
