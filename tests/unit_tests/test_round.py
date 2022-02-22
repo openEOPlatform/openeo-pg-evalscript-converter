@@ -53,7 +53,7 @@ def test_round(round_process_code, example_input, expected_output):
         ({}, True, "Mandatory argument `x` is not defined."),
         ({"y": 0.5}, True, "Mandatory argument `x` is not defined."),
         ({"x": "0.5"}, True, "Argument `x` is not a number."),
-        ({"x": 0.2, "p": "2"}, True, "Argument `p` is not a number."),
+        ({"x": 0.2, "p": "2"}, True, "Argument `p` is not an integer."),
         ({"x": 0.3, "p": 1.3}, True, "Argument `p` is not an integer."),
     ],
 )

@@ -13,10 +13,6 @@ function round(arguments) {
     throw new Error("Argument `x` is not a number.");
   }
 
-  if (typeof p !== "number") {
-    throw new Error("Argument `p` is not a number.");
-  }
-
   if (!Number.isInteger(p)) {
     throw new Error("Argument `p` is not an integer.");
   }
