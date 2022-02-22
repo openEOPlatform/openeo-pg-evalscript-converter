@@ -14,14 +14,15 @@ def mod_process_code():
     "example_input,expected_output",
     [
         ({"x": 27, "y": 5}, 2),
-        ({"x": -27, "y": 5}, -2),
-        ({"x": 3.14, "y": -2}, 1.14),
+        ({"x": -27, "y": 5}, 2),
+        ({"x": 3.14, "y": -2}, -1.14),
         ({"x": -27, "y": -5}, -2),
-        ({"x": -3, "y": -1}, 0),
-        ({"x": 3, "y": -2}, 1),
+        ({"x": -3, "y": -1}, -0),
+        ({"x": 3, "y": -2}, -1),
         ({"x": 3, "y": 4}, 3),
         ({"x": None, "y": 3}, None),
         ({"x": 1, "y": None}, None),
+        ({"x": None, "y": None}, None)
     ],
 )
 def test_mod(mod_process_code, example_input, expected_output):

@@ -25,5 +25,5 @@ function mod(arguments) {
     throw new Error("Argument `y` is not a number.");
   }
 
-  return x % y;
+  return Math.sign(y) * (Math.abs(x) % Math.abs(y));
 }
