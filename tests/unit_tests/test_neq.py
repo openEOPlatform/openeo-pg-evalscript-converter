@@ -33,8 +33,6 @@ def neq_code():
         ({"x": None, "y": None}, None),
         ({"x": True, "y": True}, False),
         ({"x": True, "y": False}, True),
-
-
     ],
 )
 def test_neq(neq_code, example_input, expected_output):

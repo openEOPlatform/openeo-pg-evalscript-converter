@@ -26,10 +26,6 @@ def gt_code():
         ({"x": "b", "y": "a"}, False),
         ({"x": "a", "y": "b"}, False),
         ({"x": "c", "y": "c"}, False),
- 
-
-
-
     ],
 )
 def test_gt(gt_code, example_input, expected_output):
