@@ -112,9 +112,36 @@ def sort_process_code():
                 None,
             ],
         ),
+        ({"data": [None, None, None]}, []),
+        ({"data": [None, None, None], "nodata": True}, [None, None, None]),
+        ({"data": [None, None, None], "nodata": False}, [None, None, None]),
     ],
 )
 def test_sort(sort_process_code, example_input, expected_output):
     output = run_process(sort_process_code, "sort", example_input)
     output = json.loads(output)
     assert output == expected_output
+
+
+@pytest.mark.parametrize(
+    "example_input,raises_exception,error_message",
+    [
+        ({"data": [1, 2, 3, 4, 5], "asc": False, "nodata": True}, False, None),
+        ({"data": "[1,2,3,4,5]", "asc": False, "nodata": True}, True, "Argument `data` is not an array."),
+        ({"data": [1, 2, 3, 4, 5], "asc": "False", "nodata": True}, True, "Argument `asc` is not a boolean."),
+        (
+            {"data": [1, 2, 3, 4, 5], "asc": False, "nodata": "True"},
+            True,
+            "Argument `nodata` is not a boolean or null.",
+        ),
+        ({"data": [1, 2, [3], 4, 5], "asc": False, "nodata": True}, True, "Element in `data` is not of correct type."),
+    ],
+)
+def test_sort_exceptions(sort_process_code, example_input, raises_exception, error_message):
+    if raises_exception:
+        with pytest.raises(Exception) as exc:
+            run_process(sort_process_code, "sort", example_input)
+        assert error_message in str(exc.value)
+
+    else:
+        run_process(sort_process_code, "sort", example_input)

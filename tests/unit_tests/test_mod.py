@@ -22,7 +22,7 @@ def mod_process_code():
         ({"x": 3, "y": 4}, 3),
         ({"x": None, "y": 3}, None),
         ({"x": 1, "y": None}, None),
-        ({"x": None, "y": None}, None)
+        ({"x": None, "y": None}, None),
     ],
 )
 def test_mod(mod_process_code, example_input, expected_output):
