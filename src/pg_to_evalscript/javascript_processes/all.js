@@ -9,22 +9,44 @@ function all(arguments) {
     throw new Error("Argument `data` is not an array.");
   }
 
-  if (!data.every((x) => typeof x === "boolean" || x === null)) {
-    throw new Error(
-      "Values in argument `data` can only be of type boolean or null."
-    );
-  }
-
-  const filteredData = data.filter((x) => x !== null);
-  if (data.length === 0 || filteredData.length === 0) {
-    return null;
-  }
-
   if (ignore_nodata) {
-    return filteredData.every((x) => x === true);
+    let returnVal = null;
+    for (let x of data) {
+      if (typeof x !== "boolean" && x !== null) {
+        throw new Error(
+          "Values in argument `data` can only be of type boolean or null."
+        );
+      }
+
+      if (x === null) {
+        continue;
+      }
+
+      if (x === false) {
+        returnVal = false;
+        break;
+      }
+
+      returnVal = true;
+    }
+
+    return returnVal;
+  }
+
+  if (data.length === 1) {
+    return data[0];
   }
 
   return data.reduce((x, y) => {
+    if (
+      (typeof x !== "boolean" && x !== null) ||
+      (typeof y !== "boolean" && y !== null)
+    ) {
+      throw new Error(
+        "Values in argument `data` can only be of type boolean or null."
+      );
+    }
+
     if (x === false || y === false) {
       return false;
     }
@@ -32,5 +54,5 @@ function all(arguments) {
       return true;
     }
     return null;
-  });
+  }, null);
 }

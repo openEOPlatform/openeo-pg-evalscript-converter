@@ -23,6 +23,10 @@ def all_process_code():
         ({"data": [True]}, True),
         ({"data": [None], "ignore_nodata": False}, None),
         ({"data": []}, None),
+        ({"data": [], "ignore_nodata": False}, None),
+        ({"data": [True]}, True),
+        ({"data": [True], "ignore_nodata": False}, True),
+        ({"data": [None, None, None]}, None),
         ({"data": [True, 1 < 3, 3 < 1], "ignore_nodata": False}, False),
         ({"data": [True, 1 < 3, 3 < 1]}, False),
         ({"data": [True, None, True, 1 < 3, 2 * 2 < 10, True]}, True),
@@ -44,7 +48,15 @@ def test_all(all_process_code, example_input, expected_output):
         ({"data_array": [True, True]}, True, "Mandatory argument `data` is not defined."),
         ({}, True, "Mandatory argument `data` is not defined."),
         (
-            {"data": [True, True, False, 1 < 3, "true"]},
+            {
+                "data": [
+                    "True",
+                    True,
+                    True,
+                    False,
+                    1 < 3,
+                ]
+            },
             True,
             "Values in argument `data` can only be of type boolean or null.",
         ),
