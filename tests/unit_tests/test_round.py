@@ -23,7 +23,7 @@ def round_process_code():
         ({"x": -0.00001}, 0),
         ({"x": 0.99999}, 1),
         ({"x": -0.99999}, -1),
-        ({"x":  2.6}, 3),
+        ({"x": 2.6}, 3),
         ({"x": 1234.5, "p": -2}, 1200),
         ({"x": 1.5, "p": 0}, 2),
         ({"x": -2.5, "p": 0}, -2),
@@ -54,7 +54,7 @@ def test_round(round_process_code, example_input, expected_output):
         ({"y": 0.5}, True, "Mandatory argument `x` is not defined."),
         ({"x": "0.5"}, True, "Argument `x` is not a number."),
         ({"x": 0.2, "p": "2"}, True, "Argument `p` is not a number."),
-        ({"x": 0.3, "p": 1.3}, True, "Argument `p` is not an integer.")
+        ({"x": 0.3, "p": 1.3}, True, "Argument `p` is not an integer."),
     ],
 )
 def test_round_exceptions(round_process_code, example_input, raises_exception, error_message):
