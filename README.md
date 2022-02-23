@@ -134,6 +134,10 @@ convert_from_process_graph(
     - `size`: size (length) of the dimension,
     - `original_temporal`, optional: boolean, should be `True` if this is the temporal dimension generated in the initial `load_collection` node.
 
+* **`set_input_bands(input_bands)`**:
+
+    Setter for input bands. `input_bands` is an array of strings (band names) or `None`. Output dimensions are recalculated.
+
 * **`get_decoding_function()`**:
 
     Returns a `decode_data` function. The data returned by the evalscript is encoded to contain the information about the datacube dimensions and has to be decoded to obtain the actual data in a ndarray format.
