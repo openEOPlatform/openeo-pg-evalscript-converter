@@ -15,13 +15,13 @@ def sin_process_code():
     "example_input,expected_output",
     [
         ({"x": 0}, 0),  # sin(0°)
-        ({"x": math.pi / 6}, pytest.approx(0.5)),  # sin(30°)
-        ({"x": math.pi / 4}, pytest.approx(math.sqrt(2) / 2)),  # sin(45°)
-        ({"x": math.pi / 3}, pytest.approx(math.sqrt(3) / 2)),  # sin(60°)
+        ({"x": math.pi / 6}, 0.5),  # sin(30°)
+        ({"x": math.pi / 4}, math.sqrt(2) / 2),  # sin(45°)
+        ({"x": math.pi / 3}, math.sqrt(3) / 2),  # sin(60°)
         ({"x": math.pi / 2}, 1),  # sin(90°)
-        ({"x": math.pi}, pytest.approx(0)),  # sin(180°)
+        ({"x": math.pi}, 0),  # sin(180°)
         ({"x": 3 * math.pi / 2}, -1),  # sin(270°)
-        ({"x": 2 * math.pi}, pytest.approx(0)),  # sin(360°)
+        ({"x": 2 * math.pi}, 0),  # sin(360°)
         ({"x": -math.pi / 2}, -1),  # sin(-90°)
         ({"x": None}, None),
     ],
@@ -29,7 +29,7 @@ def sin_process_code():
 def test_sin(sin_process_code, example_input, expected_output):
     output = run_process(sin_process_code, "sin", example_input)
     output = json.loads(output)
-    assert output == expected_output
+    assert pytest.approx(output) == expected_output
 
 
 @pytest.mark.parametrize(
