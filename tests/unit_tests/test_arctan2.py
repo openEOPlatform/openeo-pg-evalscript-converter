@@ -39,8 +39,6 @@ def arctan2_process_code():
         ({"x": -math.inf, "y": -math.inf}, -3 * math.pi / 4),
         ({"x": math.inf, "y": math.inf}, math.pi / 4),
         ({"x": math.inf, "y": -math.inf}, -math.pi / 4),
-        ({"x": 15, "y": 90}, 1.4056476493802699),  # arctan2(90, 15)
-        ({"x": 90, "y": 15}, 0.16514867741462683),  # arctan2(15, 90)
         ({"x": 1, "y": None}, None),
         ({"x": None, "y": 1}, None),
         ({"x": None, "y": None}, None),
