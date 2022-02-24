@@ -1,4 +1,4 @@
-function cos(arguments) {
+function arccos(arguments) {
   const { x } = arguments;
 
   if (x === undefined) {
@@ -13,5 +13,5 @@ function cos(arguments) {
     throw new Error("Argument `x` is not a number.");
   }
 
-  return Math.cos(x);
+  return Math.acos(x);
 }

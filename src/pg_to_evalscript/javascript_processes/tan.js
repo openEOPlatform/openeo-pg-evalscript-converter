@@ -1,11 +1,11 @@
-function cos(arguments) {
+function tan(arguments) {
   const { x } = arguments;
-
+  
   if (x === undefined) {
     throw new Error("Mandatory argument `x` is not defined.");
   }
 
-  if (x === null) {
+  if(x === null){
     return null;
   }
 
@@ -13,5 +13,5 @@ function cos(arguments) {
     throw new Error("Argument `x` is not a number.");
   }
 
-  return Math.cos(x);
+  return Math.tan(x);
 }
