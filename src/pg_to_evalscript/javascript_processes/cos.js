@@ -13,8 +13,5 @@ function cos(arguments) {
     throw new Error("Argument `x` is not a number.");
   }
 
-  // floating point handling in javascript is ... special
-  // cos((n * PI) / 2) is not exactly 0 (for n = any int value)
-  // TODO
   return Math.cos(x);
 }
