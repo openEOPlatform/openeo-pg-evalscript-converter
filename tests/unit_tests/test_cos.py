@@ -41,9 +41,7 @@ def test_cos(cos_process_code, example_input, expected_output):
         ({"x": "0.5"}, True, "Argument `x` is not a number."),
     ],
 )
-def test_cos_exceptions(
-    cos_process_code, example_input, raises_exception, error_message
-):
+def test_cos_exceptions(cos_process_code, example_input, raises_exception, error_message):
     if raises_exception:
         with pytest.raises(Exception) as exc:
             run_process(cos_process_code, "cos", example_input)

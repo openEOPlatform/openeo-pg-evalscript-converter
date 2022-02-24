@@ -41,9 +41,7 @@ def test_sin(sin_process_code, example_input, expected_output):
         ({"x": "0.5"}, True, "Argument `x` is not a number."),
     ],
 )
-def test_sin_exceptions(
-    sin_process_code, example_input, raises_exception, error_message
-):
+def test_sin_exceptions(sin_process_code, example_input, raises_exception, error_message):
     if raises_exception:
         with pytest.raises(Exception) as exc:
             run_process(sin_process_code, "sin", example_input)
