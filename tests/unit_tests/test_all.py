@@ -24,7 +24,6 @@ def all_process_code():
         ({"data": [None], "ignore_nodata": False}, None),
         ({"data": []}, None),
         ({"data": [], "ignore_nodata": False}, None),
-        ({"data": [True]}, True),
         ({"data": [True], "ignore_nodata": False}, True),
         ({"data": [None, None, None]}, None),
         ({"data": [True, 1 < 3, 3 < 1], "ignore_nodata": False}, False),
