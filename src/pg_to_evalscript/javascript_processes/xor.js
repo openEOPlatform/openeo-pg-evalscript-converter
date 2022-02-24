@@ -21,9 +21,5 @@ function xor(arguments) {
     return null;
   }
 
-  if (x === !y) {
-    return true;
-  }
-
-  return false;
+  return x === !y;
 }
