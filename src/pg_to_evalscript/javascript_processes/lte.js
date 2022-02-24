@@ -1,5 +1,7 @@
 function lte(arguments) {
   const { x, y } = arguments;
+  const supportedTypes = ["number", "string", "boolean"];
+
   if (x === undefined) {
     throw Error("Process lte requires argument x.");
   }
@@ -13,10 +15,22 @@ function lte(arguments) {
   }
 
   if (
-    (typeof x !== "number" && typeof x !== "string") ||
-    (typeof y !== "number" && typeof y !== "string")
+    supportedTypes.indexOf(typeof x) === -1 ||
+    supportedTypes.indexOf(typeof y) === -1
   ) {
     return false;
+  }
+
+  if (typeof x !== typeof y) {
+    return false;
+  }
+
+  if (typeof x === "number") {
+    return x <= y;
+  }
+
+  if (typeof x === "boolean") {
+    return x === y;
   }
 
   const xAsISODateString = parse_rfc3339(x);
@@ -25,5 +39,6 @@ function lte(arguments) {
   if (xAsISODateString && yAsISODateString) {
     return xAsISODateString <= yAsISODateString;
   }
-  return x <= y;
+
+  return x === y;
 }

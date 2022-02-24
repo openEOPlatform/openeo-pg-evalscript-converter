@@ -22,12 +22,15 @@ def gte_code():
         ({"x": "1950-01-01T00:00:00Z", "y": "2018-01-01T12:00:00Z"}, False),
         ({"x": "2018-01-01T12:00:00+00:00", "y": "2018-01-01T12:00:00Z"}, True),
         ({"x": True, "y": False}, False),
+        ({"x": True, "y": True}, True),
         ({"x": True, "y": 1}, False),
         ({"x": 0, "y": False}, False),
         ({"x": [1, 2, 3], "y": [1, 2, 3]}, False),
         ({"x": [], "y": []}, False),
         ({"x": {}, "y": {}}, False),
         ({"x": None, "y": None}, None),
+        ({"x": "b", "y": "a"}, False),
+        ({"x": "a", "y": "a"}, True),
     ],
 )
 def test_gte(gte_code, example_input, expected_output):
