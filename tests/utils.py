@@ -2,7 +2,7 @@ import os
 import json
 import glob
 import subprocess
-from functools import reduce
+
 
 def get_process_graph_json(name):
     script_dir = os.path.dirname(__file__)
@@ -47,8 +47,7 @@ def load_process_code(process_id):
         load_script("../src/pg_to_evalscript/javascript_common/", "common"),
         load_script("../src/pg_to_evalscript/javascript_processes/", process_id),
     ]
-
-    return reduce(lambda a, b: a + "\n" + b, source_files)
+    return "\n".join(source_files)
 
 
 def get_defined_processes_from_files():
