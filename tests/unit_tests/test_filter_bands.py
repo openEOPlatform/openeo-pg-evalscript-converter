@@ -107,6 +107,22 @@ def test_filter_bands(filter_bands_process_code, example_input, expected_output)
             True,
             "The process `filter_bands` requires any of the parameters `bands`, `common_names` or `wavelengths` to be set.",
         ),
+        (
+            {
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "bands": "[1,2,3]",
+            },
+            True,
+            "Argument `bands` is not an array.",
+        ),
+        (
+            {
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "bands": [1, 2, 3],
+            },
+            True,
+            "Element in argument `bands` is not a string.",
+        ),
     ],
 )
 def test_filter_bands_exceptions(filter_bands_process_code, example_input, raises_exception, error_message):
