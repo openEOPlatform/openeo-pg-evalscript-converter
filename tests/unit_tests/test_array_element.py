@@ -74,6 +74,13 @@ def test_array_element(array_element_process_code, example_input, expected_outpu
             True,
             "The array has no element with the specified index or label.",
         ),
+        ({"data": ["A", "B", "C"], "index": "0"}, True, "Argument `index` is not an integer."),
+        ({"data": ["A", "B", "C"], "index": 1.2}, True, "Argument `index` is not an integer."),
+        (
+            {"data": [1, 2, 3], "labels": ["one", "two", "three"], "label": ["two"]},
+            True,
+            "Argument `label` is not a string or a number.",
+        ),
     ],
 )
 def test_array_element_exceptions(array_element_process_code, example_input, raises_exception, error_message):
