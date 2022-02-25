@@ -26,3 +26,22 @@ def test_if(if_process_code, example_input, expected_output):
     output = run_process(if_process_code, "_if", example_input)
     output = json.loads(output)
     assert output == expected_output
+
+
+@pytest.mark.parametrize(
+    "example_input,raises_exception,error_message",
+    [
+        ({"value": True, "accept": "A", "reject": "B"}, False, None),
+        ({"accept": "A", "reject": "B"}, True, "Mandatory argument `value` is not defined."),
+        ({"value": True, "reject": "B"}, True, "Mandatory argument `accept` is not defined."),
+        ({"value": "True", "accept": "A", "reject": "B"}, True, "Argument `value` is not a boolean or null."),
+    ],
+)
+def test_if_exceptions(if_process_code, example_input, raises_exception, error_message):
+    if raises_exception:
+        with pytest.raises(Exception) as exc:
+            run_process(if_process_code, "_if", example_input)
+        assert error_message in str(exc.value)
+
+    else:
+        run_process(if_process_code, "_if", example_input)
