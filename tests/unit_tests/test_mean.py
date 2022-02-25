@@ -35,3 +35,23 @@ def test_mean(mean_process_code, example_input, expected_output):
     output = run_process(mean_process_code, "mean", example_input)
     output = json.loads(output)
     assert output == expected_output
+
+
+@pytest.mark.parametrize(
+    "example_input,raises_exception,error_message",
+    [
+        ({"data": [1, 2]}, False, None),
+        ({}, True, "Mandatory argument `data` is not defined."),
+        ({"data": 123}, True, "Argument `data` is not an array."),
+        ({"data": [1, 2, 3], "ignore_nodata": "False"}, True, "Argument `ignore_nodata` is not a boolean."),
+        ({"data": [1, 2, 3, 4, 5, True]}, True, "Element in argument `data` is not a number or null."),
+    ],
+)
+def test_mean_exceptions(mean_process_code, example_input, raises_exception, error_message):
+    if raises_exception:
+        with pytest.raises(Exception) as exc:
+            run_process(mean_process_code, "mean", example_input)
+        assert error_message in str(exc.value)
+
+    else:
+        run_process(mean_process_code, "mean", example_input)
