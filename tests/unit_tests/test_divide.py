@@ -30,7 +30,15 @@ def test_divide(divide_process_code, example_input, expected_output):
 
 @pytest.mark.parametrize(
     "example_input,raises_exception,error_message",
-    [({"x": 1, "y": 2}, False, None), ({"x": 2, "y": 0}, True, "Division by zero is not supported.")],
+    [
+        ({"x": 1, "y": 2}, False, None),
+        ({"x": 2, "y": 0}, True, "Division by zero is not supported."),
+        ({}, True, "Mandatory argument `x` is not defined."),
+        ({"y": 2}, True, "Mandatory argument `x` is not defined."),
+        ({"x": 1}, True, "Mandatory argument `y` is not defined."),
+        ({"x": "2", "y": 2}, True, "Argument `x` is not a number."),
+        ({"x": 2, "y": "2"}, True, "Argument `y` is not a number."),
+    ],
 )
 def test_divide_exceptions(divide_process_code, example_input, raises_exception, error_message):
     if raises_exception:
