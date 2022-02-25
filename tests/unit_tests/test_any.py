@@ -51,7 +51,15 @@ def test_any(any_process_code, example_input, expected_output):
         ({"data_array": [True, True]}, True, "Mandatory argument `data` is not defined."),
         ({}, True, "Mandatory argument `data` is not defined."),
         (
-            {"data": ["True", True, True, False, 1 < 3, ]},
+            {
+                "data": [
+                    "True",
+                    True,
+                    True,
+                    False,
+                    1 < 3,
+                ]
+            },
             True,
             "Values in argument `data` can only be of type boolean or null.",
         ),
