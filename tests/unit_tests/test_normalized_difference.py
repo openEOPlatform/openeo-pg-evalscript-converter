@@ -26,3 +26,27 @@ def test_normalized_difference(normalized_difference_process_code, example_input
     output = run_process(normalized_difference_process_code, "normalized_difference", example_input)
     output = json.loads(output)
     assert pytest.approx(output) == expected_output
+
+
+@pytest.mark.parametrize(
+    "example_input,raises_exception,error_message",
+    [
+        ({"x": 1, "y": 1}, False, None),
+        ({"x": 1, "y": -1}, True, "Division by zero is not supported."),
+        ({}, True, "Mandatory argument `x` is not defined."),
+        ({"y": -1}, True, "Mandatory argument `x` is not defined."),
+        ({"x": 1}, True, "Mandatory argument `y` is not defined."),
+        ({"x": "1", "y": -1}, True, "Argument `x` is not a number."),
+        ({"x": 1, "y": "-1"}, True, "Argument `y` is not a number."),
+    ],
+)
+def test_normalized_difference_exceptions(
+    normalized_difference_process_code, example_input, raises_exception, error_message
+):
+    if raises_exception:
+        with pytest.raises(Exception) as exc:
+            run_process(normalized_difference_process_code, "normalized_difference", example_input)
+        assert error_message in str(exc.value)
+
+    else:
+        run_process(normalized_difference_process_code, "normalized_difference", example_input)
