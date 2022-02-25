@@ -34,6 +34,8 @@ function median(arguments) {
     return null;
   }
 
+  newData.sort((a, b) => a - b);
+
   const bottomHalfIdx = Math.floor(newData.length / 2);
   if (bottomHalfIdx % 2 === 0) {
     return (newData[bottomHalfIdx - 1] + newData[bottomHalfIdx]) / 2;

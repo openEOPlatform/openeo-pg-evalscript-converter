@@ -14,7 +14,13 @@ def median_process_code():
     "example_input,expected_output",
     [
         ({"data": [1, 3, 3, 6, 7, 8, 9]}, 6),
+        ({"data": [3, 7, 6, 8, 7, 1, 3]}, 6),
         ({"data": [1, 2, 3, 4, 5, 6, 8, 9]}, 4.5),
+        ({"data": [8, 6, 1, 4, 3, 9, 5, 2]}, 4.5),
+        ({"data": [1, 2, 3]}, 2),
+        ({"data": [1, 3, 2]}, 2),
+        ({"data": [1, 2, 3, 4]}, 2.5),
+        ({"data": [2, 1, 3, 4]}, 2.5),
         ({"data": [-1, -0.5, None, 1]}, -0.5),
         ({"data": [-1, 0, None, 1], "ignore_nodata": False}, None),
         ({"data": []}, None),
