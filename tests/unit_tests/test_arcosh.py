@@ -16,9 +16,12 @@ def arcosh_process_code():
     [
         ({"x": 1}, 0),
         ({"x": 2}, 1.3169578969248166),
-        ({"x": 0.999999999999}, None),
-        ({"x": -1}, None),
-        ({"x": 0}, None),
+        (
+            {"x": 0.999999999999},
+            None,
+        ),  # JS returns NaN, but Python doesn't recognize JS's NaN
+        ({"x": -1}, None),  # JS returns NaN, but Python doesn't recognize JS's NaN
+        ({"x": 0}, None),  # JS returns NaN, but Python doesn't recognize JS's NaN
         ({"x": None}, None),
     ],
 )
