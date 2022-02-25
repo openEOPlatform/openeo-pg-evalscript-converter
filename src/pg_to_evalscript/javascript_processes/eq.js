@@ -33,7 +33,7 @@ function eq(arguments) {
   const yAsISODateString = parse_rfc3339(y);
 
   if (xAsISODateString && yAsISODateString) {
-    return xAsISODateString === yAsISODateString;
+    return xAsISODateString.value === yAsISODateString.value;
   } else {
     return case_sensitive ? x === y : x.toLowerCase() === y.toLowerCase();
   }

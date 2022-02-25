@@ -34,11 +34,23 @@ function between(arguments) {
   const maxAsISODateString = parse_rfc3339(max);
 
   if (xAsISODateString && minAsISODateString && maxAsISODateString) {
+    let maxValue = maxAsISODateString.value;
+    let excludeMax = exclude_max;
+
+    // handle special case where max is interval representing whole day
+    // so one day is added and upper limit is excluded
+    if (maxAsISODateString.type === "date" && !exclude_max) {
+      const nextDay = new Date(maxAsISODateString.value);
+      nextDay.setDate(nextDay.getDate() + 1);
+      maxValue = nextDay.toISOString();
+      excludeMax = true;
+    }
+
     return isBetween(
-      xAsISODateString,
-      minAsISODateString,
-      maxAsISODateString,
-      exclude_max
+      xAsISODateString.value,
+      minAsISODateString.value,
+      maxValue,
+      excludeMax
     );
   } else {
     return isBetween(x, min, max, exclude_max);

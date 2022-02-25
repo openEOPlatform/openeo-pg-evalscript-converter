@@ -29,7 +29,7 @@ function gt(arguments) {
   const yAsISODateString = parse_rfc3339(y);
 
   if (xAsISODateString && yAsISODateString) {
-    return xAsISODateString > yAsISODateString;
+    return xAsISODateString.value > yAsISODateString.value;
   }
 
   return false;

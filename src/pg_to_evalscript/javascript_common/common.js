@@ -1,11 +1,12 @@
 function parse_rfc3339(dt, default_h = 0, default_m = 0, default_s = 0) {
-  const regex =
+  const regexDateTime =
     "^([0-9]{4})-([0-9]{2})-([0-9]{2})([Tt]([0-9]{2}):([0-9]{2}):([0-9]{2})(\\.[0-9]+)?)?(([Zz]|([+-])([0-9]{2}):([0-9]{2})))?";
+  const regexDate = "^([0-9]{4})-([0-9]{2})-([0-9]{2})$";
 
   let result = null;
 
   try {
-    const g = dt.match(regex);
+    const g = dt.match(regexDateTime);
     if (g) {
       let date = Date.UTC(
         parseInt(g[1]), //year
@@ -32,7 +33,10 @@ function parse_rfc3339(dt, default_h = 0, default_m = 0, default_s = 0) {
         date = date + offset * 60 * 1000;
       }
 
-      result = new Date(date).toISOString();
+      return {
+        type: dt.match(regexDate) ? "date" : "date-time",
+        value: new Date(date).toISOString(),
+      };
     }
   } catch (err) {
     //
