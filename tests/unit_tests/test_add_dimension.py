@@ -115,6 +115,40 @@ def test_add_dimension(add_dimension_process_code, example_input, expected_outpu
             True,
             "A dimension with the specified name already exists.",
         ),
+        (
+            {"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "label": 23},
+            True,
+            "Mandatory argument `name` is not defined.",
+        ),
+        (
+            {"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "name": "temporal_name"},
+            True,
+            "Mandatory argument `label` is not defined.",
+        ),
+        (
+            {"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "name": 23, "label": 23},
+            True,
+            "Argument `name` is not a string.",
+        ),
+        (
+            {
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "name": "temporal_name",
+                "label": [1, 2, 3],
+            },
+            True,
+            "Argument `label` is not a string or a number.",
+        ),
+        (
+            {
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "name": "temporal_name",
+                "label": 23,
+                "type": 123,
+            },
+            True,
+            "Argument `type` is not a string.",
+        ),
     ],
 )
 def test_add_dimension_exceptions(add_dimension_process_code, example_input, raises_exception, error_message):
