@@ -140,6 +140,81 @@ def test_rename_labels(rename_labels_process_code, example_input, expected_outpu
             True,
             "The number of labels in the parameters `source` and `target` do not match.",
         ),
+        (
+            {
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "label": "B01",
+                "target": ["A123"],
+                "source": ["B01"],
+            },
+            True,
+            "Mandatory argument `dimension` is not defined.",
+        ),
+        (
+            {
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "dimension": "bands_name",
+                "label": "B01",
+                "source": ["B01"],
+            },
+            True,
+            "Mandatory argument `target` is not defined.",
+        ),
+        (
+            {
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "dimension": 123,
+                "label": "B01",
+                "target": ["A123"],
+                "source": ["B01"],
+            },
+            True,
+            "Argument `dimension` is not a string.",
+        ),
+        (
+            {
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "dimension": "bands_name",
+                "label": "B01",
+                "target": "A123",
+                "source": ["B01"],
+            },
+            True,
+            "Argument `target` is not an array.",
+        ),
+        (
+            {
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "dimension": "bands_name",
+                "label": "B01",
+                "target": ["A123"],
+                "source": "B01",
+            },
+            True,
+            "Argument `source` is not an array.",
+        ),
+        (
+            {
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "dimension": "bands_name",
+                "label": "B01",
+                "target": [{"name": "John"}],
+                "source": ["B01"],
+            },
+            True,
+            "Element in argument `target` is not a number or a string.",
+        ),
+        (
+            {
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "dimension": "bands_name",
+                "label": "B01",
+                "target": ["A123"],
+                "source": [{"name": "John"}],
+            },
+            True,
+            "Element in argument `source` is not a number or a string.",
+        ),
     ],
 )
 def test_rename_labels_exceptions(rename_labels_process_code, example_input, raises_exception, error_message):
