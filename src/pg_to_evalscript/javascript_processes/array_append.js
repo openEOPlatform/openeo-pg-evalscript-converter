@@ -1,8 +1,8 @@
 function array_append(arguments) {
-  const { array, value } = arguments;
-  if (array === null || array === undefined) {
+  const { data, value } = arguments;
+  if (data === null || data === undefined) {
     throw new Error(
-      "Mandatory argument `array` is either null or not defined."
+      "Mandatory argument `data` is either null or not defined."
     );
   }
   if (value === undefined) {
@@ -10,8 +10,8 @@ function array_append(arguments) {
       "Mandatory argument `value` is not defined."
     );
   }
-  if (!Array.isArray(array)) {
-    throw new Error("Argument `array` is not an array.");
+  if (!Array.isArray(data)) {
+    throw new Error("Argument `data` is not an array.");
   }
-  return [...array, value];
+  return [...data, value];
 }
