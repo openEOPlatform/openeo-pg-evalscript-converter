@@ -52,6 +52,25 @@ def merge_cubes_process_code():
         ),
         (
             {
+                "cube1": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "cube2": {"B02": [11, 12, 13], "B03": [14, 15, 16], "B04": [42, 41, 40]},
+                "overlap_resolver": "({x,y}) => x + y",
+            },
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands_name",
+                "temporal_dimension_name": "temporal_name",
+                "dimensions": [
+                    {"labels": [], "name": "temporal_name", "type": "temporal"},
+                    {"labels": ["B01", "B02", "B03", "B04"], "name": "bands_name", "type": "bands"},
+                ],
+                "data": [[1, 2, 3], [15, 17, 19], [21, 23, 25], [42, 41, 40]],
+            },
+        ),
+        (
+            {
                 "cube1": {"B03": [3]},
                 "cube2": {"B03": [7]},
                 "additional_code_specific_to_test_case": """
@@ -79,7 +98,7 @@ def test_merge_cubes(merge_cubes_process_code, example_input, expected_output):
         f"const cube1 = new DataCube({example_input['cube1']}, 'bands_name', 'temporal_name', true);"
         + f"const cube2 = new DataCube({example_input['cube2']}, 'bands_name', 'temporal_name', true);"
         + f"const overlap_resolver = eval({example_input['overlap_resolver'] if 'overlap_resolver' in example_input else ''});"
-        + f"{example_input['additional_code_specific_to_test_case'] if 'additional_code_specific_to_test_case' in example_input else ''}"
+        + f"{example_input['additional_code_specific_to_test_case'] if 'additional_code_specific_to_test_case' in example_input else ''};"
     )
     output = run_process_with_additional_js_code(
         merge_cubes_process_code,
