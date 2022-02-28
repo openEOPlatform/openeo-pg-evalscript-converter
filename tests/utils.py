@@ -35,11 +35,19 @@ def run_javacript(javascript_code):
     return subprocess.check_output(["node", "-e", javascript_code])
 
 
-def load_process_code(process_id):
+def load_script(source_file_folder, source_file_name):
     script_dir = os.path.dirname(__file__)
-    abs_file_path = os.path.join(script_dir, f"../src/pg_to_evalscript/javascript_processes/{process_id}.js")
+    abs_file_path = os.path.join(script_dir, f"{source_file_folder}/{source_file_name}.js")
     with open(abs_file_path) as f:
         return f.read()
+
+
+def load_process_code(process_id):
+    source_files = [
+        load_script("../src/pg_to_evalscript/javascript_common/", "common"),
+        load_script("../src/pg_to_evalscript/javascript_processes/", process_id),
+    ]
+    return "\n".join(source_files)
 
 
 def get_defined_processes_from_files():

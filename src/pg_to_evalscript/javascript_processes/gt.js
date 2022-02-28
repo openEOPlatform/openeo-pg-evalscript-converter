@@ -1,13 +1,13 @@
-function lt(arguments) {
+function gt(arguments) {
   const { x, y } = arguments;
   const supportedTypes = ["number", "string"];
 
   if (x === undefined) {
-    throw Error("Process lt requires argument x.");
+    throw Error("Process gt requires argument x.");
   }
 
   if (y === undefined) {
-    throw Error("Process lt requires argument y.");
+    throw Error("Process gt requires argument y.");
   }
 
   if (x === null || y === null) {
@@ -22,14 +22,15 @@ function lt(arguments) {
   }
 
   if (typeof x === "number" && typeof y === "number") {
-    return x < y;
+    return x > y;
   }
 
   const xAsISODateString = parse_rfc3339(x);
   const yAsISODateString = parse_rfc3339(y);
 
   if (xAsISODateString && yAsISODateString) {
-    return xAsISODateString.value < yAsISODateString.value;
+    return xAsISODateString.value > yAsISODateString.value;
   }
+
   return false;
 }
