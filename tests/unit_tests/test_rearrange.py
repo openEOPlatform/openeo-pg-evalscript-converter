@@ -19,6 +19,10 @@ def rearrange_process_code():
         ({"data": [5, 4, 3], "order": [2, 1, 0]}, [3, 4, 5]),
         ({"data": [5, 4, 3, 2], "order": [1, 3]}, [4, 2]),
         ({"data": [5, 4, 3, 2], "order": [0, 2, 1, 3]}, [5, 3, 4, 2]),
+        (
+            {"data": [False, "c", "b", "a", True], "order": [4, 3, 2, 1, 0]},
+            [True, "a", "b", "c", False],
+        ),
     ],
 )
 def test_rearrange(rearrange_process_code, example_input, expected_output):
