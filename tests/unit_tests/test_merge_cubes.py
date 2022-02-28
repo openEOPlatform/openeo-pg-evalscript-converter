@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process_with_additional_js_code
+from tests.utils import load_process_code, load_datacube_code, run_process_with_additional_js_code
 
 
 @pytest.fixture
@@ -95,7 +95,8 @@ def merge_cubes_process_code():
 )
 def test_merge_cubes(merge_cubes_process_code, example_input, expected_output):
     additional_js_code_to_run = (
-        f"const cube1 = new DataCube({example_input['cube1']}, 'bands_name', 'temporal_name', true);"
+        load_datacube_code()
+        + f"const cube1 = new DataCube({example_input['cube1']}, 'bands_name', 'temporal_name', true);"
         + f"const cube2 = new DataCube({example_input['cube2']}, 'bands_name', 'temporal_name', true);"
         + f"const overlap_resolver = eval({example_input['overlap_resolver'] if 'overlap_resolver' in example_input else ''});"
         + f"{example_input['additional_code_specific_to_test_case'] if 'additional_code_specific_to_test_case' in example_input else ''};"
@@ -104,7 +105,6 @@ def test_merge_cubes(merge_cubes_process_code, example_input, expected_output):
         merge_cubes_process_code,
         "merge_cubes",
         example_input,
-        True,
         additional_js_code_to_run,
         additional_params_in_string="'cube1': cube1, 'cube2': cube2, 'overlap_resolver': overlap_resolver",
     )
@@ -135,7 +135,8 @@ def test_merge_cubes(merge_cubes_process_code, example_input, expected_output):
 )
 def test_merge_cubes_exceptions(merge_cubes_process_code, example_input, raises_exception, error_message):
     additional_js_code_to_run = (
-        f"const cube1 = new DataCube({example_input['cube1']}, 'bands_name', 'temporal_name', true);"
+        load_datacube_code()
+        + f"const cube1 = new DataCube({example_input['cube1']}, 'bands_name', 'temporal_name', true);"
         + f"const cube2 = new DataCube({example_input['cube2']}, 'bands_name', 'temporal_name', true);"
         + f"const overlap_resolver = eval({example_input['overlap_resolver'] if 'overlap_resolver' in example_input else ''});"
     )
@@ -145,7 +146,6 @@ def test_merge_cubes_exceptions(merge_cubes_process_code, example_input, raises_
                 merge_cubes_process_code,
                 "merge_cubes",
                 example_input,
-                True,
                 additional_js_code_to_run,
                 additional_params_in_string="'cube1': cube1, 'cube2': cube2, 'overlap_resolver': overlap_resolver",
             )
@@ -156,7 +156,6 @@ def test_merge_cubes_exceptions(merge_cubes_process_code, example_input, raises_
             merge_cubes_process_code,
             "merge_cubes",
             example_input,
-            True,
             additional_js_code_to_run,
             additional_params_in_string="'cube1': cube1, 'cube2': cube2, 'overlap_resolver': overlap_resolver",
         )

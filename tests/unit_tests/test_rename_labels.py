@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process_with_additional_js_code
+from tests.utils import load_process_code, load_datacube_code, run_process_with_additional_js_code
 
 
 @pytest.fixture
@@ -101,13 +101,13 @@ def rename_labels_process_code():
 )
 def test_rename_labels(rename_labels_process_code, example_input, expected_output):
     additional_js_code_to_run = (
-        f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
+        load_datacube_code()
+        + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
     )
     output = run_process_with_additional_js_code(
         rename_labels_process_code,
         "rename_labels",
         example_input,
-        True,
         additional_js_code_to_run,
         additional_params_in_string="'data': cube",
     )
@@ -219,7 +219,8 @@ def test_rename_labels(rename_labels_process_code, example_input, expected_outpu
 )
 def test_rename_labels_exceptions(rename_labels_process_code, example_input, raises_exception, error_message):
     additional_js_code_to_run = (
-        f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
+        load_datacube_code()
+        + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
     )
     if raises_exception:
         with pytest.raises(Exception) as exc:
@@ -227,7 +228,6 @@ def test_rename_labels_exceptions(rename_labels_process_code, example_input, rai
                 rename_labels_process_code,
                 "rename_labels",
                 example_input,
-                True,
                 additional_js_code_to_run,
                 additional_params_in_string="'data': cube",
             )
@@ -238,7 +238,6 @@ def test_rename_labels_exceptions(rename_labels_process_code, example_input, rai
             rename_labels_process_code,
             "rename_labels",
             example_input,
-            True,
             additional_js_code_to_run,
             additional_params_in_string="'data': cube",
         )
