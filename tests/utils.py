@@ -31,12 +31,10 @@ def run_process_with_additional_js_code(
     process_code,
     process_name,
     example_input,
-    should_load_datacube,
     additional_js_code_to_run,
     additional_params_in_string,
 ):
     return run_javacript(
-        (load_datacube_code() if should_load_datacube else "")
         + process_code
         + additional_js_code_to_run
         + f"process.stdout.write(JSON.stringify({process_name}({{...{json.dumps(example_input)}, {additional_params_in_string}}})));"

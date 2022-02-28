@@ -24,7 +24,6 @@ def test_array_labels(array_labels_process_code, example_input, expected_output)
         array_labels_process_code,
         "array_labels",
         example_input,
-        False,
         additional_js_code_to_run,
         additional_params_in_string="'data': d",
     )
@@ -50,7 +49,6 @@ def test_array_labels_exceptions(array_labels_process_code, example_input, raise
                 array_labels_process_code,
                 "array_labels",
                 example_input,
-                False,
                 additional_js_code_to_run,
                 additional_params_in_string="'data': d",
             )
@@ -61,7 +59,6 @@ def test_array_labels_exceptions(array_labels_process_code, example_input, raise
             array_labels_process_code,
             "array_labels",
             example_input,
-            False,
             additional_js_code_to_run,
             additional_params_in_string="'data': d",
         )
