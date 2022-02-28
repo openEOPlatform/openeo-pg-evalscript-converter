@@ -24,17 +24,19 @@ function count(arguments) {
 
   let count = 0;
   for (let val of data) {
+    if (condition === null && is_valid({ x: val })) {
+      count++;
+      continue;
+    }
+
     if (condition === true) {
       count++;
+      continue;
     }
 
     if (condition !== null && condition({ x: val })) {
       count++;
-    }
-
-    if (condition === null) {
-      // still need to check every element if it is valid
-      count++;
+      continue;
     }
   }
 
