@@ -35,7 +35,7 @@ def run_process_with_additional_js_code(
     additional_params_in_string,
 ):
     return run_javacript(
-        + process_code
+        process_code
         + additional_js_code_to_run
         + f"process.stdout.write(JSON.stringify({process_name}({{...{json.dumps(example_input)}, {additional_params_in_string}}})));"
     )
