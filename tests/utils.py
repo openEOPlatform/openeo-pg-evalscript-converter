@@ -41,7 +41,6 @@ def run_process_with_additional_js_code(
     )
 
 
-
 def get_evalscript_input_object(evalscript):
     return json.loads(run_javacript(evalscript + f"\nprocess.stdout.write(JSON.stringify(setup()))"))
 
@@ -56,13 +55,6 @@ def load_script(source_file_folder, source_file_name):
     with open(abs_file_path) as f:
         return f.read()
 
-
-def load_datacube_code():
-    script_dir = os.path.dirname(__file__)
-    abs_file_path = os.path.join(script_dir, f"../src/pg_to_evalscript/javascript_datacube/DataCube.js")
-    with open(abs_file_path) as f:
-        return f.read()
-        
 
 def load_process_code(process_id):
     source_files = [
