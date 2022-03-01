@@ -20,6 +20,7 @@ def array_interpolate_linear_process_code():
         ({"data": [1, None, None]}, [1, None, None]),
         ({"data": [None, None, 1]}, [None, None, 1]),
         ({"data": [None, 1, None]}, [None, 1, None]),
+        ({"data": []}, []),
     ],
 )
 def test_array_interpolate_linear(
