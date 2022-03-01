@@ -22,14 +22,13 @@ function count(arguments) {
     condition.context = { ...context, ...condition.context };
   }
 
+  if (condition === true) {
+    return data.length;
+  }
+
   let count = 0;
   for (let val of data) {
     if (condition === null && is_valid({ x: val })) {
-      count++;
-      continue;
-    }
-
-    if (condition === true) {
       count++;
       continue;
     }
