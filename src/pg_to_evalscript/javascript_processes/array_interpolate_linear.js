@@ -7,6 +7,10 @@ function array_interpolate_linear(arguments) {
     );
   }
 
+  if (!Array.isArray(data)) {
+    throw new Error("Argument `data` is not an array.");
+  }
+
   const linear_interpolation = (v0, v1, t) => (1 - t) * v0 + t * v1;
   let newData = [...data];
   let start = newData[0];
