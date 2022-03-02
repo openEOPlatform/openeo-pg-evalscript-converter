@@ -40,9 +40,9 @@ def test_array_interpolate_linear(
         (
             {"data": None},
             True,
-            "Mandatory argument `array` is either null or not defined.",
+            "Mandatory argument `data` is either null or not defined.",
         ),
-        ({}, True, "Mandatory argument `array` is either null or not defined."),
+        ({}, True, "Mandatory argument `data` is either null or not defined."),
         ({"data": [1, 2, "3"]}, True, "Element in `data` is not of correct type."),
     ],
 )

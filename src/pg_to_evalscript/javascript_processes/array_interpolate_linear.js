@@ -3,7 +3,7 @@ function array_interpolate_linear(arguments) {
 
   if (data === null || data === undefined) {
     throw new Error(
-      "Mandatory argument `array` is either null or not defined."
+      "Mandatory argument `data` is either null or not defined."
     );
   }
 
