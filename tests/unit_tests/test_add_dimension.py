@@ -82,12 +82,12 @@ def test_add_dimension(add_dimension_process_code, example_input, expected_outpu
         load_datacube_code()
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
     )
+    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
     output = run_process_with_additional_js_code(
         add_dimension_process_code,
         "add_dimension",
-        example_input,
+        process_arguments,
         additional_js_code_to_run,
-        additional_params_in_string="'data': cube",
     )
     output = json.loads(output)
     assert output == expected_output
@@ -156,14 +156,14 @@ def test_add_dimension_exceptions(add_dimension_process_code, example_input, rai
         load_datacube_code()
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
     )
+    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
     if raises_exception:
         with pytest.raises(Exception) as exc:
             run_process_with_additional_js_code(
                 add_dimension_process_code,
                 "add_dimension",
-                example_input,
+                process_arguments,
                 additional_js_code_to_run,
-                additional_params_in_string="'data': cube",
             )
         assert error_message in str(exc.value)
 
@@ -171,7 +171,6 @@ def test_add_dimension_exceptions(add_dimension_process_code, example_input, rai
         run_process_with_additional_js_code(
             add_dimension_process_code,
             "add_dimension",
-            example_input,
+            process_arguments,
             additional_js_code_to_run,
-            additional_params_in_string="'data': cube",
         )

@@ -101,12 +101,14 @@ def test_merge_cubes(merge_cubes_process_code, example_input, expected_output):
         + f"const overlap_resolver = eval({example_input['overlap_resolver'] if 'overlap_resolver' in example_input else ''});"
         + f"{example_input['additional_code_specific_to_test_case'] if 'additional_code_specific_to_test_case' in example_input else ''};"
     )
+    process_arguments = (
+        f"{{...{json.dumps(example_input)}, 'cube1': cube1, 'cube2': cube2, 'overlap_resolver': overlap_resolver}}"
+    )
     output = run_process_with_additional_js_code(
         merge_cubes_process_code,
         "merge_cubes",
-        example_input,
+        process_arguments,
         additional_js_code_to_run,
-        additional_params_in_string="'cube1': cube1, 'cube2': cube2, 'overlap_resolver': overlap_resolver",
     )
     output = json.loads(output)
     assert output == expected_output
@@ -140,14 +142,16 @@ def test_merge_cubes_exceptions(merge_cubes_process_code, example_input, raises_
         + f"const cube2 = new DataCube({example_input['cube2']}, 'bands_name', 'temporal_name', true);"
         + f"const overlap_resolver = eval({example_input['overlap_resolver'] if 'overlap_resolver' in example_input else ''});"
     )
+    process_arguments = (
+        f"{{...{json.dumps(example_input)}, 'cube1': cube1, 'cube2': cube2, 'overlap_resolver': overlap_resolver}}"
+    )
     if raises_exception:
         with pytest.raises(Exception) as exc:
             run_process_with_additional_js_code(
                 merge_cubes_process_code,
                 "merge_cubes",
-                example_input,
+                process_arguments,
                 additional_js_code_to_run,
-                additional_params_in_string="'cube1': cube1, 'cube2': cube2, 'overlap_resolver': overlap_resolver",
             )
         assert error_message in str(exc.value)
 
@@ -155,7 +159,6 @@ def test_merge_cubes_exceptions(merge_cubes_process_code, example_input, raises_
         run_process_with_additional_js_code(
             merge_cubes_process_code,
             "merge_cubes",
-            example_input,
+            process_arguments,
             additional_js_code_to_run,
-            additional_params_in_string="'cube1': cube1, 'cube2': cube2, 'overlap_resolver': overlap_resolver",
         )
