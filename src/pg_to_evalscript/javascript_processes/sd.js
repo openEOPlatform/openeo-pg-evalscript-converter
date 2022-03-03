@@ -1,8 +1,8 @@
 function sd(arguments) {
   const { data, ignore_nodata = true } = arguments;
 
-  if (data === undefined) {
-    throw new Error("Mandatory argument `data` is not defined.");
+  if (data === undefined || data === null) {
+    throw new Error("Mandatory argument `data` is either null or not defined.");
   }
 
   if (!Array.isArray(data)) {

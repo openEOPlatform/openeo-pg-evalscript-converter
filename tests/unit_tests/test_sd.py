@@ -38,7 +38,8 @@ def test_sd(sd_process_code, example_input, expected_output):
     "example_input,raises_exception,error_message",
     [
         ({"data": [-1, 1, 3, None]}, False, None),
-        ({}, True, "Mandatory argument `data` is not defined."),
+        ({}, True, "Mandatory argument `data` is either null or not defined."),
+        ({"data": None}, True, "Mandatory argument `data` is either null or not defined."),
         ({"data": 2}, True, "Argument `data` is not an array."),
         ({"data": [1, 2, 3], "ignore_nodata": 12}, True, "Argument `ignore_nodata` is not a boolean."),
         ({"data": [1, 2, 3, 4, "5"]}, True, "Value in argument `data` is not a number or null."),
