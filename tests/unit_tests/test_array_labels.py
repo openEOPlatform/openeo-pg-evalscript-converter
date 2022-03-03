@@ -19,13 +19,16 @@ def array_labels_process_code():
     ],
 )
 def test_array_labels(array_labels_process_code, example_input, expected_output):
-    additional_js_code_to_run = f"const d = {json.dumps(example_input['data'])}; d.labels = {json.dumps(example_input['labels']) if 'labels' in example_input else 'undefined'};"
+    additional_js_code_to_run = (
+        f"const d = {json.dumps(example_input['data'])};"
+        + f"d.labels = {json.dumps(example_input['labels']) if 'labels' in example_input else 'undefined'};"
+    )
+    process_arguments = f"{{...{json.dumps(example_input)}, 'data': d}}"
     output = run_process_with_additional_js_code(
         array_labels_process_code,
         "array_labels",
-        example_input,
+        process_arguments,
         additional_js_code_to_run,
-        additional_params_in_string="'data': d",
     )
     output = json.loads(output)
     assert output == expected_output
@@ -42,15 +45,18 @@ def test_array_labels(array_labels_process_code, example_input, expected_output)
     ],
 )
 def test_array_labels_exceptions(array_labels_process_code, example_input, raises_exception, error_message):
-    additional_js_code_to_run = f"const d = {json.dumps(example_input['data'] if 'data' in example_input else 'undefined')}; d.labels = {json.dumps(example_input['labels']) if 'labels' in example_input else 'undefined'};"
+    additional_js_code_to_run = (
+        f"const d = {json.dumps(example_input['data'] if 'data' in example_input else 'undefined')};"
+        + f"d.labels = {json.dumps(example_input['labels']) if 'labels' in example_input else 'undefined'};"
+    )
+    process_arguments = f"{{...{json.dumps(example_input)}, 'data': d}}"
     if raises_exception:
         with pytest.raises(Exception) as exc:
             run_process_with_additional_js_code(
                 array_labels_process_code,
                 "array_labels",
-                example_input,
+                process_arguments,
                 additional_js_code_to_run,
-                additional_params_in_string="'data': d",
             )
         assert error_message in str(exc.value)
 
@@ -58,7 +64,6 @@ def test_array_labels_exceptions(array_labels_process_code, example_input, raise
         run_process_with_additional_js_code(
             array_labels_process_code,
             "array_labels",
-            example_input,
+            process_arguments,
             additional_js_code_to_run,
-            additional_params_in_string="'data': d",
         )
