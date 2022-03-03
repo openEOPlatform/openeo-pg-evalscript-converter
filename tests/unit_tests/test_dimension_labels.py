@@ -11,28 +11,31 @@ def dimension_labels_process_code():
 
 
 @pytest.mark.parametrize(
-    "example_input,expected_output",
+    "example_input,additional_js_code_specific_to_case,expected_output",
     [
         (
             {"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "dimension": "bands_name"},
+            "",
             ["B01", "B02", "B03"],
         ),
-        ({"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "dimension": "temporal_name"}, []),
+        ({"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "dimension": "temporal_name"}, "", []),
         (
             {
                 "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
                 "dimension": "temporal_name",
-                "additional_js_code_specific_to_case": "cube.getDimensionByName('temporal_name').labels = ['test1', 'test2', 'test3'];",
             },
+            "cube.getDimensionByName('temporal_name').labels = ['test1', 'test2', 'test3'];",
             ["test1", "test2", "test3"],
         ),
     ],
 )
-def test_dimension_labels(dimension_labels_process_code, example_input, expected_output):
+def test_dimension_labels(
+    dimension_labels_process_code, example_input, additional_js_code_specific_to_case, expected_output
+):
     additional_js_code_to_run = (
         load_datacube_code()
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
-        + f"{example_input['additional_js_code_specific_to_case'] if 'additional_js_code_specific_to_case' in example_input else ''}"
+        + additional_js_code_specific_to_case
     )
     process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
     output = run_process_with_additional_js_code(
@@ -46,10 +49,11 @@ def test_dimension_labels(dimension_labels_process_code, example_input, expected
 
 
 @pytest.mark.parametrize(
-    "example_input,raises_exception,error_message",
+    "example_input,additional_js_code_specific_to_case,raises_exception,error_message",
     [
         (
             {"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "dimension": "bands_name"},
+            "",
             False,
             None,
         ),
@@ -57,8 +61,8 @@ def test_dimension_labels(dimension_labels_process_code, example_input, expected
             {
                 "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
                 "dimension": "bands_name",
-                "additional_js_code_specific_to_case": "cube = undefined;",
             },
+            "cube = undefined;",
             True,
             "Mandatory argument `data` is not defined.",
         ),
@@ -66,6 +70,7 @@ def test_dimension_labels(dimension_labels_process_code, example_input, expected
             {
                 "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
             },
+            "",
             True,
             "Mandatory argument `dimension` is not defined.",
         ),
@@ -74,6 +79,7 @@ def test_dimension_labels(dimension_labels_process_code, example_input, expected
                 "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
                 "dimension": 123,
             },
+            "",
             True,
             "Argument `dimension` is not a string.",
         ),
@@ -82,6 +88,7 @@ def test_dimension_labels(dimension_labels_process_code, example_input, expected
                 "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
                 "dimension": "fake_name",
             },
+            "",
             True,
             "A dimension with the specified name does not exist.",
         ),
@@ -89,8 +96,8 @@ def test_dimension_labels(dimension_labels_process_code, example_input, expected
             {
                 "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
                 "dimension": "bands_name",
-                "additional_js_code_specific_to_case": "cube.getDimensionByName('bands_name').labels = undefined;",
             },
+            "cube.getDimensionByName('bands_name').labels = undefined;",
             True,
             "Dimension is missing attribute labels.",
         ),
@@ -98,18 +105,20 @@ def test_dimension_labels(dimension_labels_process_code, example_input, expected
             {
                 "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
                 "dimension": "bands_name",
-                "additional_js_code_specific_to_case": "cube.getDimensionByName('bands_name').labels = '[]';",
             },
+            "cube.getDimensionByName('bands_name').labels = '[]';",
             True,
             "Dimension labels is not an array.",
         ),
     ],
 )
-def test_dimension_labels_exceptions(dimension_labels_process_code, example_input, raises_exception, error_message):
+def test_dimension_labels_exceptions(
+    dimension_labels_process_code, example_input, additional_js_code_specific_to_case, raises_exception, error_message
+):
     additional_js_code_to_run = (
         load_datacube_code()
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
-        + f"{example_input['additional_js_code_specific_to_case'] if 'additional_js_code_specific_to_case' in example_input else ''}"
+        + additional_js_code_specific_to_case
     )
     process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
     if raises_exception:
