@@ -34,12 +34,12 @@ def test_dimension_labels(dimension_labels_process_code, example_input, expected
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
         + f"{example_input['additional_js_code_specific_to_case'] if 'additional_js_code_specific_to_case' in example_input else ''}"
     )
+    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
     output = run_process_with_additional_js_code(
         dimension_labels_process_code,
         "dimension_labels",
-        example_input,
+        process_arguments,
         additional_js_code_to_run,
-        additional_params_in_string="'data': cube",
     )
     output = json.loads(output)
     assert output == expected_output
@@ -111,14 +111,14 @@ def test_dimension_labels_exceptions(dimension_labels_process_code, example_inpu
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
         + f"{example_input['additional_js_code_specific_to_case'] if 'additional_js_code_specific_to_case' in example_input else ''}"
     )
+    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
     if raises_exception:
         with pytest.raises(Exception) as exc:
             run_process_with_additional_js_code(
                 dimension_labels_process_code,
                 "dimension_labels",
-                example_input,
+                process_arguments,
                 additional_js_code_to_run,
-                additional_params_in_string="'data': cube",
             )
         assert error_message in str(exc.value)
 
@@ -126,7 +126,6 @@ def test_dimension_labels_exceptions(dimension_labels_process_code, example_inpu
         run_process_with_additional_js_code(
             dimension_labels_process_code,
             "dimension_labels",
-            example_input,
+            process_arguments,
             additional_js_code_to_run,
-            additional_params_in_string="'data': cube",
         )
