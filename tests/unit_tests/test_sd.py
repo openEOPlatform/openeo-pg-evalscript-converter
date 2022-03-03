@@ -15,6 +15,9 @@ def sd_process_code():
     [
         ({"data": [-1, 1, 3, None]}, 2),
         ({"data": [-1, 1, 3, None], "ignore_nodata": False}, None),
+        ({"data": [1]}, 0),
+        ({"data": [1, -1]}, 1.4142136),
+        ({"data": [1.21, 3.4, 2, 4.66, 1.5, 5.61, 7.22]}, 2.2718327),
         ({"data": []}, None),
         ({"data": [], "ignore_nodata": False}, None),
         ({"data": [0, 1, 1, 2, 2, 3, 4, 5, 6, 6]}, 2.1602469),

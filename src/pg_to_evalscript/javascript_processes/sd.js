@@ -36,6 +36,10 @@ function sd(arguments) {
     return null;
   }
 
+  if (count === 1) {
+    return 0;
+  }
+
   const mean = sum / count;
   let sumOfSquares = 0;
   for (let x of data) {
