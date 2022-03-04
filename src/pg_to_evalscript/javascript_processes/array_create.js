@@ -10,7 +10,9 @@ function array_create(arguments) {
   }
 
   if (repeat < 1) {
-    throw new Error("Argument `repeat` has a minimum value of 1.");
+    throw new Error(
+      "Argument `repeat` must contain only values greater than or equal to 1."
+    );
   }
 
   let newData = [];

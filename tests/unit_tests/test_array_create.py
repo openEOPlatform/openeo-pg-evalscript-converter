@@ -62,7 +62,7 @@ def test_array_create(array_create_process_code, example_input, expected_output)
         ({"data": [1, 2, 3], "repeat": 2}, False, None),
         ({"data": {"1": 2, "3": 4}, "repeat": 1}, True, "Argument `data` is not an array."),
         ({"data": [1, 2, 3], "repeat": "2"}, True, "Argument `repeat` is not an integer."),
-        ({"data": [1, 2, 3], "repeat": -1}, True, "Argument `repeat` has a minimum value of 1."),
+        ({"data": [1, 2, 3], "repeat": -1}, True, "Argument `repeat` must contain only values greater than or equal to 1."),
     ],
 )
 def test_array_create_exceptions(array_create_process_code, example_input, raises_exception, error_message):
