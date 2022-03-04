@@ -61,7 +61,7 @@ def load_datacube_code():
     with open(abs_file_path) as f:
         return f.read()
 
-
+        
 def load_process_code(process_id):
     source_files = [
         load_script("../src/pg_to_evalscript/javascript_common/", "common"),
