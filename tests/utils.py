@@ -67,5 +67,5 @@ def load_process_code(process_id):
 def get_defined_processes_from_files():
     return [
         os.path.splitext(os.path.basename(file_path))[0]
-        for file_path in glob.glob(f"../src/pg_to_evalscript/javascript_processes/*.js")
+        for file_path in glob.glob(f"../../src/pg_to_evalscript/javascript_processes/*.js")
     ]
