@@ -2,7 +2,7 @@ function is_valid(arguments) {
   const { x } = arguments;
 
   if (x === undefined) {
-    throw Error("Process is_nodata requires argument x.");
+    throw Error("Process is_valid requires argument x.");
   }
 
   if (x == null) {
