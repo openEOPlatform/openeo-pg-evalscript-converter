@@ -11,14 +11,12 @@ def drop_dimension_process_code():
 
 
 @pytest.mark.parametrize(
-    "example_input,additional_js_code_specific_to_case,expected_output",
+    "data,name,additional_js_code_specific_to_case,expected_output",
     [
         (
-            {
-                "data": {"B01": [1, 2, 3]},
-                "name": "bands_name",
-            },
-            "",
+            {"B01": [1, 2, 3]},
+            "bands_name",
+            None,
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -32,11 +30,9 @@ def drop_dimension_process_code():
             },
         ),
         (
-            {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
-                "name": "temporal_name",
-            },
-            "",
+            {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+            "temporal_name",
+            None,
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -50,10 +46,8 @@ def drop_dimension_process_code():
             },
         ),
         (
-            {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
-                "name": "test_name_to_remove",
-            },
+            {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+            "test_name_to_remove",
             "cube.addDimension('test_name_to_remove', 'label123');",
             {
                 "BANDS": "bands",
@@ -70,13 +64,13 @@ def drop_dimension_process_code():
         ),
     ],
 )
-def test_drop_dimension(drop_dimension_process_code, example_input, additional_js_code_specific_to_case, expected_output):
+def test_drop_dimension(drop_dimension_process_code, data, name, additional_js_code_specific_to_case, expected_output):
     additional_js_code_to_run = (
         load_datacube_code()
-        + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
-        + additional_js_code_specific_to_case
+        + f"const cube = new DataCube({data}, 'bands_name', 'temporal_name', true);"
+        + (additional_js_code_specific_to_case or "")
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
+    process_arguments = f"{{'data': cube, 'name': '{name}'}}"
     output = run_process_with_additional_js_code(
         drop_dimension_process_code,
         "drop_dimension",
@@ -88,85 +82,75 @@ def test_drop_dimension(drop_dimension_process_code, example_input, additional_j
 
 
 @pytest.mark.parametrize(
-    "example_input,additional_js_code_specific_to_case,raises_exception,error_message",
+    "data,name,additional_js_code_specific_to_case,raises_exception,error_message",
     [
         (
-            {
-                "data": {"B01": [1, 2, 3]},
-                "name": "bands_name",
-            },
-            "",
+            {"B01": [1, 2, 3]},
+            "bands_name",
+            None,
             False,
             None,
         ),
         (
-            {"data": {"B01": [1, 2, 3]}, "name": "bands_name"},
+            {"B01": [1, 2, 3]},
+            "bands_name",
             "cube = null;",
             True,
             "Mandatory argument `data` is either null or not defined.",
         ),
         (
-            {
-                "data": {"B01": [1, 2, 3]},
-                "name": "bands_name",
-            },
+            {"B01": [1, 2, 3]},
+            "bands_name",
             "cube = undefined;",
             True,
             "Mandatory argument `data` is either null or not defined.",
         ),
         (
-            {
-                "data": {"B01": [1, 2, 3]},
-            },
-            "",
+            {"B01": [1, 2, 3]},
+            None,
+            None,
             True,
             "Mandatory argument `name` is either null or not defined.",
         ),
         (
-            {
-                "data": {"B01": [1, 2, 3]},
-                "name": None,
-            },
-            "",
+            {"B01": [1, 2, 3]},
+            None,
+            None,
             True,
             "Mandatory argument `name` is either null or not defined.",
         ),
         (
-            {
-                "data": {"B01": [1, 2, 3]},
-                "name": True,
-            },
-            "",
+            {"B01": [1, 2, 3]},
+            True,
+            None,
             True,
             "Argument `name` is not a string.",
         ),
         (
-            {
-                "data": {"B01": [1, 2, 3]},
-                "name": "bands_fake_name",
-            },
-            "",
+            {"B01": [1, 2, 3]},
+            "bands_fake_name",
+            None,
             True,
             "A dimension with the specified name does not exist.",
         ),
         (
-            {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6]},
-                "name": "bands_name",
-            },
-            "",
+            {"B01": [1, 2, 3], "B02": [4, 5, 6]},
+            "bands_name",
+            None,
             True,
             "The number of dimension labels exceeds one, which requires a reducer.",
         ),
     ],
 )
-def test_drop_dimension_exceptions(drop_dimension_process_code, example_input, additional_js_code_specific_to_case, raises_exception, error_message):
+def test_drop_dimension_exceptions(
+    drop_dimension_process_code, data, name, additional_js_code_specific_to_case, raises_exception, error_message
+):
     additional_js_code_to_run = (
         load_datacube_code()
-        + f"let cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
-        + additional_js_code_specific_to_case
+        + f"let cube = new DataCube({data}, 'bands_name', 'temporal_name', true);"
+        + (additional_js_code_specific_to_case or "")
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
+    process_arguments = f"{{'data': cube, 'name': '{name}'}}"
     if raises_exception:
         with pytest.raises(Exception) as exc:
             run_process_with_additional_js_code(
