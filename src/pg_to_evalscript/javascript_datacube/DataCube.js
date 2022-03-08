@@ -58,7 +58,8 @@ class DataCube {
       }
 
     removeDimension(dimension) {
-        this.dimensions = this.dimensions.filter(d => d.name !== dimension)
+        this.dimensions = this.dimensions.filter(d => d.name !== dimension);
+        this.data = this.data.flat()
     }
 
     addDimension(name, label, type) {

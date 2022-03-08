@@ -26,7 +26,7 @@ def drop_dimension_process_code():
                 "dimensions": [
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                 ],
-                "data": [[1, 2, 3]],
+                "data": [1, 2, 3],
             },
         ),
         (
@@ -42,7 +42,7 @@ def drop_dimension_process_code():
                 "dimensions": [
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+                "data": [1, 2, 3, 4, 5, 6, 7, 8, 9],
             },
         ),
         (
@@ -59,7 +59,7 @@ def drop_dimension_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
+                "data": [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
             },
         ),
     ],
