@@ -48,6 +48,10 @@ def run_javacript(javascript_code):
     return subprocess.check_output(["node", "-e", javascript_code])
 
 
+def run_javacript_with_output(javascript_code):
+    return subprocess.run(["node", "-e", javascript_code], capture_output=True)
+
+
 def load_script(source_file_folder, source_file_name):
     script_dir = os.path.dirname(__file__)
     abs_file_path = os.path.join(script_dir, f"{source_file_folder}/{source_file_name}.js")
@@ -61,7 +65,7 @@ def load_datacube_code():
     with open(abs_file_path) as f:
         return f.read()
 
-        
+
 def load_process_code(process_id):
     source_files = [
         load_script("../src/pg_to_evalscript/javascript_common/", "common"),

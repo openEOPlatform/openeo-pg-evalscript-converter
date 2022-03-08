@@ -1,7 +1,8 @@
 import json
 
 import pytest
-from tests.utils import load_script, run_javacript
+from tests.utils import load_script, run_javacript, run_javacript_with_output
+from subprocess import run
 
 
 @pytest.fixture
@@ -33,8 +34,85 @@ def test_common(common_code, example_input, expected_output):
         common_code + f"process.stdout.write(JSON.stringify({function_name}({json.dumps(example_input)})))"
     )
     output = json.loads(output)
-    if expected_output is None:
-        assert output is None
+
+
+@pytest.mark.parametrize(
+    "example_input,raises_exception,error_message",
+    [
+        ({"processName": "test", "parameterName": "arg1", "value": 1}, False, None),
+        ({"processName": "test", "parameterName": "arg1", "value": 1, "required": True}, False, None),
+        ({"processName": "test", "parameterName": "arg1", "value": 1, "required": False}, False, None),
+        ({"processName": "test", "parameterName": "arg1", "required": False}, False, None),
+        (
+            {"processName": "test", "parameterName": "arg1", "required": True},
+            True,
+            "MISSING_PARAMETER",
+        ),
+        (
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": "a",
+                "required": True,
+                "allowedTypes": ["string"],
+            },
+            False,
+            None,
+        ),
+        (
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": 1,
+                "required": True,
+                "allowedTypes": ["number"],
+            },
+            False,
+            None,
+        ),
+        (
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": "a",
+                "required": True,
+                "allowedTypes": ["number"],
+            },
+            True,
+            "WRONG_TYPE",
+        ),
+        (
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": True,
+                "required": True,
+                "allowedTypes": ["number", "string"],
+            },
+            True,
+            "WRONG_TYPE",
+        ),
+        (
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": "a",
+                "required": True,
+                "allowedTypes": ["string", "number"],
+            },
+            False,
+            None,
+        ),
+    ],
+)
+def test_validate_param(common_code, example_input, raises_exception, error_message):
+    function_name = "validateParameter"
+    code = common_code + f"process.stdout.write(JSON.stringify({function_name}({json.dumps(example_input)})))"
+    if raises_exception:
+        r = run_javacript_with_output(code)
+        assert error_message in str(r.stderr)
+
     else:
-        assert output["type"] == expected_output["type"]
-        assert output["value"] == expected_output["value"]
+        output = run_javacript(code)
+        output = json.loads(output)
+        assert output == True

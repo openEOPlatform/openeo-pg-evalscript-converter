@@ -1,12 +1,15 @@
 function absolute(arguments) {
   const { x } = arguments;
 
+  validateParameter({
+    processName: "absolute",
+    parameterName: "x",
+    value: x,
+    required: true,
+  });
+
   if (x === null) {
     return null;
-  }
-
-  if (x === undefined) {
-    throw Error("Process absolute requires argument x.");
   }
 
   return Math.abs(x);

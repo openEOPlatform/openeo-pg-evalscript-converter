@@ -44,3 +44,38 @@ function parse_rfc3339(dt, default_h = 0, default_m = 0, default_s = 0) {
 
   return result;
 }
+
+const VALIDATION_ERRORS = {
+  MISSING_PARAMETER: "MISSING_PARAMETER",
+  WRONG_TYPE: "WRONG_TYPE",
+};
+
+function validateParameter(arguments) {
+  const {
+    processName,
+    parameterName,
+    value,
+    required = false,
+    allowedTypes,
+  } = arguments;
+
+  if (!!required && value === undefined) {
+    throw new Error(
+      `${VALIDATION_ERRORS.MISSING_PARAMETER}: Process ${processName} requires parameter ${parameterName}.`
+    );
+  }
+
+  if (
+    allowedTypes &&
+    Array.isArray(allowedTypes) &&
+    !allowedTypes.includes(typeof value)
+  ) {
+    throw new Error(
+      `${
+        VALIDATION_ERRORS.WRONG_TYPE
+      }: Parameter ${parameterName} is not a ${allowedTypes.join(" or a")}.`
+    );
+  }
+
+  return true;
+}
