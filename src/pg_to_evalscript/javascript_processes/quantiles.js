@@ -43,7 +43,7 @@ function quantiles(arguments) {
 
   let probs = [];
 
-  if (!!q && probabilities === undefined) {
+  if (q !== undefined) {
     if (!Number.isInteger(q)) {
       throw new Error("Argument `q` is not an integer.");
     }
@@ -59,7 +59,7 @@ function quantiles(arguments) {
     probs = probs.slice(1);
   }
 
-  if (!!probabilities && q === undefined) {
+  if (probabilities !== undefined) {
     if (!Array.isArray(probabilities)) {
       throw new Error("Argument `probabilities` is not an array.");
     }
