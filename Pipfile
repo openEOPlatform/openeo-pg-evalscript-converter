@@ -14,10 +14,16 @@ jsbeautifier = "*"
 
 [packages]
 pytest = "*"
-pg-to-evalscript = {path = "."}
 
 [requires]
 python_version = "3.8"
 
 [pipenv]
 allow_prereleases = true
+
+[packages.pg-to-evalscript]
+path = "."
+
+[packages.e1839a8]
+path = "."
+editable = true

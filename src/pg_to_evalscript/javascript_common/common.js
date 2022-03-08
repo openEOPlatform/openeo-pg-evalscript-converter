@@ -51,6 +51,8 @@ const VALIDATION_ERRORS = {
   NOT_NULL: "NOT_NULL",
   NOT_ARRAY: "NOT_ARRAY",
   NOT_INTEGER: "NOT_INTEGER",
+  MIN_VALUE: "MIN_VALUE",
+  MAX_VALUE: "MAX_VALUE",
 };
 
 function validateParameter(arguments) {
@@ -63,6 +65,8 @@ function validateParameter(arguments) {
     allowedTypes,
     array,
     integer,
+    min,
+    max,
   } = arguments;
 
   if (!!required && value === undefined) {
@@ -99,6 +103,18 @@ function validateParameter(arguments) {
   if (integer && !Number.isInteger(value)) {
     throw new Error(
       `${VALIDATION_ERRORS.NOT_INTEGER}: Value for ${parameterName} is not an integer.`
+    );
+  }
+
+  if (min !== undefined && min !== null && value < min) {
+    throw new Error(
+      `${VALIDATION_ERRORS.MIN_VALUE}: Value for ${parameterName} must be greater or equal to ${min}.`
+    );
+  }
+
+  if (max !== undefined && max !== null && value > max) {
+    throw new Error(
+      `${VALIDATION_ERRORS.MAX_VALUE}: Value for ${parameterName} must be less or equal to ${max}.`
     );
   }
 

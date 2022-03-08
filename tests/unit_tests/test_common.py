@@ -43,11 +43,7 @@ def test_common(common_code, example_input, expected_output):
         ({"processName": "test", "parameterName": "arg1", "value": 1, "required": True}, False, None),
         ({"processName": "test", "parameterName": "arg1", "value": 1, "required": False}, False, None),
         ({"processName": "test", "parameterName": "arg1", "required": False}, False, None),
-        (
-            {"processName": "test", "parameterName": "arg1", "required": True},
-            True,
-            "MISSING_PARAMETER",
-        ),
+        ({"processName": "test", "parameterName": "arg1", "required": True}, True, "MISSING_PARAMETER"),
         (
             {
                 "processName": "test",
@@ -60,13 +56,7 @@ def test_common(common_code, example_input, expected_output):
             None,
         ),
         (
-            {
-                "processName": "test",
-                "parameterName": "arg1",
-                "value": 1,
-                "required": True,
-                "allowedTypes": ["number"],
-            },
+            {"processName": "test", "parameterName": "arg1", "value": 1, "required": True, "allowedTypes": ["number"]},
             False,
             None,
         ),
@@ -128,13 +118,7 @@ def test_common(common_code, example_input, expected_output):
             "NOT_NULL",
         ),
         (
-            {
-                "processName": "test",
-                "parameterName": "arg1",
-                "value": [1, 2, 3],
-                "required": True,
-                "array": True,
-            },
+            {"processName": "test", "parameterName": "arg1", "value": [1, 2, 3], "required": True, "array": True},
             False,
             None,
         ),
@@ -189,6 +173,49 @@ def test_common(common_code, example_input, expected_output):
                 "value": 1.2,
                 "required": True,
                 "integer": False,
+            },
+            False,
+            None,
+        ),
+        (
+            {"processName": "test", "parameterName": "arg1", "value": 1, "required": True, "integer": True, "min": 0},
+            False,
+            None,
+        ),
+        (
+            {"processName": "test", "parameterName": "arg1", "value": 0, "required": True, "integer": True, "min": 0},
+            False,
+            None,
+        ),
+        (
+            {"processName": "test", "parameterName": "arg1", "value": -1, "required": True, "integer": True, "min": 0},
+            True,
+            "MIN_VALUE",
+        ),
+        (
+            {"processName": "test", "parameterName": "arg1", "value": 1, "required": True, "integer": True, "max": 1},
+            False,
+            None,
+        ),
+        (
+            {"processName": "test", "parameterName": "arg1", "value": 0, "required": True, "integer": True, "max": 1},
+            False,
+            None,
+        ),
+        (
+            {"processName": "test", "parameterName": "arg1", "value": 1, "required": True, "integer": True, "max": 0},
+            True,
+            "MAX_VALUE",
+        ),
+        (
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": 1,
+                "required": True,
+                "integer": True,
+                "min": 1,
+                "max": 2,
             },
             False,
             None,
