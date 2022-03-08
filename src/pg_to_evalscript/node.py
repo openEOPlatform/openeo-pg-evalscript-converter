@@ -263,7 +263,7 @@ function count(arguments) {{
     function condition(arguments) {{
     {newline.join(node.write_function() for node in self.child_nodes)}
     {newline.join(node.write_call() for node in self.child_nodes)}
-        return {(self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id)};
+        return {(self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id) if len(self.child_nodes) > 0 else None};
     }}
 
     {pkgutil.get_data("pg_to_evalscript", f"{self.process_definitions_directory}/is_valid.js").decode("utf-8")}
