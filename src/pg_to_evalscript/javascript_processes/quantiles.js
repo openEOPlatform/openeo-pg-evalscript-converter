@@ -28,11 +28,17 @@ function quantiles(arguments) {
   }
 
   if (probabilities === undefined && q === undefined) {
-    throw new QuantilesParameterMissing("The process `quantiles` requires either the `probabilities` or `q` parameter to be set.");
+    throw new ProcessError({
+      name: "QuantilesParameterMissing",
+      message: "The process `quantiles` requires either the `probabilities` or `q` parameter to be set."
+    });
   }
 
   if (probabilities !== undefined && q !== undefined) {
-    throw new QuantilesParameterConflict("The process `quantiles` only allows that either the `probabilities` or the `q` parameter is set.");
+    throw new ProcessError({
+      name: "QuantilesParameterConflict",
+      message: "The process `quantiles` only allows that either the `probabilities` or the `q` parameter is set."
+    });
   }
 
   let probs = [];
