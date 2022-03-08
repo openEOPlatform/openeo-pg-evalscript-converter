@@ -1,29 +1,35 @@
 function add_dimension(arguments) {
   const { data, name, label, type = "other" } = arguments;
 
-  if (data === undefined) {
-    throw new Error("Mandatory argument `data` is not defined.");
-  }
+  validateParameter({
+    processName: "add_dimension",
+    parameterName: "data",
+    value: data,
+    required: true,
+  });
 
-  if (name === undefined) {
-    throw new Error("Mandatory argument `name` is not defined.");
-  }
+  validateParameter({
+    processName: "add_dimension",
+    parameterName: "name",
+    value: name,
+    required: true,
+    allowedTypes: ["string"],
+  });
 
-  if (label === undefined) {
-    throw new Error("Mandatory argument `label` is not defined.");
-  }
+  validateParameter({
+    processName: "add_dimension",
+    parameterName: "label",
+    value: label,
+    required: true,
+    allowedTypes: ["string", "number"],
+  });
 
-  if (typeof name !== "string") {
-    throw new Error("Argument `name` is not a string.");
-  }
-
-  if (typeof label !== "number" && typeof label !== "string") {
-    throw new Error("Argument `label` is not a string or a number.");
-  }
-
-  if (typeof type !== "string") {
-    throw new Error("Argument `type` is not a string.");
-  }
+  validateParameter({
+    processName: "add_dimension",
+    parameterName: "type",
+    value: type,
+    allowedTypes: ["string"],
+  });
 
   if (data.getDimensionByName(name)) {
     throw new Error("A dimension with the specified name already exists.");

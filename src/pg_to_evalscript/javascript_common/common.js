@@ -85,12 +85,13 @@ function validateParameter(arguments) {
     allowedTypes &&
     Array.isArray(allowedTypes) &&
     value !== null &&
+    value !== undefined &&
     !allowedTypes.includes(typeof value)
   ) {
     throw new Error(
       `${
         VALIDATION_ERRORS.WRONG_TYPE
-      }: Value for ${parameterName} is not a ${allowedTypes.join(" or a")}.`
+      }: Value for ${parameterName} is not a ${allowedTypes.join(" or a ")}.`
     );
   }
 
