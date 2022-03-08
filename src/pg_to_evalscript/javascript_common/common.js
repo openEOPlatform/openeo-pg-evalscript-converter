@@ -48,6 +48,9 @@ function parse_rfc3339(dt, default_h = 0, default_m = 0, default_s = 0) {
 const VALIDATION_ERRORS = {
   MISSING_PARAMETER: "MISSING_PARAMETER",
   WRONG_TYPE: "WRONG_TYPE",
+  NOT_NULL: "NOT_NULL",
+  NOT_ARRAY: "NOT_ARRAY",
+  NOT_INTEGER: "NOT_INTEGER",
 };
 
 function validateParameter(arguments) {
@@ -56,7 +59,10 @@ function validateParameter(arguments) {
     parameterName,
     value,
     required = false,
+    nullable = true,
     allowedTypes,
+    array,
+    integer,
   } = arguments;
 
   if (!!required && value === undefined) {
@@ -65,15 +71,34 @@ function validateParameter(arguments) {
     );
   }
 
+  if (!nullable && value === null) {
+    throw new Error(
+      `${VALIDATION_ERRORS.NOT_NULL}: Value for ${parameterName} should not be null.`
+    );
+  }
+
   if (
     allowedTypes &&
     Array.isArray(allowedTypes) &&
+    value !== null &&
     !allowedTypes.includes(typeof value)
   ) {
     throw new Error(
       `${
         VALIDATION_ERRORS.WRONG_TYPE
-      }: Parameter ${parameterName} is not a ${allowedTypes.join(" or a")}.`
+      }: Value for ${parameterName} is not a ${allowedTypes.join(" or a")}.`
+    );
+  }
+
+  if (array && !Array.isArray(value)) {
+    throw new Error(
+      `${VALIDATION_ERRORS.NOT_ARRAY}: Value for ${parameterName} is not an array.`
+    );
+  }
+
+  if (integer && !Number.isInteger(value)) {
+    throw new Error(
+      `${VALIDATION_ERRORS.NOT_INTEGER}: Value for ${parameterName} is not an integer.`
     );
   }
 

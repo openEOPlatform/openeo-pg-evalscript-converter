@@ -103,6 +103,96 @@ def test_common(common_code, example_input, expected_output):
             False,
             None,
         ),
+        (
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": None,
+                "required": True,
+                "nullable": True,
+                "allowedTypes": ["string", "number"],
+            },
+            False,
+            None,
+        ),
+        (
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": None,
+                "required": True,
+                "nullable": False,
+                "allowedTypes": ["string", "number"],
+            },
+            True,
+            "NOT_NULL",
+        ),
+        (
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": [1, 2, 3],
+                "required": True,
+                "array": True,
+            },
+            False,
+            None,
+        ),
+        (
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": "[1, 2, 3]",
+                "required": True,
+                "array": True,
+            },
+            True,
+            "NOT_ARRAY",
+        ),
+        (
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": "[1, 2, 3]",
+                "required": True,
+                "array": False,
+            },
+            False,
+            None,
+        ),
+        (
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": 1,
+                "required": True,
+                "integer": True,
+            },
+            False,
+            None,
+        ),
+        (
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": 1.2,
+                "required": True,
+                "integer": True,
+            },
+            True,
+            "NOT_INTEGER",
+        ),
+        (
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": 1.2,
+                "required": True,
+                "integer": False,
+            },
+            False,
+            None,
+        ),
     ],
 )
 def test_validate_param(common_code, example_input, raises_exception, error_message):
