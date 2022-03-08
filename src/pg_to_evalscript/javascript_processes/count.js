@@ -1,5 +1,5 @@
 function count(arguments) {
-  const { data, condition = null, context = null } = arguments;
+  const { data, condition: cond = null } = arguments;
 
   if (data === undefined) {
     throw new Error("Mandatory argument `data` is not defined.");
@@ -10,30 +10,26 @@ function count(arguments) {
   }
 
   if (
-    typeof condition !== "boolean" &&
-    typeof condition === "object" &&
-    Array.isArray(condition) &&
-    condition !== null
+    typeof cond !== "boolean" &&
+    typeof cond === "object" &&
+    Array.isArray(cond) &&
+    cond !== null
   ) {
     throw new Error("Argument `condition` is not a boolean, object or null.");
   }
 
-  if (condition && context) {
-    condition.context = { ...context, ...condition.context };
-  }
-
-  if (condition === true) {
+  if (cond === true) {
     return data.length;
   }
 
   let count = 0;
   for (let val of data) {
-    if (condition === null && is_valid({ x: val })) {
+    if (cond === null && is_valid({ x: val })) {
       count++;
       continue;
     }
 
-    if (condition !== null && condition({ x: val })) {
+    if (cond !== null && condition({ x: val })) {
       count++;
       continue;
     }
