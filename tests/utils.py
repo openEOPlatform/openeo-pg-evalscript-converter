@@ -45,11 +45,7 @@ def get_evalscript_input_object(evalscript):
 
 
 def run_javacript(javascript_code):
-    return subprocess.check_output(["node", "-e", javascript_code])
-
-
-def run_javacript_with_output(javascript_code):
-    return subprocess.run(["node", "-e", javascript_code], capture_output=True)
+    return subprocess.check_output(["node", "-e", javascript_code], stderr=subprocess.PIPE)
 
 
 def load_script(source_file_folder, source_file_name):

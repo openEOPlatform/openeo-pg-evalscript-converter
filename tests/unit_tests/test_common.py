@@ -1,8 +1,8 @@
 import json
-
 import pytest
-from tests.utils import load_script, run_javacript, run_javacript_with_output
-from subprocess import run
+import subprocess
+
+from tests.utils import load_script, run_javacript
 
 
 @pytest.fixture
@@ -226,8 +226,10 @@ def test_validate_param(common_code, example_input, raises_exception, error_mess
     function_name = "validateParameter"
     code = common_code + f"process.stdout.write(JSON.stringify({function_name}({json.dumps(example_input)})))"
     if raises_exception:
-        r = run_javacript_with_output(code)
-        assert error_message in str(r.stderr)
+        try:
+            run_javacript(code)
+        except subprocess.CalledProcessError as exc:
+            assert error_message in str(exc.stderr)
 
     else:
         output = run_javacript(code)
