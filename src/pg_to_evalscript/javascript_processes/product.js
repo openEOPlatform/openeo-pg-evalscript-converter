@@ -1,4 +1,4 @@
-function max(arguments) {
+function product(arguments) {
   const { data, ignore_nodata = true } = arguments;
 
   if (data === undefined) {
@@ -13,30 +13,27 @@ function max(arguments) {
     throw new Error("Argument `ignore_nodata` is not a boolean.");
   }
 
-  let maxVal = null;
-
+  let product = 1;
   for (let x of data) {
     if (typeof x !== "number" && x !== null) {
-      throw new Error("Element in argument `data` is not a number or null.");
+      throw new Error("Value in argument `data` is not a number or null.");
     }
 
     if (x === null) {
       if (ignore_nodata) {
         continue;
       } else {
-        return null;
+        product = null;
+        break;
       }
     }
 
-    if (maxVal === null) {
-      maxVal = x;
-      continue;
-    }
-
-    if (x > maxVal) {
-      maxVal = x;
-    }
+    product = product * x;
   }
 
-  return maxVal;
+  if (data.length === 0) {
+    product = null;
+  }
+
+  return product;
 }
