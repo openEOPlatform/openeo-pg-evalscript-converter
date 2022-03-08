@@ -52,11 +52,10 @@ function quantiles(arguments) {
       throw new Error("Argument `q` must be greater or equal to 2.");
     }
 
-    for (let i = 0; i < 1; i += 1 / q) {
+    const interval = 1 / q;
+    for (let i = interval; i < 1; i += interval) {
       probs.push(i);
     }
-
-    probs = probs.slice(1);
   }
 
   if (probabilities !== undefined) {
