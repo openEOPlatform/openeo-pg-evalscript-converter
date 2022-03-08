@@ -1,17 +1,3 @@
-class QuantilesParameterMissing extends Error {
-  constructor(message) {
-    super(message);
-    this.name = "QuantilesParameterMissing";
-  }
-}
-
-class QuantilesParameterConflict extends Error {
-  constructor(message) {
-    super(message);
-    this.name = "QuantilesParameterConflict";
-  }
-}
-
 function quantiles(arguments) {
   const { data, probabilities, q, ignore_nodata = true } = arguments;
 
