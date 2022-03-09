@@ -6,6 +6,7 @@ function absolute(arguments) {
     parameterName: "x",
     value: x,
     required: true,
+    allowedTypes: ["number"],
   });
 
   if (x === null) {
