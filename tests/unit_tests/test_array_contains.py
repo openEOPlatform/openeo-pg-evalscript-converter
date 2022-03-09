@@ -22,6 +22,8 @@ def array_contains_process_code():
         ({"data": [{"a": "b"}, {"c": "d"}], "value": {"a": "b"}}, False),
         ({"data": ["12:23:54", "13.1.2022", "5/28/2013 10:30:15 AM"], "value": "13.1.2022"}, True),
         ({"data": ["12:23:54", "13.1.2022", "5/28/2013 10:30:15 AM"], "value": "13.1.2022+00:00"}, False),
+        ({"data": [1, 2, 3], "value": "2"}, False),
+        ({"data": ["1", "2", "3"], "value": 2}, False),
     ],
 )
 def test_array_contains(array_contains_process_code, example_input, expected_output):

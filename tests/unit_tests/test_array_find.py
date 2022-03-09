@@ -22,6 +22,8 @@ def array_find_process_code():
         ({"data": [{"a": "b"}, {"c": "d"}], "value": {"a": "b"}}, None),
         ({"data": ["12:23:54", "13.1.2022", "5/28/2013 10:30:15 AM"], "value": "13.1.2022"}, 1),
         ({"data": ["12:23:54", "13.1.2022", "5/28/2013 10:30:15 AM"], "value": "13.1.2022+00:00"}, None),
+        ({"data": [1, 2, 3], "value": "2"}, None),
+        ({"data": ["1", "2", "3"], "value": 2}, None),
     ],
 )
 def test_array_find(array_find_process_code, example_input, expected_output):

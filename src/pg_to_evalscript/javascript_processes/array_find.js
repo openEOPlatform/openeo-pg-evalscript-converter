@@ -13,7 +13,7 @@ function array_find(arguments) {
   if (typeof value === "object" || value === null) {
     return null;
   }
-  const index = data.findIndex((x) => x === value);
-  
+
+  const index = data.indexOf(value);
   return (index === -1 ? null : index);
 }

@@ -13,6 +13,5 @@ function array_contains(arguments) {
   if (typeof value === "object" || value === null) {
     return false;
   }
-  const el = data.find((x) => x === value);
-  return typeof el === typeof value;
+  return data.includes(value);
 }
