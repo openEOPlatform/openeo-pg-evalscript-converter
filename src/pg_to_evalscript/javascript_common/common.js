@@ -44,3 +44,10 @@ function parse_rfc3339(dt, default_h = 0, default_m = 0, default_s = 0) {
 
   return result;
 }
+
+class ProcessError extends Error {
+  constructor({name, message}) {
+    super(message);
+    this.name = name;
+  }
+}
