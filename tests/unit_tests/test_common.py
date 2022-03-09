@@ -1,6 +1,5 @@
 import json
 import pytest
-import subprocess
 
 from tests.utils import load_script, run_javacript, run_input_validation
 
