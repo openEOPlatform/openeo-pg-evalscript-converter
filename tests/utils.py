@@ -75,3 +75,16 @@ def get_defined_processes_from_files():
         os.path.splitext(os.path.basename(file_path))[0]
         for file_path in glob.glob(f"../src/pg_to_evalscript/javascript_processes/*.js")
     ]
+
+
+# helper function used for testing process inputs validation
+def run_input_validation(code, process, example_input, raises_exception, error_code, error_message=None):
+    expected = f"code: '{error_code}'" if error_code else error_message
+    if raises_exception:
+        try:
+            run_process(code, process, example_input)
+        except subprocess.CalledProcessError as exc:
+            assert expected in str(exc.stderr)
+
+    else:
+        run_process(code, process, example_input)
