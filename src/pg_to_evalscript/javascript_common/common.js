@@ -45,7 +45,14 @@ function parse_rfc3339(dt, default_h = 0, default_m = 0, default_s = 0) {
   return result;
 }
 
-const VALIDATION_ERRORS = {
+class ValidationError extends Error {
+  constructor(code, message) {
+    super(message);
+    this.code = code;
+  }
+}
+
+const VALIDATION_ERROR_CODES = {
   MISSING_PARAMETER: "MISSING_PARAMETER",
   WRONG_TYPE: "WRONG_TYPE",
   NOT_NULL: "NOT_NULL",
@@ -70,14 +77,16 @@ function validateParameter(arguments) {
   } = arguments;
 
   if (!!required && value === undefined) {
-    throw new Error(
-      `${VALIDATION_ERRORS.MISSING_PARAMETER}: Process ${processName} requires parameter ${parameterName}.`
+    throw new ValidationError(
+      VALIDATION_ERROR_CODES.MISSING_PARAMETER,
+      `Process ${processName} requires parameter ${parameterName}.`
     );
   }
 
   if (!nullable && value === null) {
-    throw new Error(
-      `${VALIDATION_ERRORS.NOT_NULL}: Value for ${parameterName} should not be null.`
+    throw new ValidationError(
+      VALIDATION_ERROR_CODES.NOT_NULL,
+      `Value for ${parameterName} should not be null.`
     );
   }
 
@@ -88,34 +97,37 @@ function validateParameter(arguments) {
     value !== undefined &&
     !allowedTypes.includes(typeof value)
   ) {
-    throw new Error(
-      `${
-        VALIDATION_ERRORS.WRONG_TYPE
-      }: Value for ${parameterName} is not a ${allowedTypes.join(" or a ")}.`
+    throw new ValidationError(
+      VALIDATION_ERROR_CODES.WRONG_TYPE,
+      `Value for ${parameterName} is not a ${allowedTypes.join(" or a ")}.`
     );
   }
 
   if (array && !Array.isArray(value)) {
-    throw new Error(
-      `${VALIDATION_ERRORS.NOT_ARRAY}: Value for ${parameterName} is not an array.`
+    throw new ValidationError(
+      VALIDATION_ERROR_CODES.NOT_ARRAY,
+      `Value for ${parameterName} is not an array.`
     );
   }
 
   if (integer && !Number.isInteger(value)) {
-    throw new Error(
-      `${VALIDATION_ERRORS.NOT_INTEGER}: Value for ${parameterName} is not an integer.`
+    throw new ValidationError(
+      VALIDATION_ERROR_CODES.NOT_INTEGER,
+      `Value for ${parameterName} is not an integer.`
     );
   }
 
   if (min !== undefined && min !== null && value < min) {
-    throw new Error(
-      `${VALIDATION_ERRORS.MIN_VALUE}: Value for ${parameterName} must be greater or equal to ${min}.`
+    throw new ValidationError(
+      VALIDATION_ERROR_CODES.MIN_VALUE,
+      `Value for ${parameterName} must be greater or equal to ${min}.`
     );
   }
 
   if (max !== undefined && max !== null && value > max) {
-    throw new Error(
-      `${VALIDATION_ERRORS.MAX_VALUE}: Value for ${parameterName} must be less or equal to ${max}.`
+    throw new ValidationError(
+      VALIDATION_ERROR_CODES.MAX_VALUE,
+      `Value for ${parameterName} must be less or equal to ${max}.`
     );
   }
 
