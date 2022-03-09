@@ -84,6 +84,8 @@ def run_input_validation(code, process, example_input, raises_exception, error_c
         assert expected != None
         try:
             run_process(code, process, example_input)
+            # it should always throw an exception
+            assert False
         except subprocess.CalledProcessError as exc:
             assert expected in str(exc.stderr)
 
