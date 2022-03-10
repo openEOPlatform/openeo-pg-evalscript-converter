@@ -36,7 +36,7 @@ def test_common(common_code, example_input, expected_output):
 
 
 @pytest.mark.parametrize(
-    "example_input,raises_exception,error_code",
+    "example_input,raises_exception,error_name",
     [
         ({"processName": "test", "parameterName": "arg1", "value": 1}, False, None),
         ({"processName": "test", "parameterName": "arg1", "value": 1, "required": True}, False, None),
@@ -221,5 +221,5 @@ def test_common(common_code, example_input, expected_output):
         ),
     ],
 )
-def test_validate_param(common_code, example_input, raises_exception, error_code):
-    run_input_validation(common_code, "validateParameter", example_input, raises_exception, error_code)
+def test_validate_param(common_code, example_input, raises_exception, error_name):
+    run_input_validation(common_code, "validateParameter", example_input, raises_exception, error_name)

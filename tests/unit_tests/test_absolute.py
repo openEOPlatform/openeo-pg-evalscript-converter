@@ -27,7 +27,7 @@ def test_absolute(absolute_process_code, example_input, expected_output):
 
 
 @pytest.mark.parametrize(
-    "example_input,raises_exception,error_code",
+    "example_input,raises_exception,error_name",
     [
         ({}, True, "MISSING_PARAMETER"),
         ({"x": None}, False, None),
@@ -35,5 +35,5 @@ def test_absolute(absolute_process_code, example_input, expected_output):
         ({"x": "0.3"}, True, "WRONG_TYPE"),
     ],
 )
-def test_absolute_inputs(absolute_process_code, example_input, raises_exception, error_code):
-    run_input_validation(absolute_process_code, "absolute", example_input, raises_exception, error_code)
+def test_absolute_inputs(absolute_process_code, example_input, raises_exception, error_name):
+    run_input_validation(absolute_process_code, "absolute", example_input, raises_exception, error_name)

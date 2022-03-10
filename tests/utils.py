@@ -78,9 +78,9 @@ def get_defined_processes_from_files():
 
 
 # helper function used for testing process inputs validation
-def run_input_validation(code, process, example_input, raises_exception, error_code=None, error_message=None):
+def run_input_validation(code, process, example_input, raises_exception, error_name=None, error_message=None):
     if raises_exception:
-        expected = f"code: '{error_code}'" if error_code else error_message
+        expected = error_name if error_name else error_message
         assert expected != None
         try:
             run_process(code, process, example_input)
