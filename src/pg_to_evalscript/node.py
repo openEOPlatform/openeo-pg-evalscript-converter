@@ -249,9 +249,6 @@ function apply(arguments) {{
 
 
 class CountNode(Node):
-    def is_process_defined(self, process_id):
-        return True
-
     def write_process(self):
         newline = "\n"
         tab = "\t"
