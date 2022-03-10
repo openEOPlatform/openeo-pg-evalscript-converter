@@ -252,9 +252,6 @@ class CountNode(Node):
     def write_process(self):
         newline = "\n"
         tab = "\t"
-        count_process_definition = self.load_process_code()
-        # remove first and last line from file, so we get only content of count process (function)
-        count_process_definition_content = count_process_definition[count_process_definition.find(newline) + 1 : count_process_definition.rfind('}')]
         return f"""
 function count(arguments) {{
     function condition(arguments) {{
@@ -265,6 +262,7 @@ function count(arguments) {{
 
     {pkgutil.get_data("pg_to_evalscript", f"{self.process_definitions_directory}/is_valid.js").decode("utf-8")}
 
-    {count_process_definition_content}
+    {self.load_process_code()}
+    return count(arguments);
 }}
 """
