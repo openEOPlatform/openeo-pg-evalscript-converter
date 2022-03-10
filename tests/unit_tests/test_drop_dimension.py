@@ -15,22 +15,6 @@ def drop_dimension_process_code():
     [
         (
             {"B01": [1, 2, 3]},
-            "bands_name",
-            None,
-            {
-                "BANDS": "bands",
-                "OTHER": "other",
-                "TEMPORAL": "temporal",
-                "bands_dimension_name": "bands_name",
-                "temporal_dimension_name": "temporal_name",
-                "dimensions": [
-                    {"labels": [], "name": "temporal_name", "type": "temporal"},
-                ],
-                "data": [1, 2, 3],
-            },
-        ),
-        (
-            {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
             "temporal_name",
             None,
             {
@@ -40,15 +24,35 @@ def drop_dimension_process_code():
                 "bands_dimension_name": "bands_name",
                 "temporal_dimension_name": "temporal_name",
                 "dimensions": [
-                    {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
+                    {"labels": ["B01"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                "data": [1, 2, 3],
+            },
+        ),
+        (
+            {"B01": [1, 2, 3, 4], "B02": [5, 6, 7, 8], "B03": [9, 10, 11, 12], "B04": [13, 14, 15, 16]},
+            "temporal_name",
+            "cube.addDimension('x', 'x_label', 'spatial');"
+            + "cube.addDimension('y', 'y_label', 'spatial');"
+            + "cube.data = [[[[1,2,3,4]], [[5,6,7,8]]], [[[9,10,11,12]], [[13,14,15,16]]]];",
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands_name",
+                "temporal_dimension_name": "temporal_name",
+                "dimensions": [
+                    {"labels": ["y_label"], "name": "y", "type": "spatial"},
+                    {"labels": ["x_label"], "name": "x", "type": "spatial"},
+                    {"labels": ["B01", "B02", "B03", "B04"], "name": "bands_name", "type": "bands"},
+                ],
+                "data": [[[1, 2, 3, 4], [5, 6, 7, 8]], [[9, 10, 11, 12], [13, 14, 15, 16]]],
             },
         ),
         (
             {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
             "test_name_to_remove",
-            "cube.addDimension('test_name_to_remove', 'label123');",
+            "cube.addDimension('test_name_to_remove', 'label123', 'other');",
             {
                 "BANDS": "bands",
                 "OTHER": "other",

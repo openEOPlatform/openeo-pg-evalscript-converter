@@ -58,8 +58,32 @@ class DataCube {
       }
 
     removeDimension(dimension) {
+        const idx = this.dimensions.findIndex(d => d.name === dimension);
         this.dimensions = this.dimensions.filter(d => d.name !== dimension);
-        this.data = this.data.flat()
+        this.removeDimensionFromData(this.data, 0, idx === 0 ? idx : idx - 1);
+    }
+
+    removeDimensionFromData(data, currLevel, level) {
+        if (currLevel === level) {
+            if (currLevel === 0) {
+                const tmpData = data[0]
+                for (let i = 0; i < tmpData.length; i++) {
+                    data[i] = tmpData[i]
+                }
+                return;
+            }
+
+            for (let j = 0; j < data.length; j++) {
+                const tmpData = data[j]
+                for (let i = 0; i < tmpData.length; i++) {
+                    data[j] = tmpData[i]
+                }
+            }
+            return;
+        }
+        for (let i = 0; i < data.length; i++) {
+            this.removeDimensionFromData(data[i], currLevel + 1, level)
+        }
     }
 
     addDimension(name, label, type) {
