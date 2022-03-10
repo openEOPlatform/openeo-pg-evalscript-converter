@@ -71,6 +71,7 @@ class Node:
             "merge_cubes": MergeCubesNode,
             "if": IfNode,
             "apply": ApplyNode,
+            "count": CountNode,
         }
         if class_types_for_process.get(process_id):
             self.__class__ = class_types_for_process[process_id]
@@ -243,5 +244,25 @@ function apply(arguments) {{
     const newData = data.clone()
     newData.apply(process)
     return newData;
+}}
+"""
+
+
+class CountNode(Node):
+    def write_process(self):
+        newline = "\n"
+        tab = "\t"
+        return f"""
+function count(arguments) {{
+    function condition(arguments) {{
+    {newline.join(node.write_function() for node in self.child_nodes)}
+    {newline.join(node.write_call() for node in self.child_nodes)}
+        return {(self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id) if len(self.child_nodes) > 0 else None};
+    }}
+
+    {pkgutil.get_data("pg_to_evalscript", f"{self.process_definitions_directory}/is_valid.js").decode("utf-8")}
+
+    {self.load_process_code()}
+    return count(arguments);
 }}
 """
