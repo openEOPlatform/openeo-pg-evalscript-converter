@@ -1,19 +1,20 @@
 function array_create(arguments) {
   const { data = [], repeat = 1 } = arguments;
 
-  if (!Array.isArray(data)) {
-    throw new Error("Argument `data` is not an array.");
-  }
+  validateParameter({
+    processName: "array_create",
+    parameterName: "data",
+    value: data,
+    array: true,
+  });
 
-  if (!Number.isInteger(repeat)) {
-    throw new Error("Argument `repeat` is not an integer.");
-  }
-
-  if (repeat < 1) {
-    throw new Error(
-      "Argument `repeat` must contain only values greater than or equal to 1."
-    );
-  }
+  validateParameter({
+    processName: "array_create",
+    parameterName: "repeat",
+    value: repeat,
+    integer: true,
+    min: 1,
+  });
 
   let newData = [];
 
