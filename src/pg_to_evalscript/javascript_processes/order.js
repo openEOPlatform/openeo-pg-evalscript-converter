@@ -19,7 +19,16 @@ function order(arguments) {
 
   return data
     .map((value, index) => {
-      return { value, index };
+      if (typeof value === "number" || value === null) {
+        return { value, index };
+      }
+
+      const ISODateString = parse_rfc3339(value);
+      if (ISODateString) {
+        return { value: ISODateString.value, index };
+      }
+
+      throw new Error("Element in argument `data` is not a number, null or a valid ISO date string.");
     })
     .sort((a, b) => {
       if (a.value === null && b.value === null) return 0;
