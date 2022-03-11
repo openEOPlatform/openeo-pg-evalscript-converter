@@ -1,21 +1,21 @@
 function and(arguments) {
   const { x, y } = arguments;
 
-  if (x === undefined) {
-    throw new Error("Mandatory argument `x` is not defined.");
-  }
+  validateParameter({
+    processName: "and",
+    parameterName: "x",
+    value: x,
+    required: true,
+    boolean: true,
+  });
 
-  if (y === undefined) {
-    throw new Error("Mandatory argument `y` is not defined.");
-  }
-
-  if (typeof x !== "boolean" && x !== null) {
-    throw new Error("Argument `x` is not a boolean or null.");
-  }
-
-  if (typeof y !== "boolean" && y !== null) {
-    throw new Error("Argument `y` is not a boolean or null.");
-  }
+  validateParameter({
+    processName: "and",
+    parameterName: "y",
+    value: y,
+    required: true,
+    boolean: true,
+  });
 
   if (x === false || y === false) {
     return false;
