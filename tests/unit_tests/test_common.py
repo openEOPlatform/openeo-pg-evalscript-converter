@@ -177,6 +177,11 @@ def test_common(common_code, example_input, expected_output):
             False,
             None,
         ),
+        (
+            {"processName": "test", "parameterName": "arg1", "value": None, "required": True, "boolean": True},
+            False,
+            None,
+        ),
         # MIN_VALUE
         (
             {"processName": "test", "parameterName": "arg1", "value": 1, "required": True, "integer": True, "min": 0},

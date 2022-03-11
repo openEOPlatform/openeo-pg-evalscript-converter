@@ -46,7 +46,7 @@ function parse_rfc3339(dt, default_h = 0, default_m = 0, default_s = 0) {
 }
 
 class ProcessError extends Error {
-  constructor({name, message}) {
+  constructor({ name, message }) {
     super(message);
     this.name = name;
   }
@@ -128,7 +128,12 @@ function validateParameter(arguments) {
     });
   }
 
-  if (boolean && typeof value !== "boolean") {
+  if (
+    boolean &&
+    value !== undefined &&
+    value !== null &&
+    typeof value !== "boolean"
+  ) {
     throw new ValidationError({
       name: VALIDATION_ERRORS.NOT_BOOLEAN,
       message: `Value for ${parameterName} is not a boolean.`,
