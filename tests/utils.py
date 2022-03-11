@@ -28,6 +28,19 @@ def run_process(process_code, process_name, example_input):
     )
 
 
+def run_process_with_additional_js_code(
+    process_code,
+    process_name,
+    process_arguments,
+    additional_js_code_to_run,
+):
+    return run_javacript(
+        process_code
+        + additional_js_code_to_run
+        + f"process.stdout.write(JSON.stringify({process_name}({process_arguments})));"
+    )
+
+
 def get_evalscript_input_object(evalscript):
     return json.loads(run_javacript(evalscript + f"\nprocess.stdout.write(JSON.stringify(setup()))"))
 
