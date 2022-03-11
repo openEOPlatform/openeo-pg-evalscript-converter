@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process_with_additional_js_code
+from tests.utils import load_process_code, run_process
 
 
 @pytest.fixture
@@ -20,15 +20,13 @@ def array_labels_process_code():
 )
 def test_array_labels(array_labels_process_code, example_input, expected_output):
     additional_js_code_to_run = (
-        f"const d = {json.dumps(example_input['data'])};"
-        + f"d.labels = {json.dumps(example_input['labels']) if 'labels' in example_input else 'undefined'};"
+        f"const d = {json.dumps(example_input['data'])};" + f"d.labels = {json.dumps(example_input['labels'])};"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': d}}"
-    output = run_process_with_additional_js_code(
-        array_labels_process_code,
+    process_arguments = f"{{'data': d, 'labels': {example_input['labels']}}}"
+    output = run_process(
+        array_labels_process_code + additional_js_code_to_run,
         "array_labels",
         process_arguments,
-        additional_js_code_to_run,
     )
     output = json.loads(output)
     assert output == expected_output
@@ -52,18 +50,16 @@ def test_array_labels_exceptions(array_labels_process_code, example_input, raise
     process_arguments = f"{{...{json.dumps(example_input)}, 'data': d}}"
     if raises_exception:
         with pytest.raises(Exception) as exc:
-            run_process_with_additional_js_code(
-                array_labels_process_code,
+            run_process(
+                array_labels_process_code + additional_js_code_to_run,
                 "array_labels",
                 process_arguments,
-                additional_js_code_to_run,
             )
         assert error_message in str(exc.value)
 
     else:
-        run_process_with_additional_js_code(
-            array_labels_process_code,
+        run_process(
+            array_labels_process_code + additional_js_code_to_run,
             "array_labels",
             process_arguments,
-            additional_js_code_to_run,
         )
