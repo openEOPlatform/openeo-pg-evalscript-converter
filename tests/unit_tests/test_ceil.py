@@ -38,5 +38,5 @@ def test_ceil(ceil_process_code, example_input, expected_output):
         ({"x": "0.5"}, True, "WRONG_TYPE"),
     ],
 )
-def test_ceil_exceptions(ceil_process_code, example_input, raises_exception, error_name):
+def test_input_validation(ceil_process_code, example_input, raises_exception, error_name):
     run_input_validation(ceil_process_code, "ceil", example_input, raises_exception, error_name)

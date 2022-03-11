@@ -43,5 +43,5 @@ def test_gt(gt_code, example_input, expected_output):
         ({"x": "0.5"}, True, "MISSING_PARAMETER"),
     ],
 )
-def test_ceil_exceptions(gt_code, example_input, raises_exception, error_name):
+def test_input_validation(gt_code, example_input, raises_exception, error_name):
     run_input_validation(gt_code, "gt", example_input, raises_exception, error_name)

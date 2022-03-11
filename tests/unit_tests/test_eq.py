@@ -53,5 +53,5 @@ def test_eq(eq_code, example_input, expected_output):
         ({"x": "0.5"}, True, "MISSING_PARAMETER"),
     ],
 )
-def test_ceil_exceptions(eq_code, example_input, raises_exception, error_name):
+def test_input_validation(eq_code, example_input, raises_exception, error_name):
     run_input_validation(eq_code, "eq", example_input, raises_exception, error_name)
