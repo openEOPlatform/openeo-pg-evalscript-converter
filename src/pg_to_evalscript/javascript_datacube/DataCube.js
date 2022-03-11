@@ -27,19 +27,19 @@ class DataCube {
 
     makeArrayFromSamples(samples) {
         if (Array.isArray(samples)) {
+            if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
+                this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(samples[0])
+            }
             let newData = []
             for (let entry of samples) {
-                if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
-                    this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(entry)
-                }
-                newData.push(Object.values(entry))
+                newData = newData.concat(extractValues(entry))
             }
-            return newData
+            return ndarray(newData, [samples.length, extractValues(samples[0]).length])
         } else {
             if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
                 this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(samples)
             }
-            return Object.values(samples)
+            return ndarray(new Float64Array(Object.values(samples)), [1, samples.length])
         }
     }
 
@@ -52,10 +52,10 @@ class DataCube {
         const axis = this.dimensions.findIndex((e) => e.name === this.bands_dimension_name);
         this.data = this._filter(this.data, axis, indices);
         this.getDimensionByName(this.bands_dimension_name).labels =
-          this.getDimensionByName(this.bands_dimension_name).labels.filter((lab) =>
-            bands.includes(lab)
-          );
-      }
+            this.getDimensionByName(this.bands_dimension_name).labels.filter((lab) =>
+                bands.includes(lab)
+            );
+    }
 
     removeDimension(dimension) {
         this.dimensions = this.dimensions.filter(d => d.name !== dimension)
@@ -71,14 +71,21 @@ class DataCube {
     }
 
     clone() {
-        const copy = new DataCube(this._iter(this.data), this.bands_dimension_name, this.temporal_dimension_name)
-        copy.dimensions = JSON.parse(JSON.stringify(this.dimensions))
+        const copy = new DataCube(ndarray(this.data.data.slice(), this.data.shape), this.bands_dimension_name, this.temporal_dimension_name)
+        const newDimensions = []
+        for (let dim of this.dimensions) {
+            newDimensions.push({
+                name: dim.name,
+                labels: dim.labels.slice(),
+                type: dim.type
+            })
+        }
+        copy.dimensions = newDimensions
         return copy
     }
 
     flattenToArray() {
-        const flattenedData = this.flatten();
-        return Array.isArray(flattenedData) ? flattenedData : [flattenedData]
+        return convert_to_1d_array(this.data)
     }
 
     encodeData() {
@@ -88,39 +95,42 @@ class DataCube {
     }
 
 
-    _iter(arr, execute = v => v, removeDim = () => false, execute_on_result = r => r, coords = []) {
-        if (Array.isArray(arr)) {
-            let result = []
-            for (let i = 0; i < arr.length; i++) {
-                const val = this._iter(arr[i], execute, removeDim, execute_on_result, [...coords, i])
-                if (val !== undefined) {
-                    result.push(val)
-                }
-            }
-            result = execute_on_result(result, coords)
-            if (result.length === 0) {
-                return
-            }
-            const shouldRemoveDim = removeDim(coords)
-            if (shouldRemoveDim && result.length !== 1) {
-                throw new Error('Can only remove dimension of length 1!')
-            } else if (shouldRemoveDim) {
-                return result[0]
-            }
-            return result
-        } else {
-            return execute(arr, coords)
-        }
-    }
+    // _iter(arr, execute = v => v, removeDim = () => false, execute_on_result = r => r, coords = []) {
+    //     if (Array.isArray(arr)) {
+    //         let result = []
+    //         for (let i = 0; i < arr.length; i++) {
+    //             const val = this._iter(arr[i], execute, removeDim, execute_on_result, [...coords, i])
+    //             if (val !== undefined) {
+    //                 result.push(val)
+    //             }
+    //         }
+    //         result = execute_on_result(result, coords)
+    //         if (result.length === 0) {
+    //             return
+    //         }
+    //         const shouldRemoveDim = removeDim(coords)
+    //         if (shouldRemoveDim && result.length !== 1) {
+    //             throw new Error('Can only remove dimension of length 1!')
+    //         } else if (shouldRemoveDim) {
+    //             return result[0]
+    //         }
+    //         return result
+    //     } else {
+    //         return execute(arr, coords)
+    //     }
+    // }
 
     reduceByDimension(reducer, dimension) {
-        let newData = this._iter(this.data)
+        let newData = ndarray(this.data.data.slice(), this.data.shape)
         const axis = this.dimensions.findIndex(e => e.name === dimension)
-        const shape = this.getDataShape()
-        const coords = new Array(shape.length).fill(0);
+        const shape = newData.shape
+        const newShape = shape.slice()
+        newShape.splice(axis, 1)
+        const coords = fill(shape.slice(), 0);
         coords[axis] = null;
-        let currInd = 0;
         const labels = this.dimensions[axis].labels
+        const newValues = []
+        let currInd = 0;
 
         while (true) {
             if (coords[currInd] === null) {
@@ -129,30 +139,28 @@ class DataCube {
             if (currInd >= shape.length) {
                 break;
             }
-            const dataToReduce = this._select(newData, coords)
+            const dataToReduce = convert_to_1d_array(newData.pick.apply(newData, coords))
             dataToReduce.labels = labels
             const newVals = reducer({
                 data: dataToReduce
             })
-            newData = this._set(newData, newVals, coords)
+            newValues.push(newVals)
             if (coords[currInd] + 1 >= shape[currInd]) {
                 currInd++
             } else {
                 coords[currInd]++
             }
         }
-        const finalSelectCoords = new Array(shape.length).fill(null);
-        finalSelectCoords[axis] = 0;
-        this.data = this._select(newData, finalSelectCoords);
-        this.removeDimension(dimension)
+        this.data = ndarray(newValues, newShape)
+        this.dimensions.splice(axis, 1)
     }
 
-    flatten() {
-        const flattenArr = (arr) => arr.reduce((flat, next) => flat.concat(next), []);
-        return this._iter(this.data, v => v, () => false, r => {
-            return flattenArr(r)
-        })
-    }
+    // flatten() {
+    //     const flattenArr = (arr) => arr.reduce((flat, next) => flat.concat(next), []);
+    //     return this._iter(this.data, v => v, () => false, r => {
+    //         return flattenArr(r)
+    //     })
+    // }
 
     getDataShape() {
         let dimensions;
@@ -218,7 +226,22 @@ class DataCube {
     }
 
     apply(process) {
-      const newData = this._iter(this.data, x=>process({"x": x}));
-      this.data = newData;
+        const dataShape = this.data.shape;
+        const dataShapeLength = dataShape.length;
+        const coords = fill(dataShape.slice(), 0)
+        let axis = 0;
+        while (true) {
+            const args = coords.concat([process({
+                "x": this.data.get.apply(this.data, coords)
+            })])
+            this.data.set.apply(this.data, args)
+            if (coords[axis] + 1 >= dataShape[axis]) {
+                axis++
+                if (axis >= dataShapeLength) {
+                    break
+                }
+            }
+            coords[axis]++
+        }
     }
 }
