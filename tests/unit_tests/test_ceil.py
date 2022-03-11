@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -30,19 +30,13 @@ def test_ceil(ceil_process_code, example_input, expected_output):
 
 
 @pytest.mark.parametrize(
-    "example_input,raises_exception,error_message",
+    "example_input,raises_exception,error_name",
     [
         ({"x": 1}, False, None),
-        ({}, True, "Mandatory argument `x` is not defined."),
-        ({"y": 0.5}, True, "Mandatory argument `x` is not defined."),
-        ({"x": "0.5"}, True, "Argument `x` is not a number."),
+        ({}, True, "MISSING_PARAMETER"),
+        ({"y": 0.5}, True, "MISSING_PARAMETER"),
+        ({"x": "0.5"}, True, "WRONG_TYPE"),
     ],
 )
-def test_ceil_exceptions(ceil_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(ceil_process_code, "ceil", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(ceil_process_code, "ceil", example_input)
+def test_ceil_exceptions(ceil_process_code, example_input, raises_exception, error_name):
+    run_input_validation(ceil_process_code, "ceil", example_input, raises_exception, error_name)
