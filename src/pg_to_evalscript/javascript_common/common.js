@@ -58,6 +58,7 @@ const VALIDATION_ERRORS = {
   NOT_NULL: "NOT_NULL",
   NOT_ARRAY: "NOT_ARRAY",
   NOT_INTEGER: "NOT_INTEGER",
+  NOT_BOOLEAN: "NOT_BOOLEAN",
   MIN_VALUE: "MIN_VALUE",
   MAX_VALUE: "MAX_VALUE",
 };
@@ -72,6 +73,7 @@ function validateParameter(arguments) {
     allowedTypes,
     array,
     integer,
+    boolean,
     min,
     max,
   } = arguments;
@@ -116,6 +118,13 @@ function validateParameter(arguments) {
     throw new ValidationError({
       name: VALIDATION_ERRORS.NOT_INTEGER,
       message: `Value for ${parameterName} is not an integer.`,
+    });
+  }
+
+  if (boolean && typeof value !== "boolean") {
+    throw new ValidationError({
+      name: VALIDATION_ERRORS.NOT_BOOLEAN,
+      message: `Value for ${parameterName} is not a boolean.`,
     });
   }
 

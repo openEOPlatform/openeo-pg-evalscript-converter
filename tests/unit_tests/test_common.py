@@ -38,11 +38,13 @@ def test_common(common_code, example_input, expected_output):
 @pytest.mark.parametrize(
     "example_input,raises_exception,error_name",
     [
+        # MISSING_PARAMETER
         ({"processName": "test", "parameterName": "arg1", "value": 1}, False, None),
         ({"processName": "test", "parameterName": "arg1", "value": 1, "required": True}, False, None),
         ({"processName": "test", "parameterName": "arg1", "value": 1, "required": False}, False, None),
         ({"processName": "test", "parameterName": "arg1", "required": False}, False, None),
         ({"processName": "test", "parameterName": "arg1", "required": True}, True, "MISSING_PARAMETER"),
+        # WRONG_TYPE
         (
             {
                 "processName": "test",
@@ -92,6 +94,7 @@ def test_common(common_code, example_input, expected_output):
             False,
             None,
         ),
+        # NOT_NULL
         (
             {
                 "processName": "test",
@@ -116,66 +119,65 @@ def test_common(common_code, example_input, expected_output):
             True,
             "NOT_NULL",
         ),
+        # NOT_ARRAY
         (
             {"processName": "test", "parameterName": "arg1", "value": [1, 2, 3], "required": True, "array": True},
             False,
             None,
         ),
         (
-            {
-                "processName": "test",
-                "parameterName": "arg1",
-                "value": "[1, 2, 3]",
-                "required": True,
-                "array": True,
-            },
+            {"processName": "test", "parameterName": "arg1", "value": "[1, 2, 3]", "required": True, "array": True},
             True,
             "NOT_ARRAY",
         ),
         (
-            {
-                "processName": "test",
-                "parameterName": "arg1",
-                "value": "[1, 2, 3]",
-                "required": True,
-                "array": False,
-            },
+            {"processName": "test", "parameterName": "arg1", "value": "[1, 2, 3]", "required": True, "array": False},
+            False,
+            None,
+        ),
+        # NOT_INTEGER
+        (
+            {"processName": "test", "parameterName": "arg1", "value": 1, "required": True, "integer": True},
             False,
             None,
         ),
         (
-            {
-                "processName": "test",
-                "parameterName": "arg1",
-                "value": 1,
-                "required": True,
-                "integer": True,
-            },
-            False,
-            None,
-        ),
-        (
-            {
-                "processName": "test",
-                "parameterName": "arg1",
-                "value": 1.2,
-                "required": True,
-                "integer": True,
-            },
+            {"processName": "test", "parameterName": "arg1", "value": 1.2, "required": True, "integer": True},
             True,
             "NOT_INTEGER",
         ),
         (
-            {
-                "processName": "test",
-                "parameterName": "arg1",
-                "value": 1.2,
-                "required": True,
-                "integer": False,
-            },
+            {"processName": "test", "parameterName": "arg1", "value": 1.2, "required": True, "integer": False},
             False,
             None,
         ),
+        # NOT_BOOLEAN
+        (
+            {"processName": "test", "parameterName": "arg1", "value": True, "required": True, "boolean": True},
+            False,
+            None,
+        ),
+        (
+            {"processName": "test", "parameterName": "arg1", "value": False, "required": True, "boolean": True},
+            False,
+            None,
+        ),
+        (
+            {"processName": "test", "parameterName": "arg1", "value": 0, "required": True, "boolean": True},
+            True,
+            "NOT_BOOLEAN",
+        ),
+        (
+            {"processName": "test", "parameterName": "arg1", "value": "False", "required": True, "boolean": True},
+            True,
+            "NOT_BOOLEAN",
+        ),
+        (
+            {"processName": "test", "parameterName": "arg1", "value": "False", "required": True, "boolean": False},
+            False,
+            None,
+        ),
+        # MIN_VALUE
         (
             {"processName": "test", "parameterName": "arg1", "value": 1, "required": True, "integer": True, "min": 0},
             False,
@@ -196,6 +198,7 @@ def test_common(common_code, example_input, expected_output):
             False,
             None,
         ),
+        # MAX_VALUE
         (
             {"processName": "test", "parameterName": "arg1", "value": 0, "required": True, "integer": True, "max": 1},
             False,
