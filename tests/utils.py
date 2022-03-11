@@ -56,10 +56,13 @@ def load_script(source_file_folder, source_file_name):
 
 
 def load_datacube_code():
-    script_dir = os.path.dirname(__file__)
-    abs_file_path = os.path.join(script_dir, f"../src/pg_to_evalscript/javascript_datacube/DataCube.js")
-    with open(abs_file_path) as f:
-        return f.read()
+    ndarray_code = load_script("../src/pg_to_evalscript/javascript_datacube/", "ndarray")
+    datacube_code = load_script("../src/pg_to_evalscript/javascript_datacube/", "DataCube")
+    return ndarray_code + datacube_code
+    # script_dir = os.path.dirname(__file__)
+    # abs_file_path = os.path.join(script_dir, f"../src/pg_to_evalscript/javascript_datacube/DataCube.js")
+    # with open(abs_file_path) as f:
+    #     return f.read()
 
 
 def load_process_code(process_id):
