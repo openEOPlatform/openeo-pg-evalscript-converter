@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -44,12 +44,12 @@ def test_any(any_process_code, example_input, expected_output):
 
 
 @pytest.mark.parametrize(
-    "example_input,raises_exception,error_message",
+    "example_input,raises_exception,error_name",
     [
         ({"data": [True, True, True]}, False, None),
-        ({"data": "['array']"}, True, "Argument `data` is not an array."),
-        ({"data_array": [True, True]}, True, "Mandatory argument `data` is not defined."),
-        ({}, True, "Mandatory argument `data` is not defined."),
+        ({"data": "['array']"}, True, "NOT_ARRAY"),
+        ({"data_array": [True, True]}, True, "MISSING_PARAMETER"),
+        ({}, True, "MISSING_PARAMETER"),
         (
             {
                 "data": [
@@ -61,15 +61,9 @@ def test_any(any_process_code, example_input, expected_output):
                 ]
             },
             True,
-            "Values in argument `data` can only be of type boolean or null.",
+            "NOT_BOOLEAN",
         ),
     ],
 )
-def test_any_exceptions(any_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(any_process_code, "any", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(any_process_code, "any", example_input)
+def test_any_exceptions(any_process_code, example_input, raises_exception, error_name):
+    run_input_validation(any_process_code, "any", example_input, raises_exception, error_name)
