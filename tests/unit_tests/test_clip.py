@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -27,29 +27,16 @@ def test_clip(clip_process_code, example_input, expected_output):
 
 
 @pytest.mark.parametrize(
-    "example_input,raises_exception,error_message",
+    "example_input,raises_exception,error_name",
     [
         ({"x": 1, "min": 0, "max": 2}, False, None),
-        ({"min": 0, "max": 2}, True, "Mandatory argument `x` is not defined."),
-        ({"x": 1, "max": 2}, True, "Mandatory argument `min` is not defined."),
-        (
-            {
-                "x": 1,
-                "min": 0,
-            },
-            True,
-            "Mandatory argument `max` is not defined.",
-        ),
-        ({"x": "1", "min": 0, "max": 2}, True, "Argument `x` is not a number."),
-        ({"x": 1, "min": "0", "max": 2}, True, "Argument `min` is not a number."),
-        ({"x": 1, "min": 0, "max": "2"}, True, "Argument `max` is not a number."),
+        ({"min": 0, "max": 2}, True, "MISSING_PARAMETER"),
+        ({"x": 1, "max": 2}, True, "MISSING_PARAMETER"),
+        ({"x": 1, "min": 0}, True, "MISSING_PARAMETER"),
+        ({"x": "1", "min": 0, "max": 2}, True, "WRONG_TYPE"),
+        ({"x": 1, "min": "0", "max": 2}, True, "WRONG_TYPE"),
+        ({"x": 1, "min": 0, "max": "2"}, True, "WRONG_TYPE"),
     ],
 )
-def test_clip_exceptions(clip_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(clip_process_code, "clip", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(clip_process_code, "clip", example_input)
+def test_clip_exceptions(clip_process_code, example_input, raises_exception, error_name):
+    run_input_validation(clip_process_code, "clip", example_input, raises_exception, error_name)

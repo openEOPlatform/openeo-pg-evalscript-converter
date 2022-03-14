@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -57,19 +57,17 @@ def test_array_create(array_create_process_code, example_input, expected_output)
 
 
 @pytest.mark.parametrize(
-    "example_input,raises_exception,error_message",
+    "example_input,raises_exception,error_name",
     [
         ({"data": [1, 2, 3], "repeat": 2}, False, None),
-        ({"data": {"1": 2, "3": 4}, "repeat": 1}, True, "Argument `data` is not an array."),
-        ({"data": [1, 2, 3], "repeat": "2"}, True, "Argument `repeat` is not an integer."),
-        ({"data": [1, 2, 3], "repeat": -1}, True, "Argument `repeat` must contain only values greater than or equal to 1."),
+        ({"data": {"1": 2, "3": 4}, "repeat": 1}, True, "NOT_ARRAY"),
+        ({"data": [1, 2, 3], "repeat": "2"}, True, "NOT_INTEGER"),
+        (
+            {"data": [1, 2, 3], "repeat": -1},
+            True,
+            "MIN_VALUE",
+        ),
     ],
 )
-def test_array_create_exceptions(array_create_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(array_create_process_code, "array_create", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(array_create_process_code, "array_create", example_input)
+def test_array_create_exceptions(array_create_process_code, example_input, raises_exception, error_name):
+    run_input_validation(array_create_process_code, "array_create", example_input, raises_exception, error_name)
