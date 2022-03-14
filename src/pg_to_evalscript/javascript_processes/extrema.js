@@ -13,7 +13,7 @@ function extrema(arguments) {
     processName: "extrema",
     parameterName: "ignore_nodata",
     value: ignore_nodata,
-    boolean: true,
+    allowedTypes: ["boolean"],
   });
 
   let minVal = null;

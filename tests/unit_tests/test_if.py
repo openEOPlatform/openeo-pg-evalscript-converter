@@ -34,7 +34,7 @@ def test_if(if_process_code, example_input, expected_output):
         ({"value": True, "accept": "A", "reject": "B"}, False, None),
         ({"accept": "A", "reject": "B"}, True, "MISSING_PARAMETER"),
         ({"value": True, "reject": "B"}, True, "MISSING_PARAMETER"),
-        ({"value": "True", "accept": "A", "reject": "B"}, True, "NOT_BOOLEAN"),
+        ({"value": "True", "accept": "A", "reject": "B"}, True, "WRONG_TYPE"),
     ],
 )
 def test_if_exceptions(if_process_code, example_input, raises_exception, error_message):

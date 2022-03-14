@@ -37,9 +37,9 @@ def test_and(and_process_code, example_input, expected_output):
         ({}, True, "MISSING_PARAMETER"),
         ({"x": True}, True, "MISSING_PARAMETER"),
         ({"y": True}, True, "MISSING_PARAMETER"),
-        ({"x": "True", "y": "True"}, True, "NOT_BOOLEAN"),
-        ({"x": "True", "y": True}, True, "NOT_BOOLEAN"),
-        ({"x": True, "y": "True"}, True, "NOT_BOOLEAN"),
+        ({"x": "True", "y": "True"}, True, "WRONG_TYPE"),
+        ({"x": "True", "y": True}, True, "WRONG_TYPE"),
+        ({"x": True, "y": "True"}, True, "WRONG_TYPE"),
     ],
 )
 def test_and_exceptions(and_process_code, example_input, raises_exception, error_name):

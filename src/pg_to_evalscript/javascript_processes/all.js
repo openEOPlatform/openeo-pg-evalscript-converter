@@ -16,7 +16,7 @@ function all(arguments) {
         processName: "all",
         parameterName: "element of data",
         value: x,
-        boolean: true,
+        allowedTypes: ["boolean"],
       });
 
       if (x === null) {
@@ -43,14 +43,14 @@ function all(arguments) {
       processName: "all",
       parameterName: "element of data",
       value: x,
-      boolean: true,
+      allowedTypes: ["boolean"],
     });
 
     validateParameter({
       processName: "all",
       parameterName: "element of data",
       value: y,
-      boolean: true,
+      allowedTypes: ["boolean"],
     });
 
     if (x === false || y === false) {

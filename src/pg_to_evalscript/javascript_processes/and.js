@@ -6,7 +6,7 @@ function and(arguments) {
     parameterName: "x",
     value: x,
     required: true,
-    boolean: true,
+    allowedTypes: ["boolean"],
   });
 
   validateParameter({
@@ -14,7 +14,7 @@ function and(arguments) {
     parameterName: "y",
     value: y,
     required: true,
-    boolean: true,
+    allowedTypes: ["boolean"],
   });
 
   if (x === false || y === false) {

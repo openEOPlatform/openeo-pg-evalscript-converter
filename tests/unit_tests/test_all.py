@@ -57,7 +57,7 @@ def test_all(all_process_code, example_input, expected_output):
                 ]
             },
             True,
-            "NOT_BOOLEAN",
+            "WRONG_TYPE",
         ),
     ],
 )

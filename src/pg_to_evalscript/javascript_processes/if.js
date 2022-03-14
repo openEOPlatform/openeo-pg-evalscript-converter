@@ -6,7 +6,7 @@ function _if(arguments) {
     parameterName: "value",
     value: value,
     required: true,
-    boolean: true,
+    allowedTypes: ["boolean"],
   });
 
   validateParameter({
