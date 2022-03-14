@@ -2,13 +2,19 @@ function lte(arguments) {
   const { x, y } = arguments;
   const supportedTypes = ["number", "string", "boolean"];
 
-  if (x === undefined) {
-    throw Error("Process lte requires argument x.");
-  }
+  validateParameter({
+    processName: "lt",
+    parameterName: "x",
+    value: x,
+    required: true,
+  });
 
-  if (y === undefined) {
-    throw Error("Process lte requires argument y.");
-  }
+  validateParameter({
+    processName: "lt",
+    parameterName: "y",
+    value: y,
+    required: true,
+  });
 
   if (x === null || y === null) {
     return null;
