@@ -79,7 +79,6 @@ function validateParameter(arguments) {
     allowedTypes,
     array,
     integer,
-    boolean,
     min,
     max,
   } = arguments;
