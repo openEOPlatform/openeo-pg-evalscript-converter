@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -33,20 +33,16 @@ def test_normalized_difference(normalized_difference_process_code, example_input
     [
         ({"x": 1, "y": 1}, False, None),
         ({"x": 1, "y": -1}, True, "Division by zero is not supported."),
-        ({}, True, "Mandatory argument `x` is not defined."),
-        ({"y": -1}, True, "Mandatory argument `x` is not defined."),
-        ({"x": 1}, True, "Mandatory argument `y` is not defined."),
-        ({"x": "1", "y": -1}, True, "Argument `x` is not a number."),
-        ({"x": 1, "y": "-1"}, True, "Argument `y` is not a number."),
+        ({}, True, "MISSING_PARAMETER"),
+        ({"y": -1}, True, "MISSING_PARAMETER"),
+        ({"x": 1}, True, "MISSING_PARAMETER"),
+        ({"x": "1", "y": -1}, True, "WRONG_TYPE"),
+        ({"x": 1, "y": "-1"}, True, "WRONG_TYPE"),
     ],
 )
 def test_normalized_difference_exceptions(
     normalized_difference_process_code, example_input, raises_exception, error_message
 ):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(normalized_difference_process_code, "normalized_difference", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(normalized_difference_process_code, "normalized_difference", example_input)
+    run_input_validation(
+        normalized_difference_process_code, "normalized_difference", example_input, raises_exception, error_message
+    )
