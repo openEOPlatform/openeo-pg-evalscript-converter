@@ -43,7 +43,8 @@ def test_convertable_process_graphs(pg_name, example_input, expected_output):
     evalscript = result[0]["evalscript"].write()
     output = run_evalscript(evalscript, example_input)
     output = json.loads(output)
-    assert output == expected_output, evalscript
+    
+    assert output == expected_output
 
 
 def test_list_supported_processes():

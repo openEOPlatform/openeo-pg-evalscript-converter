@@ -402,3 +402,36 @@ function fill(arr, val) {
     }
     return arr
 }
+
+function isNotSubarray(ndarray, shape) {
+    let length = 1;
+    for (let i = 0; i < shape.length; i++) {
+        length *= shape[i]
+    }
+    return length === ndarray.data.length
+}
+
+function flattenToNativeArray(ndarray) {
+    const shape = ndarray.shape
+
+    if (isNotSubarray(ndarray, shape)) {
+        return ndarray.data
+    }
+
+    const cumulatives = fill(shape.slice(), 0);
+    const coord = shape.slice();
+    const arr = []
+    let total = 1;
+
+    for (let d = shape.length - 1; d >= 0; d--) {
+        cumulatives[d] = total;
+        total *= shape[d];
+    }
+    for (let i = 0; i < total; i++) {
+        for (let d = shape.length - 1; d >= 0; d--) {
+            coord[d] = Math.floor(i / cumulatives[d]) % shape[d];
+        }
+        arr.push(ndarray.get.apply(ndarray, coord))
+    }
+    return arr
+}
