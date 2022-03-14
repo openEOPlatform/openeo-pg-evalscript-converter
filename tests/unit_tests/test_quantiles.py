@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -40,18 +40,10 @@ def test_quantiles(quantiles_process_code, example_input, expected_output):
     "example_input,raises_exception,error_message",
     [
         ({"data": [1, 2, 3, 4], "q": 2}, False, None),
-        ({"q": 2}, True, "Mandatory argument `data` is either null or not defined"),
-        (
-            {"data": None, "q": 2},
-            True,
-            "Mandatory argument `data` is either null or not defined",
-        ),
-        ({"data": "1", "q": 2}, True, "Argument `data` is not an array."),
-        (
-            {"data": [1, 2], "q": 2, "ignore_nodata": 1},
-            True,
-            "Argument `ignore_nodata` is not a boolean.",
-        ),
+        ({"q": 2}, True, "MISSING_PARAMETER"),
+        ({"data": None, "q": 2}, True, "NOT_NULL"),
+        ({"data": "1", "q": 2}, True, "NOT_ARRAY"),
+        ({"data": [1, 2], "q": 2, "ignore_nodata": 1}, True, "WRONG_TYPE"),
         (
             {"data": [1, 2]},
             True,
@@ -62,31 +54,14 @@ def test_quantiles(quantiles_process_code, example_input, expected_output):
             True,
             "The process `quantiles` only allows that either the `probabilities` or the `q` parameter is set.",
         ),
-        ({"data": [1, 2], "q": "1"}, True, "Argument `q` is not an integer."),
-        (
-            {"data": [1, 2], "probabilities": "1"},
-            True,
-            "Argument `probabilities` is not an array.",
-        ),
-        (
-            {"data": [1, 2], "probabilities": ["1"]},
-            True,
-            "Element in argument `probabilities` is not a number.",
-        ),
-        (
-            {"data": [1, 2], "probabilities": [-1, 5]},
-            True,
-            "Elements in argument `probabilities` must be between 0 and 1 (both inclusive).",
-        ),
+        ({"data": [1, 2], "q": "1"}, True, "NOT_INTEGER"),
+        ({"data": [1, 2], "q": 1}, True, "MIN_VALUE"),
+        ({"data": [1, 2], "probabilities": "1"}, True, "NOT_ARRAY"),
+        ({"data": [1, 2], "probabilities": ["1"]}, True, "WRONG_TYPE"),
+        ({"data": [1, 2], "probabilities": [-1, 5]}, True, "MIN_VALUE"),
+        ({"data": [1, 2], "probabilities": [1, 5]}, True, "MAX_VALUE"),
+        ({"data": [1, 2], "probabilities": [1, 0]}, False, None),
     ],
 )
-def test_quantiles_exceptions(
-    quantiles_process_code, example_input, raises_exception, error_message
-):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(quantiles_process_code, "quantiles", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(quantiles_process_code, "quantiles", example_input)
+def test_quantiles_exceptions(quantiles_process_code, example_input, raises_exception, error_message):
+    run_input_validation(quantiles_process_code, "quantiles", example_input, raises_exception, error_message)
