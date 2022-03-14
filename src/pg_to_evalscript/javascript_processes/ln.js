@@ -2,7 +2,7 @@ function ln(arguments) {
   const { x } = arguments;
 
   validateParameter({
-    processName: "last",
+    processName: "ln",
     parameterName: "x",
     value: x,
     required: true,

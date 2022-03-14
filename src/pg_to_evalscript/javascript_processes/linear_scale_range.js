@@ -2,7 +2,7 @@ function linear_scale_range(arguments) {
   const { x, inputMin, inputMax, outputMin = 0, outputMax = 1 } = arguments;
 
   validateParameter({
-    processName: "last",
+    processName: "linear_scale_range",
     parameterName: "x",
     value: x,
     required: true,
@@ -13,7 +13,7 @@ function linear_scale_range(arguments) {
   }
 
   validateParameter({
-    processName: "last",
+    processName: "linear_scale_range",
     parameterName: "inputMin",
     value: inputMin,
     required: true,
@@ -21,7 +21,7 @@ function linear_scale_range(arguments) {
   });
 
   validateParameter({
-    processName: "last",
+    processName: "linear_scale_range",
     parameterName: "inputMax",
     value: inputMax,
     required: true,

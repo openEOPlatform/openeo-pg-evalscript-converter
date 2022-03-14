@@ -2,7 +2,7 @@ function log(arguments) {
   const { x, base } = arguments;
 
   validateParameter({
-    processName: "last",
+    processName: "log",
     parameterName: "x",
     value: x,
     required: true,
@@ -10,7 +10,7 @@ function log(arguments) {
   });
 
   validateParameter({
-    processName: "last",
+    processName: "log",
     parameterName: "base",
     value: base,
     required: true,

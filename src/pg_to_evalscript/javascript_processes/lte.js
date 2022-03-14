@@ -3,14 +3,14 @@ function lte(arguments) {
   const supportedTypes = ["number", "string", "boolean"];
 
   validateParameter({
-    processName: "lt",
+    processName: "lte",
     parameterName: "x",
     value: x,
     required: true,
   });
 
   validateParameter({
-    processName: "lt",
+    processName: "lte",
     parameterName: "y",
     value: y,
     required: true,
