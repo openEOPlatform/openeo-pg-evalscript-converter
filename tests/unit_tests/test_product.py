@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -38,17 +38,11 @@ def test_product(product_process_code, example_input, expected_output):
     "example_input,raises_exception,error_message",
     [
         ({"data": [1, 0, 3, 2]}, False, None),
-        ({"data_fake": [1, 0, 3, 2]}, True, "Mandatory argument `data` is not defined."),
-        ({"data": "[1,0,3,2]"}, True, "Argument `data` is not an array."),
-        ({"data": [1, 0, 3, 2], "ignore_nodata": [1, 2, 3]}, True, "Argument `ignore_nodata` is not a boolean."),
-        ({"data": [1, 2, 3, None, "1"]}, True, "Value in argument `data` is not a number or null."),
+        ({"data_fake": [1, 0, 3, 2]}, True, "MISSING_PARAMETER"),
+        ({"data": "[1,0,3,2]"}, True, "NOT_ARRAY"),
+        ({"data": [1, 0, 3, 2], "ignore_nodata": [1, 2, 3]}, True, "WRONG_TYPE"),
+        ({"data": [1, 2, 3, None, "1"]}, True, "WRONG_TYPE"),
     ],
 )
 def test_product_exceptions(product_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(product_process_code, "product", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(product_process_code, "product", example_input)
+    run_input_validation(product_process_code, "product", example_input, raises_exception, error_message)
