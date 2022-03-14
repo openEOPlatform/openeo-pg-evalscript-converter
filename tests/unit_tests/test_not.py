@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -24,16 +24,10 @@ def test_not(not_process_code, example_input, expected_output):
     "example_input,raises_exception,error_message",
     [
         ({"x": True}, False, None),
-        ({}, True, "Mandatory argument `x` is not defined."),
-        ({"y": True}, True, "Mandatory argument `x` is not defined."),
-        ({"x": "True"}, True, "Argument `x` is not a boolean."),
+        ({}, True, "MISSING_PARAMETER"),
+        ({"y": True}, True, "MISSING_PARAMETER"),
+        ({"x": "True"}, True, "WRONG_TYPE"),
     ],
 )
 def test_not_exceptions(not_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(not_process_code, "not", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(not_process_code, "not", example_input)
+    run_input_validation(not_process_code, "not", example_input, raises_exception, error_message)
