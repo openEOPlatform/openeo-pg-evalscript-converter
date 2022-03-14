@@ -1,20 +1,23 @@
 function round(arguments) {
   const { x, p = 0 } = arguments;
 
-  if (typeof x === undefined) {
-    throw new Error("Mandatory argument `x` is not defined.");
-  }
+  validateParameter({
+    processName: "round",
+    parameterName: "x",
+    value: x,
+    required: true,
+    allowedTypes: ["number"],
+  });
+
+  validateParameter({
+    processName: "round",
+    parameterName: "p",
+    value: p,
+    integer: true,
+  });
 
   if (x === null) {
     return null;
-  }
-
-  if (typeof x !== "number") {
-    throw new Error("Argument `x` is not a number.");
-  }
-
-  if (!Number.isInteger(p)) {
-    throw new Error("Argument `p` is not an integer.");
   }
 
   /**
