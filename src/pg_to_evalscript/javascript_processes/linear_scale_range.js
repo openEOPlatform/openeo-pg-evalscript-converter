@@ -1,21 +1,32 @@
 function linear_scale_range(arguments) {
   const { x, inputMin, inputMax, outputMin = 0, outputMax = 1 } = arguments;
 
+  validateParameter({
+    processName: "last",
+    parameterName: "x",
+    value: x,
+    required: true,
+  });
+
   if (x === null) {
     return null;
   }
 
-  if (x === undefined) {
-    throw Error("Process linear_scale_range requires argument x.");
-  }
+  validateParameter({
+    processName: "last",
+    parameterName: "inputMin",
+    value: inputMin,
+    required: true,
+    nullable: false,
+  });
 
-  if (inputMin === null || inputMin === undefined) {
-    throw Error("Process linear_scale_range requires argument inputMin.");
-  }
-
-  if (inputMax === null || inputMax === undefined) {
-    throw Error("Process linear_scale_range requires argument inputMax.");
-  }
+  validateParameter({
+    processName: "last",
+    parameterName: "inputMax",
+    value: inputMax,
+    required: true,
+    nullable: false,
+  });
 
   //The given number in x is clipped to the bounds specified in inputMin and inputMax
   const clippedValue = Math.min(inputMax, Math.max(x, inputMin));

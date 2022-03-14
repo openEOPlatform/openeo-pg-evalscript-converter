@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -13,29 +13,20 @@ def linear_scale_range_process_code():
 @pytest.mark.parametrize(
     "example_input,raises_exception,error_message",
     [
-        ({}, True, "Process linear_scale_range requires argument x."),
+        ({}, True, "MISSING_PARAMETER"),
         ({"x": None}, False, None),
         ({"x": 0.3, "inputMin": 0, "inputMax": 1}, False, None),
-        ({"x": 0.3}, True, "Process linear_scale_range requires argument inputMin."),
-        ({"x": 0.3, "inputMax": 1}, True, "Process linear_scale_range requires argument inputMin."),
-        ({"x": 0.3, "inputMin": 0}, True, "Process linear_scale_range requires argument inputMax."),
-        ({"x": 0.3, "inputMin": None, "inputMax": 1}, True, "Process linear_scale_range requires argument inputMin."),
-        ({"x": 0.3, "inputMin": 1, "inputMax": None}, True, "Process linear_scale_range requires argument inputMax."),
-        (
-            {"x": 0.3, "inputMin": None, "inputMax": None},
-            True,
-            "Process linear_scale_range requires argument inputMin.",
-        ),
+        ({"x": 0.3}, True, "MISSING_PARAMETER"),
+        ({"x": 0.3, "inputMax": 1}, True, "MISSING_PARAMETER"),
+        ({"x": 0.3, "inputMin": 0}, True, "MISSING_PARAMETER"),
+        ({"x": 0.3, "inputMin": None, "inputMax": 1}, True, "NOT_NULL"),
+        ({"x": 0.3, "inputMin": 1, "inputMax": None}, True, "NOT_NULL"),
     ],
 )
 def test_linear_scale_range_inputs(linear_scale_range_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(linear_scale_range_process_code, "linear_scale_range", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(linear_scale_range_process_code, "linear_scale_range", example_input)
+    run_input_validation(
+        linear_scale_range_process_code, "linear_scale_range", example_input, raises_exception, error_message
+    )
 
 
 @pytest.mark.parametrize(
