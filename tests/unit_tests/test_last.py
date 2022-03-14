@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -37,15 +37,9 @@ def test_last(last_process_code, example_input, expected_output):
     "example_input,raises_exception,error_message",
     [
         ({"data": [10, 0, 3, 2]}, False, None),
-        ({"data": None}, True, "Mandatory argument `data` is either null or not defined."),
-        ({}, True, "Mandatory argument `data` is either null or not defined."),
+        ({"data": None}, True, "NOT_NULL"),
+        ({}, True, "MISSING_PARAMETER"),
     ],
 )
 def test_last_exceptions(last_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(last_process_code, "last", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(last_process_code, "last", example_input)
+    run_input_validation(last_process_code, "last", example_input, raises_exception, error_message)
