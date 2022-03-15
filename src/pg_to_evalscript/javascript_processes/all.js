@@ -1,22 +1,23 @@
 function all(arguments) {
   const { data, ignore_nodata = true } = arguments;
 
-  if (data === undefined) {
-    throw new Error("Mandatory argument `data` is not defined.");
-  }
-
-  if (!Array.isArray(data)) {
-    throw new Error("Argument `data` is not an array.");
-  }
+  validateParameter({
+    processName: "all",
+    parameterName: "data",
+    value: data,
+    required: true,
+    array: true,
+  });
 
   if (ignore_nodata) {
     let returnVal = null;
     for (let x of data) {
-      if (typeof x !== "boolean" && x !== null) {
-        throw new Error(
-          "Values in argument `data` can only be of type boolean or null."
-        );
-      }
+      validateParameter({
+        processName: "all",
+        parameterName: "element of data",
+        value: x,
+        allowedTypes: ["boolean"],
+      });
 
       if (x === null) {
         continue;
@@ -38,14 +39,19 @@ function all(arguments) {
   }
 
   return data.reduce((x, y) => {
-    if (
-      (typeof x !== "boolean" && x !== null) ||
-      (typeof y !== "boolean" && y !== null)
-    ) {
-      throw new Error(
-        "Values in argument `data` can only be of type boolean or null."
-      );
-    }
+    validateParameter({
+      processName: "all",
+      parameterName: "element of data",
+      value: x,
+      allowedTypes: ["boolean"],
+    });
+
+    validateParameter({
+      processName: "all",
+      parameterName: "element of data",
+      value: y,
+      allowedTypes: ["boolean"],
+    });
 
     if (x === false || y === false) {
       return false;
