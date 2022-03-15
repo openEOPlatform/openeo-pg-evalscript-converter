@@ -27,6 +27,9 @@ class DataCube {
 
     makeArrayFromSamples(samples) {
         if (Array.isArray(samples)) {
+            if(samples.length === 0) {
+                return ndarray([])
+            }
             if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
                 this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(samples[0])
             }
@@ -115,7 +118,7 @@ class DataCube {
         let currInd = 0;
 
         while (true) {
-            if (coords[currInd] === null) {
+            if (coords.length > 1 && coords[currInd] === null) {
                 currInd++
             }
             if (currInd >= shape.length) {
@@ -127,6 +130,9 @@ class DataCube {
                 data: dataToReduce
             })
             newValues.push(newVals)
+            if (coords.length === 1) {
+                break;
+            }
             if (coords[currInd] + 1 >= shape[currInd]) {
                 currInd++
             } else {
