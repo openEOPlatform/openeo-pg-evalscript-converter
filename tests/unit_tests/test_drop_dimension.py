@@ -1,6 +1,7 @@
 import json
 
 import pytest
+import subprocess
 
 from tests.utils import load_process_code, load_datacube_code, run_process
 
@@ -74,7 +75,7 @@ def test_drop_dimension(drop_dimension_process_code, data, name, additional_js_c
         + f"const cube = new DataCube({data}, 'bands_name', 'temporal_name', true);"
         + (additional_js_code_specific_to_case or "")
     )
-    process_arguments = f"{{'data': cube, 'name': '{name}'}}"
+    process_arguments = f"{{'data': cube, 'name': {json.dumps(name)}}}"
     output = run_process(
         drop_dimension_process_code + additional_js_code_to_run,
         "drop_dimension",
@@ -99,35 +100,28 @@ def test_drop_dimension(drop_dimension_process_code, data, name, additional_js_c
             "bands_name",
             "cube = null;",
             True,
-            "Mandatory argument `data` is either null or not defined.",
+            "Value for data should not be null.",
         ),
         (
             {"B01": [1, 2, 3]},
             "bands_name",
             "cube = undefined;",
             True,
-            "Mandatory argument `data` is either null or not defined.",
+            "Process drop_dimension requires parameter data.",
         ),
         (
             {"B01": [1, 2, 3]},
             None,
             None,
             True,
-            "Mandatory argument `name` is either null or not defined.",
-        ),
-        (
-            {"B01": [1, 2, 3]},
-            None,
-            None,
-            True,
-            "Mandatory argument `name` is either null or not defined.",
+            "Value for name should not be null.",
         ),
         (
             {"B01": [1, 2, 3]},
             True,
             None,
             True,
-            "Argument `name` is not a string.",
+            "Value for name is not a string.",
         ),
         (
             {"B01": [1, 2, 3]},
@@ -153,15 +147,16 @@ def test_drop_dimension_exceptions(
         + f"let cube = new DataCube({data}, 'bands_name', 'temporal_name', true);"
         + (additional_js_code_specific_to_case or "")
     )
-    process_arguments = f"{{'data': cube, 'name': '{name}'}}"
+    process_arguments = f"{{'data': cube, 'name': {json.dumps(name)}}}"
     if raises_exception:
-        with pytest.raises(Exception) as exc:
+        try:
             run_process(
                 drop_dimension_process_code + additional_js_code_to_run,
                 "drop_dimension",
                 process_arguments,
             )
-        assert error_message in str(exc.value)
+        except subprocess.CalledProcessError as exc:
+            assert error_message in str(exc.stderr)
 
     else:
         run_process(

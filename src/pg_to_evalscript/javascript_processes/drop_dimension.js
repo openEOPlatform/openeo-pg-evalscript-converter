@@ -1,17 +1,22 @@
 function drop_dimension(arguments) {
   const { data, name } = arguments;
 
-  if (data === undefined || data === null) {
-    throw new Error("Mandatory argument `data` is either null or not defined.");
-  }
+  validateParameter({
+    processName: "drop_dimension",
+    parameterName: "data",
+    value: data,
+    nullable: false,
+    required: true,
+  });
 
-  if (name === undefined || name === null) {
-    throw new Error("Mandatory argument `name` is either null or not defined.");
-  }
-
-  if (typeof name !== "string") {
-    throw new Error("Argument `name` is not a string.");
-  }
+  validateParameter({
+    processName: "drop_dimension",
+    parameterName: "name",
+    value: name,
+    nullable: false,
+    required: true,
+    allowedTypes: ["string"],
+  });
 
   const dim = data.getDimensionByName(name);
   if (!dim) {
