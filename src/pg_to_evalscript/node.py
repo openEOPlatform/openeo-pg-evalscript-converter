@@ -72,6 +72,7 @@ class Node:
             "if": IfNode,
             "apply": ApplyNode,
             "count": CountNode,
+            "array_filter": ArrayFilterNode,
         }
         if class_types_for_process.get(process_id):
             self.__class__ = class_types_for_process[process_id]
@@ -264,5 +265,23 @@ function count(arguments) {{
 
     {self.load_process_code()}
     return count(arguments);
+}}
+"""
+
+
+class ArrayFilterNode(Node):
+    def write_process(self):
+        newline = "\n"
+        tab = "\t"
+        return f"""
+function array_filter(arguments) {{
+    function condition(arguments) {{
+    {newline.join(node.write_function() for node in self.child_nodes)}
+    {newline.join(node.write_call() for node in self.child_nodes)}
+        return {self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id};
+    }}
+
+    {self.load_process_code()}
+    return array_filter(arguments);
 }}
 """
