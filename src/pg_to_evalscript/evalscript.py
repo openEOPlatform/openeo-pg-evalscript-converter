@@ -94,7 +94,7 @@ function evaluatePixel(samples) {{
             lambda x, y: x * y, sizes_without_original_temporal_dimensions, 1
         )
         collection_scenes_length = "* collection.scenes.length" * number_of_original_temporal_dimensions
-        number_of_final_dimensions = len(self._output_dimensions)
+        number_of_final_dimensions = len(self._output_dimensions) + 1 if self.encode_result else 0
         return f"""
 function updateOutput(outputs, collection) {{
     Object.values(outputs).forEach((output) => {{
