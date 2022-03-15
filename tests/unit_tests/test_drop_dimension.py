@@ -90,7 +90,7 @@ def test_drop_dimension(drop_dimension_process_code, data, name, additional_js_c
     [
         (
             {"B01": [1, 2, 3]},
-            "bands_name",
+            "temporal_name",
             None,
             False,
             None,
