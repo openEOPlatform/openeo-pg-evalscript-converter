@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -32,17 +32,11 @@ def test_exp(exp_process_code, example_input, expected_output):
     "example_input,raises_exception,error_message",
     [
         ({"p": 1}, False, None),
-        ({}, True, "Mandatory argument `p` is not defined."),
-        ({"q": 0.5}, True, "Mandatory argument `p` is not defined."),
-        ({"p": "0.5"}, True, "Argument `p` is not a number."),
-        ({"p": {"p": 0.5}}, True, "Argument `p` is not a number."),
+        ({}, True, "MISSING_PARAMETER"),
+        ({"q": 0.5}, True, "MISSING_PARAMETER"),
+        ({"p": "0.5"}, True, "WRONG_TYPE"),
+        ({"p": {"p": 0.5}}, True, "WRONG_TYPE"),
     ],
 )
 def test_exp_exceptions(exp_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(exp_process_code, "exp", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(exp_process_code, "exp", example_input)
+    run_input_validation(exp_process_code, "exp", example_input, raises_exception, error_message)

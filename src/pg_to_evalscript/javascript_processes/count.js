@@ -1,21 +1,27 @@
 function count(arguments) {
   const { data, condition: cond = null } = arguments;
 
-  if (data === undefined) {
-    throw new Error("Mandatory argument `data` is not defined.");
-  }
+  validateParameter({
+    processName: "count",
+    parameterName: "data",
+    value: data,
+    required: true,
+    array: true,
+  });
 
-  if (!Array.isArray(data)) {
-    throw new Error("Argument `data` is not an array.");
-  }
+  validateParameter({
+    processName: "count",
+    parameterName: "condition",
+    required: true,
+    value: cond,
+    allowedTypes: ["boolean", "object"],
+  });
 
-  if (
-    typeof cond !== "boolean" &&
-    typeof cond === "object" &&
-    Array.isArray(cond) &&
-    cond !== null
-  ) {
-    throw new Error("Argument `condition` is not a boolean, object or null.");
+  if (cond !== null && Array.isArray(cond)) {
+    throw new ValidationError({
+      name: VALIDATION_ERRORS.WRONG_TYPE,
+      message: `Value for condition is not boolean or object.`,
+    });
   }
 
   if (cond === true) {

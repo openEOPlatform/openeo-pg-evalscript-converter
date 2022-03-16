@@ -9,21 +9,32 @@ function between(arguments) {
 
   const { x, min, max, exclude_max = false } = arguments;
 
+  validateParameter({
+    processName: "between",
+    parameterName: "x",
+    value: x,
+    required: true,
+  });
+
   if (x === null) {
     return null;
   }
 
-  if (x === undefined) {
-    throw Error("Process between requires argument x.");
-  }
+  validateParameter({
+    processName: "between",
+    parameterName: "min",
+    value: min,
+    required: true,
+    nullable: false,
+  });
 
-  if (min === null || min === undefined) {
-    throw Error("Process between requires argument min.");
-  }
-
-  if (max === null || max === undefined) {
-    throw Error("Process between requires argument max.");
-  }
+  validateParameter({
+    processName: "between",
+    parameterName: "max",
+    value: max,
+    required: true,
+    nullable: false,
+  });
 
   if (min > max) {
     return false;

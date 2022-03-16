@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -33,21 +33,15 @@ def test_add(add_process_code, example_input, expected_output):
 
 
 @pytest.mark.parametrize(
-    "example_input,raises_exception,error_message",
+    "example_input,raises_exception,error_name",
     [
         ({"x": 1, "y": 2}, False, None),
-        ({}, True, "Mandatory argument `x` is not defined."),
-        ({"y": 2}, True, "Mandatory argument `x` is not defined."),
-        ({"x": 1}, True, "Mandatory argument `y` is not defined."),
-        ({"x": False, "y": 2}, True, "Argument `x` is not a number."),
-        ({"x": 1, "y": False}, True, "Argument `y` is not a number."),
+        ({}, True, "MISSING_PARAMETER"),
+        ({"y": 2}, True, "MISSING_PARAMETER"),
+        ({"x": 1}, True, "MISSING_PARAMETER"),
+        ({"x": False, "y": 2}, True, "WRONG_TYPE"),
+        ({"x": 1, "y": False}, True, "WRONG_TYPE"),
     ],
 )
-def test_add_exceptions(add_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(add_process_code, "add", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(add_process_code, "add", example_input)
+def test_add_exceptions(add_process_code, example_input, raises_exception, error_name):
+    run_input_validation(add_process_code, "add", example_input, raises_exception, error_name)
