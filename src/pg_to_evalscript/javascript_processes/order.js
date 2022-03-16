@@ -26,30 +26,38 @@ function order(arguments) {
     allowedTypes: ["boolean"],
   });
 
-  return data
-    .map((value, index) => {
-      if (typeof value === "number" || value === null) {
-        return { value, index };
-      }
+  const dataWithIndex = [];
+  for (let i = 0; i < data.length; i++) {
+    if (typeof data[i] === "number" || data[i] === null) {
+      dataWithIndex.push({ index: i, value: data[i] });
+      continue;
+    }
 
-      const ISODateString = parse_rfc3339(value);
-      if (ISODateString) {
-        return { value: ISODateString.value, index };
-      }
+    const ISODateString = parse_rfc3339(data[i]);
+    if (ISODateString) {
+      dataWithIndex.push({ index: i, value: ISODateString.value });
+      continue;
+    }
 
-      throw new Error("Element in argument `data` is not a number, null or a valid ISO date string.");
-    })
-    .sort((a, b) => {
-      if (a.value === null && b.value === null) return 0;
-      if (a.value === null) return nodata ? 1 : -1;
-      if (b.value === null) return nodata ? -1 : 1;
+    throw new Error("Element in argument `data` is not a number, null or a valid ISO date string.");
+  }
 
-      if (a.value === b.value) return 0;
-      if (a.value < b.value) return asc ? -1 : 1;
-      if (a.value > b.value) return asc ? 1 : -1;
-    })
-    .filter(obj => {
-      return obj.value !== null || nodata !== null;
-    })
-    .map(obj => obj.index);
+  dataWithIndex.sort((a, b) => {
+    if (a.value === null && b.value === null) return 0;
+    if (a.value === null) return nodata ? 1 : -1;
+    if (b.value === null) return nodata ? -1 : 1;
+
+    if (a.value === b.value) return 0;
+    if (a.value < b.value) return asc ? -1 : 1;
+    if (a.value > b.value) return asc ? 1 : -1;
+  });
+
+  const sortedIndexes = [];
+  for (let i = 0; i < dataWithIndex.length; i++) {
+    if (dataWithIndex[i].value !== null || nodata !== null) {
+      sortedIndexes.push(dataWithIndex[i].index);
+    }
+  }
+
+  return sortedIndexes;
 }
