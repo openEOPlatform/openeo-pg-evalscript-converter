@@ -22,7 +22,7 @@ def test_array_filter(array_filter_process_code, example_input, expected_output)
     condition_js_code = f"const condition = ({{ x }}) => x > 2;"
     output = run_process(array_filter_process_code + condition_js_code, "array_filter", example_input)
     output = json.loads(output)
-    assert pytest.approx(output) == expected_output
+    assert output == expected_output
 
 
 @pytest.mark.parametrize(
