@@ -1,21 +1,30 @@
 function order(arguments) {
   const { data, asc = true, nodata = null} = arguments;
 
-  if (data === null || data === undefined) {
-    throw new Error("Mandatory argument `data` is either null or not defined.");
-  }
+  validateParameter({
+    processName: "order",
+    parameterName: "data",
+    value: data,
+    required: true,
+    array: true,
+  });
 
-  if (!Array.isArray(data)) {
-    throw new Error("Argument `data` is not an array.");
-  }
+  validateParameter({
+    processName: "order",
+    parameterName: "asc",
+    value: asc,
+    required: true,
+    nullable: false,
+    allowedTypes: ["boolean"],
+  });
 
-  if (typeof asc !== "boolean") {
-    throw new Error("Argument `asc` is not a boolean.");
-  }
-
-  if (typeof nodata !== "boolean" && nodata !== null) {
-    throw new Error("Argument `asc` is not a boolean or null.");
-  }
+  validateParameter({
+    processName: "nodata",
+    parameterName: "nodata",
+    value: nodata,
+    required: true,
+    allowedTypes: ["boolean"],
+  });
 
   return data
     .map((value, index) => {

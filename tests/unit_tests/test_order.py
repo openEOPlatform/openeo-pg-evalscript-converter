@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -32,27 +32,19 @@ def test_order(order_process_code, example_input, expected_output):
 
 
 @pytest.mark.parametrize(
-    "example_input,raises_exception,error_message",
+    "example_input,raises_exception,error_name",
     [
         ({"data": [1, 2, 3]}, False, None),
-        ({"asc": False}, True, "Mandatory argument `data` is either null or not defined."),
-        ({"data": False}, True, "Argument `data` is not an array."),
+        ({"asc": False}, True, "MISSING_PARAMETER"),
+        ({"data": False}, True, "NOT_ARRAY"),
         ({"data": [1, 2, 3], "asc": True}, False, None),
-        ({"data": [1, 2, 3], "asc": None}, True, "Argument `asc` is not a boolean."),
+        ({"data": [1, 2, 3], "asc": None}, True, "NOT_NULL"),
         ({"data": [1, 2, 3], "nodata": False}, False, None),
         ({"data": [1, 2, 3], "nodata": None}, False, None),
-        ({"data": [1, 2, 3], "nodata": []}, True, "Argument `asc` is not a boolean or null."),
+        ({"data": [1, 2, 3], "nodata": []}, True, "WRONG_TYPE"),
         ({"data": [1, True, 2, 3]}, True, "Element in argument `data` is not a number, null or a valid ISO date string."),
         ({"data": [1, "random string", 2, 3]}, True, "Element in argument `data` is not a number, null or a valid ISO date string."),
     ],
 )
-def test_order_exceptions(
-    order_process_code, example_input, raises_exception, error_message
-):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(order_process_code, "order", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(order_process_code, "order", example_input)
+def test_order_inputs(order_process_code, example_input, raises_exception, error_name):
+    run_input_validation(order_process_code, "order", example_input, raises_exception, error_name)
