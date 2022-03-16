@@ -7,6 +7,14 @@ function last(arguments) {
     value: data,
     required: true,
     nullable: false,
+    array: true,
+  });
+
+  validateParameter({
+    processName: "max",
+    parameterName: "ignore_nodata",
+    value: ignore_nodata,
+    allowedTypes: ["boolean"],
   });
 
   if (data.length === 0 || data.every((x) => x === null)) {
