@@ -16,7 +16,13 @@ function array_filter(arguments) {
     required: true,
   });
 
-  return data.filter((val) => {
-    return condition({ x: val });
-  });
+  let filteredData = [];
+
+  for (let val of data) {
+    if (condition({ x: val })) {
+      filteredData.push(val);
+    }
+  }
+
+  return filteredData;
 }
