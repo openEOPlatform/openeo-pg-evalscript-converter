@@ -16,6 +16,20 @@ function neq(arguments) {
     required: true,
   });
 
+  validateParameter({
+    processName: "neq",
+    parameterName: "delta",
+    value: delta,
+    allowedTypes: ["number"],
+  });
+
+  validateParameter({
+    processName: "neq",
+    parameterName: "case_sensitive",
+    value: case_sensitive,
+    allowedTypes: ["boolean"],
+  });
+
   if (x === null || y === null) {
     return null;
   }

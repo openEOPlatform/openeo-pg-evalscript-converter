@@ -48,6 +48,8 @@ def test_neq(neq_code, example_input, expected_output):
         ({}, True, "MISSING_PARAMETER"),
         ({"y": 0.5}, True, "MISSING_PARAMETER"),
         ({"x": "0.5"}, True, "MISSING_PARAMETER"),
+        ({"x": 1, "y": 1, "delta": "1"}, True, "WRONG_TYPE"),
+        ({"x": 1, "y": 1, "case_sensitive": "True"}, True, "WRONG_TYPE"),
     ],
 )
 def test_input_validation(neq_code, example_input, raises_exception, error_name):
