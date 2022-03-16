@@ -2,13 +2,19 @@ function gte(arguments) {
   const { x, y } = arguments;
   const supportedTypes = ["number", "string", "boolean"];
 
-  if (x === undefined) {
-    throw Error("Process gte requires argument x.");
-  }
+  validateParameter({
+    processName: "gt",
+    parameterName: "x",
+    value: x,
+    required: true,
+  });
 
-  if (y === undefined) {
-    throw Error("Process gte requires argument y.");
-  }
+  validateParameter({
+    processName: "gt",
+    parameterName: "y",
+    value: y,
+    required: true,
+  });
 
   if (x === null || y === null) {
     return null;

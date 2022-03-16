@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, load_datacube_code, run_process, run_process_with_additional_js_code
+from tests.utils import load_process_code, load_datacube_code, run_process, run_process
 
 
 @pytest.fixture
@@ -40,11 +40,10 @@ def test_array_element(array_element_process_code, example_input, expected_outpu
         + f"const d = {json.dumps(example_input['data'])}; d.labels = {json.dumps(example_input['labels']) if 'labels' in example_input else 'undefined'};"
     )
     process_arguments = f"{{...{json.dumps(example_input)}, 'data': d}}"
-    output = run_process_with_additional_js_code(
-        array_element_process_code,
+    output = run_process(
+        array_element_process_code + additional_js_code_to_run,
         "array_element",
         process_arguments,
-        additional_js_code_to_run,
     )
     output = json.loads(output)
     assert output == expected_output

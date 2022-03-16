@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -23,48 +23,32 @@ def array_interpolate_linear_process_code():
         ({"data": []}, []),
     ],
 )
-def test_array_interpolate_linear(
-    array_interpolate_linear_process_code, example_input, expected_output
-):
-    output = run_process(
-        array_interpolate_linear_process_code, "array_interpolate_linear", example_input
-    )
+def test_array_interpolate_linear(array_interpolate_linear_process_code, example_input, expected_output):
+    output = run_process(array_interpolate_linear_process_code, "array_interpolate_linear", example_input)
     output = json.loads(output)
     assert output == expected_output
 
 
 @pytest.mark.parametrize(
-    "example_input,raises_exception,error_message",
+    "example_input,raises_exception,error_name",
     [
         ({"data": [1, None, 3]}, False, None),
         (
             {"data": None},
             True,
-            "Mandatory argument `data` is either null or not defined.",
+            "NOT_NULL",
         ),
-        ({}, True, "Mandatory argument `data` is either null or not defined."),
-        ({"data": "[1]"}, True, "Argument `data` is not an array."),
-        ({"data": [1, 2, "3"]}, True, "Element in `data` is not of correct type."),
+        ({}, True, "MISSING_PARAMETER"),
+        ({"data": "[1]"}, True, "NOT_ARRAY"),
+        ({"data": [1, 2, "3"]}, True, "WRONG_TYPE"),
     ],
 )
 def test_array_interpolate_linear_exceptions(
     array_interpolate_linear_process_code,
     example_input,
     raises_exception,
-    error_message,
+    error_name,
 ):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(
-                array_interpolate_linear_process_code,
-                "array_interpolate_linear",
-                example_input,
-            )
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(
-            array_interpolate_linear_process_code,
-            "array_interpolate_linear",
-            example_input,
-        )
+    run_input_validation(
+        array_interpolate_linear_process_code, "array_interpolate_linear", example_input, raises_exception, error_name
+    )

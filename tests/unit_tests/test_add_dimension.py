@@ -1,8 +1,9 @@
 import json
 
 import pytest
+import subprocess
 
-from tests.utils import load_process_code, load_datacube_code, run_process_with_additional_js_code
+from tests.utils import load_process_code, load_datacube_code, run_process
 
 
 @pytest.fixture
@@ -83,11 +84,10 @@ def test_add_dimension(add_dimension_process_code, example_input, expected_outpu
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
     )
     process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
-    output = run_process_with_additional_js_code(
-        add_dimension_process_code,
+    output = run_process(
+        add_dimension_process_code + additional_js_code_to_run,
         "add_dimension",
         process_arguments,
-        additional_js_code_to_run,
     )
     output = json.loads(output)
     assert output == expected_output
@@ -118,18 +118,14 @@ def test_add_dimension(add_dimension_process_code, example_input, expected_outpu
         (
             {"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "label": 23},
             True,
-            "Mandatory argument `name` is not defined.",
+            "Process add_dimension requires parameter name.",
         ),
         (
             {"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "name": "temporal_name"},
             True,
-            "Mandatory argument `label` is not defined.",
+            "Process add_dimension requires parameter label.",
         ),
-        (
-            {"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "name": 23, "label": 23},
-            True,
-            "Argument `name` is not a string.",
-        ),
+        ({"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "name": 23, "label": 23}, True, "WRONG_TYPE"),
         (
             {
                 "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
@@ -137,7 +133,7 @@ def test_add_dimension(add_dimension_process_code, example_input, expected_outpu
                 "label": [1, 2, 3],
             },
             True,
-            "Argument `label` is not a string or a number.",
+            "Value for label is not a string or a number.",
         ),
         (
             {
@@ -147,7 +143,7 @@ def test_add_dimension(add_dimension_process_code, example_input, expected_outpu
                 "type": 123,
             },
             True,
-            "Argument `type` is not a string.",
+            "Value for type is not a string",
         ),
     ],
 )
@@ -158,19 +154,18 @@ def test_add_dimension_exceptions(add_dimension_process_code, example_input, rai
     )
     process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
     if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process_with_additional_js_code(
-                add_dimension_process_code,
+        try:
+            run_process(
+                add_dimension_process_code + additional_js_code_to_run,
                 "add_dimension",
                 process_arguments,
-                additional_js_code_to_run,
             )
-        assert error_message in str(exc.value)
+        except subprocess.CalledProcessError as exc:
+            assert error_message in str(exc.stderr)
 
     else:
-        run_process_with_additional_js_code(
-            add_dimension_process_code,
+        run_process(
+            add_dimension_process_code + additional_js_code_to_run,
             "add_dimension",
             process_arguments,
-            additional_js_code_to_run,
         )

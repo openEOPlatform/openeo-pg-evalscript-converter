@@ -22,21 +22,9 @@ def run_evalscript(evalscript, example_input):
 
 
 def run_process(process_code, process_name, example_input):
+    input_arguments = json.dumps(example_input) if type(example_input) is dict else example_input
     return run_javacript(
-        process_code + f"process.stdout.write(JSON.stringify({process_name}({json.dumps(example_input)})))"
-    )
-
-
-def run_process_with_additional_js_code(
-    process_code,
-    process_name,
-    process_arguments,
-    additional_js_code_to_run,
-):
-    return run_javacript(
-        process_code
-        + additional_js_code_to_run
-        + f"process.stdout.write(JSON.stringify({process_name}({process_arguments})));"
+        process_code + f"process.stdout.write(JSON.stringify({process_name}({input_arguments})))"
     )
 
 
@@ -45,7 +33,7 @@ def get_evalscript_input_object(evalscript):
 
 
 def run_javacript(javascript_code):
-    return subprocess.check_output(["node", "-e", javascript_code])
+    return subprocess.check_output(["node", "-e", javascript_code], stderr=subprocess.PIPE)
 
 
 def load_script(source_file_folder, source_file_name):
@@ -61,7 +49,7 @@ def load_datacube_code():
     with open(abs_file_path) as f:
         return f.read()
 
-        
+
 def load_process_code(process_id):
     source_files = [
         load_script("../src/pg_to_evalscript/javascript_common/", "common"),
@@ -75,3 +63,19 @@ def get_defined_processes_from_files():
         os.path.splitext(os.path.basename(file_path))[0]
         for file_path in glob.glob(f"../src/pg_to_evalscript/javascript_processes/*.js")
     ]
+
+
+# helper function used for testing process inputs validation
+def run_input_validation(code, process, example_input, raises_exception, error_name=None, error_message=None):
+    if raises_exception:
+        expected = error_name if error_name else error_message
+        assert expected != None
+        try:
+            run_process(code, process, example_input)
+            # it should always throw an exception
+            assert False
+        except subprocess.CalledProcessError as exc:
+            assert expected in str(exc.stderr)
+
+    else:
+        run_process(code, process, example_input)

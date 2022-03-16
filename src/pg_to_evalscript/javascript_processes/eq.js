@@ -2,13 +2,19 @@ function eq(arguments) {
   const { x, y, delta = null, case_sensitive = true } = arguments;
   const supportedTypes = ["number", "string", "boolean"];
 
-  if (x === undefined) {
-    throw Error("Process eq requires argument x.");
-  }
+  validateParameter({
+    processName: "eq",
+    parameterName: "x",
+    value: x,
+    required: true,
+  });
 
-  if (y === undefined) {
-    throw Error("Process eq requires argument y.");
-  }
+  validateParameter({
+    processName: "eq",
+    parameterName: "y",
+    value: y,
+    required: true,
+  });
 
   if (x === null || y === null) {
     return null;
