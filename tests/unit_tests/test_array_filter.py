@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -11,18 +11,13 @@ def array_filter_process_code():
 
 
 @pytest.mark.parametrize(
-    "example_input,raises_exception,error_message",
+    "example_input,raises_exception,error_name",
     [
-        ({"x": 1}, True, "Mandatory argument `data` is not defined."),
-        ({"data": 1}, True, "Argument `data` is not an array."),
-        ({"data": [1, 2]}, True, "Mandatory argument `condition` is not defined."),
+        ({}, True, "MISSING_PARAMETER"),
+        ({"data": 1}, True, "NOT_ARRAY"),
+        ({"data": [1, 2]}, True, "MISSING_PARAMETER"),
+        ({"data": [1, 2], "condition": True}, True, "WRONG_TYPE"),
     ],
 )
-def test_array_filter_exceptions(array_filter_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(array_filter_process_code, "array_filter", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(array_filter_process_code, "array_filter", example_input)
+def test_array_filter_inputs(array_filter_process_code, example_input, raises_exception, error_name):
+    run_input_validation(array_filter_process_code, "array_filter", example_input, raises_exception, error_name)
