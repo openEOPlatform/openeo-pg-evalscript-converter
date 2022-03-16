@@ -6,6 +6,7 @@ function normalized_difference(arguments) {
     parameterName: "x",
     value: x,
     required: true,
+    nullable: false,
     allowedTypes: ["number"],
   });
 
@@ -14,6 +15,7 @@ function normalized_difference(arguments) {
     parameterName: "y",
     value: y,
     required: true,
+    nullable: false,
     allowedTypes: ["number"],
   });
 
