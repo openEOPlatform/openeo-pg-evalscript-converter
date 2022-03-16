@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -33,20 +33,14 @@ def test_array_find(array_find_process_code, example_input, expected_output):
 
 
 @pytest.mark.parametrize(
-    "example_input,raises_exception,error_message",
+    "example_input,raises_exception,error_name",
     [
         ({"data": [1, 2, 3], "value": 2}, False, None),
-        ({"value": 2}, True, "Mandatory argument `data` is either null or not defined."),
-        ({"data": None, "value": 2}, True, "Mandatory argument `data` is either null or not defined."),
-        ({"data": [1, 2, 3]}, True, "Mandatory argument `value` is not defined."),
-        ({"data": "[1,2,3]", "value": 2}, True, "Argument `data` is not an array."),
+        ({"value": 2}, True, "MISSING_PARAMETER"),
+        ({"data": None, "value": 2}, True, "NOT_NULL"),
+        ({"data": [1, 2, 3]}, True, "MISSING_PARAMETER"),
+        ({"data": "[1,2,3]", "value": 2}, True, "NOT_ARRAY"),
     ],
 )
-def test_array_find_exceptions(array_find_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(array_find_process_code, "array_find", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(array_find_process_code, "array_find", example_input)
+def test_array_find_inputs(array_find_process_code, example_input, raises_exception, error_name):
+    run_input_validation(array_find_process_code, "array_find", example_input, raises_exception, error_name)

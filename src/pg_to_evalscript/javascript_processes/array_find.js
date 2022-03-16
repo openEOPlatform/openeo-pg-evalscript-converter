@@ -1,14 +1,21 @@
 function array_find(arguments) {
   const { data, value } = arguments;
-  if (data === null || data === undefined) {
-    throw new Error("Mandatory argument `data` is either null or not defined.");
-  }
-  if (!Array.isArray(data)) {
-    throw new Error("Argument `data` is not an array.");
-  }
-  if (value === undefined) {
-    throw new Error("Mandatory argument `value` is not defined.");
-  }
+
+  validateParameter({
+    processName: "array_find",
+    parameterName: "data",
+    value: data,
+    required: true,
+    nullable: false,
+    array: true,
+  });
+
+  validateParameter({
+    processName: "array_find",
+    parameterName: "value",
+    value: value,
+    required: true,
+  });
 
   if (typeof value === "object" || value === null) {
     return null;
