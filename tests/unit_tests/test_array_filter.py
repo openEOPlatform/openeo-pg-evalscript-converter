@@ -8,6 +8,8 @@ from tests.utils import load_process_code, run_process, run_input_validation
 @pytest.fixture
 def array_filter_process_code():
     return load_process_code("array_filter")
+
+
 @pytest.mark.parametrize(
     "example_input,expected_output",
     [
@@ -21,11 +23,6 @@ def test_array_filter(array_filter_process_code, example_input, expected_output)
     output = run_process(array_filter_process_code + condition_js_code, "array_filter", example_input)
     output = json.loads(output)
     assert pytest.approx(output) == expected_output
-
-
-@pytest.fixture
-def array_filter_process_code():
-    return load_process_code("array_filter")
 
 
 @pytest.mark.parametrize(
