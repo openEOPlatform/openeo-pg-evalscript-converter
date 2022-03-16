@@ -38,6 +38,7 @@ def test_max(max_process_code, example_input, expected_output):
         ({}, True, "MISSING_PARAMETER"),
         ({"data": 123}, True, "NOT_ARRAY"),
         ({"data": [1, 2, 3], "ignore_nodata": "False"}, True, "WRONG_TYPE"),
+        ({"data": [1, 2, 3], "ignore_nodata": None}, True, "NOT_NULL"),
         ({"data": [1, 2, 3, 4, 5, True]}, True, "WRONG_TYPE"),
     ],
 )

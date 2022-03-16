@@ -14,6 +14,7 @@ function sd(arguments) {
     processName: "sd",
     parameterName: "ignore_nodata",
     value: ignore_nodata,
+    nullable: false,
     allowedTypes: ["boolean"],
   });
 

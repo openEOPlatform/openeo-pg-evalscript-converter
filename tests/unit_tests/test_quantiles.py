@@ -44,6 +44,7 @@ def test_quantiles(quantiles_process_code, example_input, expected_output):
         ({"data": None, "q": 2}, True, "NOT_NULL"),
         ({"data": "1", "q": 2}, True, "NOT_ARRAY"),
         ({"data": [1, 2], "q": 2, "ignore_nodata": 1}, True, "WRONG_TYPE"),
+        ({"data": [1, 2], "q": 2, "ignore_nodata": None}, True, "NOT_NULL"),
         (
             {"data": [1, 2]},
             True,

@@ -13,6 +13,7 @@ function mean(arguments) {
     processName: "mean",
     parameterName: "ignore_nodata",
     value: ignore_nodata,
+    nullable: false,
     allowedTypes: ["boolean"],
   });
 

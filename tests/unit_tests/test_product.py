@@ -41,6 +41,7 @@ def test_product(product_process_code, example_input, expected_output):
         ({"data_fake": [1, 0, 3, 2]}, True, "MISSING_PARAMETER"),
         ({"data": "[1,0,3,2]"}, True, "NOT_ARRAY"),
         ({"data": [1, 0, 3, 2], "ignore_nodata": [1, 2, 3]}, True, "WRONG_TYPE"),
+        ({"data": [1, 0, 3, 2], "ignore_nodata": None}, True, "NOT_NULL"),
         ({"data": [1, 2, 3, None, "1"]}, True, "WRONG_TYPE"),
     ],
 )

@@ -14,6 +14,7 @@ function quantiles(arguments) {
     processName: "quantiles",
     parameterName: "ignore_nodata",
     value: ignore_nodata,
+    nullable: false,
     allowedTypes: ["boolean"],
   });
 

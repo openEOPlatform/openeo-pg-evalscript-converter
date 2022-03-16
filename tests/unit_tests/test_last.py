@@ -41,6 +41,7 @@ def test_last(last_process_code, example_input, expected_output):
         ({"data": 1}, True, "NOT_ARRAY"),
         ({}, True, "MISSING_PARAMETER"),
         ({"data": [1, 2, 3, None], "ignore_nodata": "False"}, True, "WRONG_TYPE"),
+        ({"data": [1, 2, 3, None], "ignore_nodata": None}, True, "NOT_NULL"),
     ],
 )
 def test_last_exceptions(last_process_code, example_input, raises_exception, error_message):
