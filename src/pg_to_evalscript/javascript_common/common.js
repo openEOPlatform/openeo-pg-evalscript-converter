@@ -44,3 +44,101 @@ function parse_rfc3339(dt, default_h = 0, default_m = 0, default_s = 0) {
 
   return result;
 }
+
+class ProcessError extends Error {
+  constructor({ name, message }) {
+    super(message);
+    this.name = name;
+  }
+}
+
+class ValidationError extends Error {
+  constructor({ name, message }) {
+    super(message);
+    this.name = name;
+  }
+}
+
+const VALIDATION_ERRORS = {
+  MISSING_PARAMETER: "MISSING_PARAMETER",
+  WRONG_TYPE: "WRONG_TYPE",
+  NOT_NULL: "NOT_NULL",
+  NOT_ARRAY: "NOT_ARRAY",
+  NOT_INTEGER: "NOT_INTEGER",
+  MIN_VALUE: "MIN_VALUE",
+  MAX_VALUE: "MAX_VALUE",
+};
+
+function validateParameter(arguments) {
+  const {
+    processName,
+    parameterName,
+    value,
+    required = false,
+    nullable = true,
+    allowedTypes,
+    array,
+    integer,
+    min,
+    max,
+  } = arguments;
+
+  if (!!required && value === undefined) {
+    throw new ValidationError({
+      name: VALIDATION_ERRORS.MISSING_PARAMETER,
+      message: `Process ${processName} requires parameter ${parameterName}.`,
+    });
+  }
+
+  if (!nullable && value === null) {
+    throw new ValidationError({
+      name: VALIDATION_ERRORS.NOT_NULL,
+      message: `Value for ${parameterName} should not be null.`,
+    });
+  }
+
+  if (
+    allowedTypes &&
+    Array.isArray(allowedTypes) &&
+    value !== null &&
+    value !== undefined &&
+    !allowedTypes.includes(typeof value)
+  ) {
+    throw new ValidationError({
+      name: VALIDATION_ERRORS.WRONG_TYPE,
+      message: `Value for ${parameterName} is not a ${allowedTypes.join(
+        " or a "
+      )}.`,
+    });
+  }
+
+  if (array && !Array.isArray(value)) {
+    throw new ValidationError({
+      name: VALIDATION_ERRORS.NOT_ARRAY,
+      message: `Value for ${parameterName} is not an array.`,
+    });
+  }
+
+  if (integer && !Number.isInteger(value)) {
+    throw new ValidationError({
+      name: VALIDATION_ERRORS.NOT_INTEGER,
+      message: `Value for ${parameterName} is not an integer.`,
+    });
+  }
+
+  if (min !== undefined && min !== null && value < min) {
+    throw new ValidationError({
+      name: VALIDATION_ERRORS.MIN_VALUE,
+      message: `Value for ${parameterName} must be greater or equal to ${min}.`,
+    });
+  }
+
+  if (max !== undefined && max !== null && value > max) {
+    throw new ValidationError({
+      name: VALIDATION_ERRORS.MAX_VALUE,
+      message: `Value for ${parameterName} must be less or equal to ${max}.`,
+    });
+  }
+
+  return true;
+}

@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -32,16 +32,10 @@ def test_if(if_process_code, example_input, expected_output):
     "example_input,raises_exception,error_message",
     [
         ({"value": True, "accept": "A", "reject": "B"}, False, None),
-        ({"accept": "A", "reject": "B"}, True, "Mandatory argument `value` is not defined."),
-        ({"value": True, "reject": "B"}, True, "Mandatory argument `accept` is not defined."),
-        ({"value": "True", "accept": "A", "reject": "B"}, True, "Argument `value` is not a boolean or null."),
+        ({"accept": "A", "reject": "B"}, True, "MISSING_PARAMETER"),
+        ({"value": True, "reject": "B"}, True, "MISSING_PARAMETER"),
+        ({"value": "True", "accept": "A", "reject": "B"}, True, "WRONG_TYPE"),
     ],
 )
 def test_if_exceptions(if_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(if_process_code, "_if", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(if_process_code, "_if", example_input)
+    run_input_validation(if_process_code, "_if", example_input, raises_exception, error_message)

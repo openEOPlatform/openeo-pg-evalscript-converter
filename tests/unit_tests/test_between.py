@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -11,32 +11,26 @@ def between_process_code():
 
 
 @pytest.mark.parametrize(
-    "example_input,raises_exception,error_message",
+    "example_input,raises_exception,error_name",
     [
-        ({}, True, "Process between requires argument x"),
+        ({}, True, "MISSING_PARAMETER"),
         ({"x": None}, False, None),
         ({"x": 0.3, "min": 0, "max": 1}, False, None),
         ({"x": 0.3, "min": 0, "max": 1, "exclude_max": False}, False, None),
-        ({"x": 0.3}, True, "Process between requires argument min."),
-        ({"x": 0.3, "max": 1}, True, "Process between requires argument min."),
-        ({"x": 0.3, "min": 0}, True, "Process between requires argument max."),
-        ({"x": 0.3, "min": None, "max": 1}, True, "Process between requires argument min."),
-        ({"x": 0.3, "min": 1, "max": None}, True, "Process between requires argument max."),
+        ({"x": 0.3}, True, "MISSING_PARAMETER"),
+        ({"x": 0.3, "max": 1}, True, "MISSING_PARAMETER"),
+        ({"x": 0.3, "min": 0}, True, "MISSING_PARAMETER"),
+        ({"x": 0.3, "min": None, "max": 1}, True, "NOT_NULL"),
+        ({"x": 0.3, "min": 1, "max": None}, True, "NOT_NULL"),
         (
             {"x": 0.3, "min": None, "max": None},
             True,
-            "Process between requires argument min.",
+            "NOT_NULL",
         ),
     ],
 )
-def test_between_inputs(between_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(between_process_code, "between", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(between_process_code, "between", example_input)
+def test_between_inputs(between_process_code, example_input, raises_exception, error_name):
+    run_input_validation(between_process_code, "between", example_input, raises_exception, error_name)
 
 
 @pytest.mark.parametrize(

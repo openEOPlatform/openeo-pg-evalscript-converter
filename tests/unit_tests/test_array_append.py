@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -29,25 +29,14 @@ def test_array_append(array_append_process_code, example_input, expected_output)
 
 
 @pytest.mark.parametrize(
-    "example_input,raises_exception,error_message",
+    "example_input,raises_exception,error_name",
     [
         ({"data": [1, 2], "value": [3]}, False, None),
-        (
-            {"value": 1},
-            True,
-            "Mandatory argument `data` is either null or not defined.",
-        ),
-        ({"data": [1]}, True, "Mandatory argument `value` is not defined."),
-        ({"data": "[0]", "value": 1}, True, "Argument `data` is not an array."),
+        ({"value": 1}, True, "MISSING_PARAMETER"),
+        ({"data": [1]}, True, "MISSING_PARAMETER"),
+        ({"data": None, "value": 1}, True, "NOT_NULL"),
+        ({"data": "[0]", "value": 1}, True, "NOT_ARRAY"),
     ],
 )
-def test_array_append_exceptions(
-    array_append_process_code, example_input, raises_exception, error_message
-):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(array_append_process_code, "array_append", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(array_append_process_code, "array_append", example_input)
+def test_array_append_exceptions(array_append_process_code, example_input, raises_exception, error_name):
+    run_input_validation(array_append_process_code, "array_append", example_input, raises_exception, error_name)

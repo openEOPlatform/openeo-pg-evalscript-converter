@@ -1,32 +1,32 @@
 function clip(arguments) {
   const { x, min, max } = arguments;
 
-  if (x === undefined) {
-    throw new Error("Mandatory argument `x` is not defined.");
-  }
+  validateParameter({
+    processName: "clip",
+    parameterName: "x",
+    value: x,
+    required: true,
+    allowedTypes: ["number"],
+  });
 
-  if (min === undefined) {
-    throw new Error("Mandatory argument `min` is not defined.");
-  }
+  validateParameter({
+    processName: "clip",
+    parameterName: "min",
+    value: min,
+    required: true,
+    allowedTypes: ["number"],
+  });
 
-  if (max === undefined) {
-    throw new Error("Mandatory argument `max` is not defined.");
-  }
+  validateParameter({
+    processName: "clip",
+    parameterName: "max",
+    value: max,
+    required: true,
+    allowedTypes: ["number"],
+  });
 
   if (x === null) {
     return null;
-  }
-
-  if (typeof x !== "number") {
-    throw new Error("Argument `x` is not a number.");
-  }
-
-  if (typeof min !== "number") {
-    throw new Error("Argument `min` is not a number.");
-  }
-
-  if (typeof max !== "number") {
-    throw new Error("Argument `max` is not a number.");
   }
 
   if (x < min) {

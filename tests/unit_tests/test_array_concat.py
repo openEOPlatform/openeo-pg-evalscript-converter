@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -31,22 +31,16 @@ def test_array_concat(array_concat_process_code, example_input, expected_output)
 
 
 @pytest.mark.parametrize(
-    "example_input,raises_exception,error_message",
+    "example_input,raises_exception,error_name",
     [
         ({"array1": [1, 2, 3], "array2": [4, 5, 6]}, False, None),
-        ({"array2": [1, 2, 3]}, True, "Mandatory argument `array1` is either null or not defined."),
-        ({"array1": None, "array2": [1, 2, 3]}, True, "Mandatory argument `array1` is either null or not defined."),
-        ({"array1": [1, 2, 3]}, True, "Mandatory argument `array2` is either null or not defined."),
-        ({"array1": [1, 2, 3], "array2": None}, True, "Mandatory argument `array2` is either null or not defined."),
-        ({"array1": [1, 2, 3], "array2": "[4,5,6]"}, True, "Argument `array1` or `array2` is not an array."),
-        ({"array1": "[1,2,3]", "array2": [4, 5, 6]}, True, "Argument `array1` or `array2` is not an array."),
+        ({"array2": [1, 2, 3]}, True, "MISSING_PARAMETER"),
+        ({"array1": None, "array2": [1, 2, 3]}, True, "NOT_NULL"),
+        ({"array1": [1, 2, 3]}, True, "MISSING_PARAMETER"),
+        ({"array1": [1, 2, 3], "array2": None}, True, "NOT_NULL"),
+        ({"array1": [1, 2, 3], "array2": "[4,5,6]"}, True, "NOT_ARRAY"),
+        ({"array1": "[1,2,3]", "array2": [4, 5, 6]}, True, "NOT_ARRAY"),
     ],
 )
-def test_array_concat_exceptions(array_concat_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(array_concat_process_code, "array_concat", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(array_concat_process_code, "array_concat", example_input)
+def test_array_concat_exceptions(array_concat_process_code, example_input, raises_exception, error_name):
+    run_input_validation(array_concat_process_code, "array_concat", example_input, raises_exception, error_name)
