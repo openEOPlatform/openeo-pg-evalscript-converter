@@ -1,24 +1,24 @@
 function subtract(arguments) {
   const { x, y } = arguments;
 
-  if (x === undefined) {
-    throw new Error("Mandatory argument `x` is not defined.");
-  }
+  validateParameter({
+    processName: "subtract",
+    parameterName: "x",
+    value: x,
+    required: true,
+    allowedTypes: ["number"],
+  });
 
-  if (y === undefined) {
-    throw new Error("Mandatory argument `y` is not defined.");
-  }
+  validateParameter({
+    processName: "subtract",
+    parameterName: "y",
+    value: y,
+    required: true,
+    allowedTypes: ["number"],
+  });
 
   if (x === null || y === null) {
     return null;
-  }
-
-  if (typeof x !== "number") {
-    throw new Error("Argument `x` is not a number.");
-  }
-
-  if (typeof y !== "number") {
-    throw new Error("Argument `y` is not a number.");
   }
 
   return x - y;

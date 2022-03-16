@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -28,3 +28,18 @@ def test_multiply(multiply_process_code, example_input, expected_output):
     output = run_process(multiply_process_code, "multiply", example_input)
     output = json.loads(output)
     assert pytest.approx(output) == expected_output
+
+
+@pytest.mark.parametrize(
+    "example_input,raises_exception,error_message",
+    [
+        ({"x": 1, "y": 2}, False, None),
+        ({}, True, "MISSING_PARAMETER"),
+        ({"y": 2}, True, "MISSING_PARAMETER"),
+        ({"x": 1}, True, "MISSING_PARAMETER"),
+        ({"x": "2", "y": 2}, True, "WRONG_TYPE"),
+        ({"x": 2, "y": "2"}, True, "WRONG_TYPE"),
+    ],
+)
+def test_input_validation(multiply_process_code, example_input, raises_exception, error_message):
+    run_input_validation(multiply_process_code, "multiply", example_input, raises_exception, error_message)

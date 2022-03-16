@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -31,17 +31,11 @@ def test_sqrt(sqrt_process_code, example_input, expected_output):
     "example_input,raises_exception,error_message",
     [
         ({"x": 1}, False, None),
-        ({}, True, "Mandatory argument `x` is not defined."),
-        ({"y": 0.5}, True, "Mandatory argument `x` is not defined."),
-        ({"x": "0.5"}, True, "Argument `x` is not a number."),
-        ({"x": -4}, True, "Argument `x` is not a non-negative number."),
+        ({}, True, "MISSING_PARAMETER"),
+        ({"y": 0.5}, True, "MISSING_PARAMETER"),
+        ({"x": "0.5"}, True, "WRONG_TYPE"),
+        ({"x": -4}, True, "MIN_VALUE"),
     ],
 )
 def test_sqrt_exceptions(sqrt_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(sqrt_process_code, "sqrt", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(sqrt_process_code, "sqrt", example_input)
+    run_input_validation(sqrt_process_code, "sqrt", example_input, raises_exception, error_message)
