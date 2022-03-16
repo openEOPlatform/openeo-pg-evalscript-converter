@@ -32,6 +32,7 @@ from tests.utils import (
         ),
         ("test_count_with_condition", [{"B01": 0, "B02":1}, {"B01":2, "B02":3}, {"B01":4, "B02":5}, {"B01":None, "B02": None}], [1, 2]),
         ("test_count_without_condition", [{"B01": 0, "B02":1}, {"B01":2, "B02":3}, {"B01":4, "B02":5}, {"B01":None, "B02": 3}], [3, 4]),
+        # todo: test_array_filter process graph uses reduce_dimension which gives unconclusive results, update with apply_dimension once implemented
         ("test_array_filter", [{"B01": 0}, {"B01": 1}, {"B01":2}, {"B01":4}, {"B01":5}], [2]),
     ],
 )

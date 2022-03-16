@@ -14,7 +14,6 @@ function array_filter(arguments) {
     parameterName: "condition",
     value: cond,
     required: true,
-    allowedTypes: ["object"],
   });
 
   return data.filter((val) => {
