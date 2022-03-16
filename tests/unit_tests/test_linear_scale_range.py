@@ -15,12 +15,17 @@ def linear_scale_range_process_code():
     [
         ({}, True, "MISSING_PARAMETER"),
         ({"x": None}, False, None),
+        ({"x": "0.3", "inputMin": 0, "inputMax": 1}, True, "WRONG_TYPE"),
         ({"x": 0.3, "inputMin": 0, "inputMax": 1}, False, None),
         ({"x": 0.3}, True, "MISSING_PARAMETER"),
         ({"x": 0.3, "inputMax": 1}, True, "MISSING_PARAMETER"),
         ({"x": 0.3, "inputMin": 0}, True, "MISSING_PARAMETER"),
         ({"x": 0.3, "inputMin": None, "inputMax": 1}, True, "NOT_NULL"),
+        ({"x": 0.3, "inputMin": "0", "inputMax": 1}, True, "WRONG_TYPE"),
         ({"x": 0.3, "inputMin": 1, "inputMax": None}, True, "NOT_NULL"),
+        ({"x": 0.3, "inputMin": 0, "inputMax": True}, True, "WRONG_TYPE"),
+        ({"x": 0.3, "inputMin": 0, "inputMax": 1, "outputMin": "0", "outputMax": 255}, True, "WRONG_TYPE"),
+        ({"x": 0.3, "inputMin": 0, "inputMax": 1, "outputMin": 0, "outputMax": "255"}, True, "WRONG_TYPE"),
     ],
 )
 def test_linear_scale_range_inputs(linear_scale_range_process_code, example_input, raises_exception, error_message):

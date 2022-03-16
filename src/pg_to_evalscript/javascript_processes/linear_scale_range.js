@@ -6,6 +6,7 @@ function linear_scale_range(arguments) {
     parameterName: "x",
     value: x,
     required: true,
+    allowedTypes: ["number"],
   });
 
   if (x === null) {
@@ -18,6 +19,7 @@ function linear_scale_range(arguments) {
     value: inputMin,
     required: true,
     nullable: false,
+    allowedTypes: ["number"],
   });
 
   validateParameter({
@@ -26,6 +28,21 @@ function linear_scale_range(arguments) {
     value: inputMax,
     required: true,
     nullable: false,
+    allowedTypes: ["number"],
+  });
+
+  validateParameter({
+    processName: "linear_scale_range",
+    parameterName: "outputMin",
+    value: outputMin,
+    allowedTypes: ["number"],
+  });
+
+  validateParameter({
+    processName: "linear_scale_range",
+    parameterName: "outputMax",
+    value: outputMax,
+    allowedTypes: ["number"],
   });
 
   //The given number in x is clipped to the bounds specified in inputMin and inputMax
