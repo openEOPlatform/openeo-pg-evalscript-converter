@@ -30,8 +30,16 @@ from tests.utils import (
             [{"B01": 0.5, "B02": 0.75}, {"B01": 0, "B02": 1}, {"B01": -3, "B02": 4}, {"B01": None, "B02": None}],
             [1, 1.5, 0, 2, 0, 2, None, None],
         ),
-        ("test_count_with_condition", [{"B01": 0, "B02":1}, {"B01":2, "B02":3}, {"B01":4, "B02":5}, {"B01":None, "B02": None}], [1, 2]),
-        ("test_count_without_condition", [{"B01": 0, "B02":1}, {"B01":2, "B02":3}, {"B01":4, "B02":5}, {"B01":None, "B02": 3}], [3, 4]),
+        (
+            "test_count_with_condition",
+            [{"B01": 0}, {"B01": 1}, {"B01": 2}, {"B01": 3}, {"B01": 4}, {"B01": 5}, {"B01": None}, {"B01": None}],
+            [3],
+        ),
+        (
+            "test_count_without_condition",
+            [{"B01": 0}, {"B01": 1}, {"B01": 2}, {"B01": 3}, {"B01": 4}, {"B01": 5}, {"B01": None}, {"B01": 3}],
+            [7],
+        ),
     ],
 )
 def test_convertable_process_graphs(pg_name, example_input, expected_output):
