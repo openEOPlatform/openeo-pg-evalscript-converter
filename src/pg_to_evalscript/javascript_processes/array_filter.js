@@ -18,9 +18,9 @@ function array_filter(arguments) {
 
   let filteredData = [];
 
-  for (let val of data) {
-    if (condition({ x: val })) {
-      filteredData.push(val);
+  for (let i = 0; i < data.length; i++) {
+    if (condition({ x: data[i], index: i, label: data.labels ? data.labels[i] : undefined, context })) {
+      filteredData.push(data[i]);
     }
   }
 
