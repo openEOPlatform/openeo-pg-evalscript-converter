@@ -2,12 +2,24 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_input_validation
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
 def array_apply_process_code():
     return load_process_code("array_apply")
+
+
+@pytest.mark.parametrize(
+    "example_input,expected_output", 
+    [
+        ({"data": [], "process": {"process_graph": {"add_pg": {"process_id": "add", "arguments": {"x": {"from_parameter": "x"}, "index": {"from_parameter": "index"}, "y": 10}}}}}, [])
+    ]
+)
+def test_array_apply(array_apply_process_code, example_input, expected_output):
+    output = run_process(array_apply_process_code, "array_apply", example_input)
+    output = json.loads(output)
+    assert output == expected_output
 
 
 @pytest.mark.parametrize(
