@@ -15,7 +15,7 @@ def filter_bands_process_code():
     [
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
                 "bands": ["abc", "def"],
             },
             {
@@ -32,7 +32,7 @@ def filter_bands_process_code():
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
                 "bands": ["B01", "B02", "B03"],
             },
             {
@@ -45,12 +45,12 @@ def filter_bands_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+                "data": [[1, 2, 3], [4, 5, 6]],
             },
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
                 "bands": ["B03"],
             },
             {
@@ -63,7 +63,7 @@ def filter_bands_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[3], [6], [9]],
+                "data": [[3], [6]],
             },
         ),
     ],
@@ -88,27 +88,27 @@ def test_filter_bands(filter_bands_process_code, example_input, expected_output)
     [
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data":  [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
                 "bands": ["B01", "B02"],
             },
             False,
             None,
         ),
         (
-            {"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "bands": []},
+            {"data":  [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}], "bands": []},
             True,
             "The process `filter_bands` requires any of the parameters `bands`, `common_names` or `wavelengths` to be set.",
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data":  [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
             },
             True,
             "The process `filter_bands` requires any of the parameters `bands`, `common_names` or `wavelengths` to be set.",
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data":  [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
                 "bands": "[1,2,3]",
             },
             True,
@@ -116,7 +116,7 @@ def test_filter_bands(filter_bands_process_code, example_input, expected_output)
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data":  [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
                 "bands": [1, 2, 3],
             },
             True,

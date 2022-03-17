@@ -15,7 +15,7 @@ def drop_dimension_process_code():
     "data,name,additional_js_code_specific_to_case,expected_output",
     [
         (
-            {"B01": [1, 2, 3]},
+            [{"B01": 1, "B02": 2, "B03": 3}],
             "temporal_name",
             None,
             {
@@ -25,7 +25,7 @@ def drop_dimension_process_code():
                 "bands_dimension_name": "bands_name",
                 "temporal_dimension_name": "temporal_name",
                 "dimensions": [
-                    {"labels": ["B01"], "name": "bands_name", "type": "bands"},
+                    {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
                 "data": [1, 2, 3],
             },
@@ -51,7 +51,7 @@ def drop_dimension_process_code():
             },
         ),
         (
-            {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+            [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
             "test_name_to_remove",
             "cube.addDimension('test_name_to_remove', 'label123', 'other');",
             {
@@ -64,7 +64,7 @@ def drop_dimension_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+                "data": [[1, 2, 3], [4, 5, 6]],
             },
         ),
     ],
@@ -89,49 +89,49 @@ def test_drop_dimension(drop_dimension_process_code, data, name, additional_js_c
     "data,name,additional_js_code_specific_to_case,raises_exception,error_message",
     [
         (
-            {"B01": [1, 2, 3]},
+            [{"B01": 1, "B02": 2, "B03": 3}],
             "temporal_name",
             None,
             False,
             None,
         ),
         (
-            {"B01": [1, 2, 3]},
+            [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
             "bands_name",
             "cube = null;",
             True,
             "Value for data should not be null.",
         ),
         (
-            {"B01": [1, 2, 3]},
+            [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
             "bands_name",
             "cube = undefined;",
             True,
             "Process drop_dimension requires parameter data.",
         ),
         (
-            {"B01": [1, 2, 3]},
+            [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
             None,
             None,
             True,
             "Value for name should not be null.",
         ),
         (
-            {"B01": [1, 2, 3]},
+            [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
             True,
             None,
             True,
             "Value for name is not a string.",
         ),
         (
-            {"B01": [1, 2, 3]},
+            [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
             "bands_fake_name",
             None,
             True,
             "A dimension with the specified name does not exist.",
         ),
         (
-            {"B01": [1, 2, 3], "B02": [4, 5, 6]},
+            [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
             "bands_name",
             None,
             True,
