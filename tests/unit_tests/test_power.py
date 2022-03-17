@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -36,21 +36,15 @@ def test_power(power_process_code, example_input, expected_output):
     "example_input,raises_exception,error_message",
     [
         ({"p": 1, "base": 2}, False, None),
-        ({}, True, "Mandatory argument `p` or `base` is not defined."),
-        ({"p": 2}, True, "Mandatory argument `p` or `base` is not defined."),
-        ({"base": 3}, True, "Mandatory argument `p` or `base` is not defined."),
-        ({"q": 0.5, "base": 12}, True, "Mandatory argument `p` or `base` is not defined."),
-        ({"p": "0.5", "base": 1}, True, "Argument `p` is not a number."),
-        ({"p": {"p": 0.5}, "base": 4}, True, "Argument `p` is not a number."),
-        ({"p": 12, "base": "3"}, True, "Argument `base` is not a number."),
-        ({"p": 2, "base": {"base": 4}}, True, "Argument `base` is not a number."),
+        ({}, True, "MISSING_PARAMETER"),
+        ({"p": 2}, True, "MISSING_PARAMETER"),
+        ({"base": 3}, True, "MISSING_PARAMETER"),
+        ({"q": 0.5, "base": 12}, True, "MISSING_PARAMETER"),
+        ({"p": "0.5", "base": 1}, True, "WRONG_TYPE"),
+        ({"p": {"p": 0.5}, "base": 4}, True, "WRONG_TYPE"),
+        ({"p": 12, "base": "3"}, True, "WRONG_TYPE"),
+        ({"p": 2, "base": {"base": 4}}, True, "WRONG_TYPE"),
     ],
 )
 def test_power_exceptions(power_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(power_process_code, "power", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(power_process_code, "power", example_input)
+    run_input_validation(power_process_code, "power", example_input, raises_exception, error_message)

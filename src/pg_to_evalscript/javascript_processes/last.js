@@ -1,9 +1,22 @@
 function last(arguments) {
   const { data, ignore_nodata = true } = arguments;
 
-  if (data === null || data === undefined) {
-    throw new Error("Mandatory argument `data` is either null or not defined.");
-  }
+  validateParameter({
+    processName: "last",
+    parameterName: "data",
+    value: data,
+    required: true,
+    nullable: false,
+    array: true,
+  });
+
+  validateParameter({
+    processName: "max",
+    parameterName: "ignore_nodata",
+    value: ignore_nodata,
+    nullable: false,
+    allowedTypes: ["boolean"],
+  });
 
   if (data.length === 0 || data.every((x) => x === null)) {
     return null;

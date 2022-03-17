@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -127,21 +127,14 @@ def test_sort(sort_process_code, example_input, expected_output):
     "example_input,raises_exception,error_message",
     [
         ({"data": [1, 2, 3, 4, 5], "asc": False, "nodata": True}, False, None),
-        ({"data": "[1,2,3,4,5]", "asc": False, "nodata": True}, True, "Argument `data` is not an array."),
-        ({"data": [1, 2, 3, 4, 5], "asc": "False", "nodata": True}, True, "Argument `asc` is not a boolean."),
-        (
-            {"data": [1, 2, 3, 4, 5], "asc": False, "nodata": "True"},
-            True,
-            "Argument `nodata` is not a boolean or null.",
-        ),
-        ({"data": [1, 2, [3], 4, 5], "asc": False, "nodata": True}, True, "Element in `data` is not of correct type."),
+        ({"data": "[1,2,3,4,5]", "asc": False, "nodata": True}, True, "NOT_ARRAY"),
+        ({"data": None, "asc": False, "nodata": True}, True, "NOT_NULL"),
+        ({"asc": False, "nodata": True}, True, "MISSING_PARAMETER"),
+        ({"data": [1, 2, 3, 4, 5], "asc": "False", "nodata": True}, True, "WRONG_TYPE"),
+        ({"data": [1, 2, 3, 4, 5], "asc": None, "nodata": True}, True, "NOT_NULL"),
+        ({"data": [1, 2, 3, 4, 5], "asc": False, "nodata": "True"}, True, "WRONG_TYPE"),
+        ({"data": [1, 2, [3], 4, 5], "asc": False, "nodata": True}, True, "WRONG_TYPE"),
     ],
 )
 def test_sort_exceptions(sort_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(sort_process_code, "sort", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(sort_process_code, "sort", example_input)
+    run_input_validation(sort_process_code, "sort", example_input, raises_exception, error_message)

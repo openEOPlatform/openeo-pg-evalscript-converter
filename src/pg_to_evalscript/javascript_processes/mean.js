@@ -1,25 +1,32 @@
 function mean(arguments) {
   const { data, ignore_nodata = true } = arguments;
 
-  if (data === undefined) {
-    throw new Error("Mandatory argument `data` is not defined.");
-  }
+  validateParameter({
+    processName: "mean",
+    parameterName: "data",
+    value: data,
+    required: true,
+    array: true,
+  });
 
-  if (!Array.isArray(data)) {
-    throw new Error("Argument `data` is not an array.");
-  }
-
-  if (typeof ignore_nodata !== "boolean") {
-    throw new Error("Argument `ignore_nodata` is not a boolean.");
-  }
+  validateParameter({
+    processName: "mean",
+    parameterName: "ignore_nodata",
+    value: ignore_nodata,
+    nullable: false,
+    allowedTypes: ["boolean"],
+  });
 
   let sum = 0;
   let el_num = 0;
 
   for (let x of data) {
-    if (typeof x !== "number" && x !== null) {
-      throw new Error("Element in argument `data` is not a number or null.");
-    }
+    validateParameter({
+      processName: "mean",
+      parameterName: "element of data",
+      value: x,
+      allowedTypes: ["number"],
+    });
 
     if (x === null) {
       if (ignore_nodata) {
