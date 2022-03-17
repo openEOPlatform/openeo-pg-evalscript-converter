@@ -15,6 +15,7 @@ def array_filter_process_code():
     [
         ({"data": [1, 2], "condition": "dummy"},  []),
         ({"data": [1, 2, 3, 4, 5], "condition": "dummy"},  [3, 4, 5]),
+        ({"data": [6, 4, 9, 3, 2, 0, 5, 1, 3, 10], "condition": "dummy"},  [6, 4, 9, 3, 5, 3, 10]),
         ({"data": [4, 5], "condition": "dummy"},  [4, 5]),
     ],
 )
