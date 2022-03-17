@@ -35,8 +35,9 @@ def test_order(order_process_code, example_input, expected_output):
     "example_input,raises_exception,error_name",
     [
         ({"data": [1, 2, 3]}, False, None),
-        ({"asc": False}, True, "MISSING_PARAMETER"),
+        ({}, True, "MISSING_PARAMETER"),
         ({"data": False}, True, "NOT_ARRAY"),
+        ({"data": None}, True, "NOT_NULL"),
         ({"data": [1, 2, 3], "asc": True}, False, None),
         ({"data": [1, 2, 3], "asc": None}, True, "NOT_NULL"),
         ({"data": [1, 2, 3], "nodata": False}, False, None),

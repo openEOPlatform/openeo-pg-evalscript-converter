@@ -6,6 +6,7 @@ function order(arguments) {
     parameterName: "data",
     value: data,
     required: true,
+    nullable: false,
     array: true,
   });
 
@@ -13,16 +14,14 @@ function order(arguments) {
     processName: "order",
     parameterName: "asc",
     value: asc,
-    required: true,
     nullable: false,
     allowedTypes: ["boolean"],
   });
 
   validateParameter({
-    processName: "nodata",
+    processName: "order",
     parameterName: "nodata",
     value: nodata,
-    required: true,
     allowedTypes: ["boolean"],
   });
 
