@@ -1,7 +1,7 @@
 import json
 import pytest
 
-from tests.utils import load_script, run_javacript, run_input_validation
+from tests.utils import load_script, run_javascript, run_input_validation
 
 
 @pytest.fixture
@@ -29,7 +29,7 @@ def common_code():
 )
 def test_common(common_code, example_input, expected_output):
     function_name = "parse_rfc3339"
-    output = run_javacript(
+    output = run_javascript(
         common_code + f"process.stdout.write(JSON.stringify({function_name}({json.dumps(example_input)})))"
     )
     output = json.loads(output)
