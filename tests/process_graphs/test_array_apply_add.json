@@ -14,7 +14,7 @@
       "data": {
         "from_node": "loadcollection1"
       },
-      "dimension": "bands",
+      "dimension": "t",
       "reducer": {
         "process_graph": {
           "array_apply": {
