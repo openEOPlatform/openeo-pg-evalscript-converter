@@ -283,27 +283,7 @@ function array_apply(arguments) {{
         return {self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id};
     }}
 
-    const {{data, context = null}} = arguments;
-
-    validateParameter({{
-        processName: "array_apply",
-        parameterName: "data",
-        value: data,
-        required: true,
-        nullable: false,
-        array: true
-    }});
-
-    let newData = [];
-    for (let i = 0; i < data.length; i++) {{
-        newData[i] = process({{
-            x: data[i],
-            index: i,
-            label: data.labels ? data.labels[i] : undefined,
-            context: context,
-        }});
-    }}
-
-    return newData;
+    {self.load_process_code()}
+    return array_apply(arguments)
 }}
 """
