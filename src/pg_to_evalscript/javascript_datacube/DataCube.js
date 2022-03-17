@@ -146,7 +146,7 @@ class DataCube {
         const finalSelectCoords = new Array(shape.length).fill(null);
         finalSelectCoords[axis] = 0;
         this.data = this._select(newData, finalSelectCoords);
-        this.removeDimension(dimension)
+        this.dimensions = this.dimensions.filter(d => d.name !== dimension);
     }
 
     flatten() {
