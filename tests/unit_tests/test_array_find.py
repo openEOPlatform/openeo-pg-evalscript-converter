@@ -16,7 +16,7 @@ def array_find_process_code():
         ({"data": [1, 2, 3], "value": 2}, 1),
         ({"data": ["A", "B", "C"], "value": "b"}, None),
         ({"data": [1, 2, 3], "value": "2"}, None),
-        ({"data": [1, None, 2, None], "value": None}, None), # example in docs shows "1" as a return, but description states "None"
+        ({"data": [1, None, 2, None], "value": None}, None),
         ({"data": [[1, 2], [3, 4]], "value": [1, 2]}, None),
         ({"data": [[1, 2], [3, 4]], "value": 2}, None),
         ({"data": [{"a": "b"}, {"c": "d"}], "value": {"a": "b"}}, None),
