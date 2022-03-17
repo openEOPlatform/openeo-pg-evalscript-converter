@@ -16,6 +16,7 @@ def array_contains_process_code():
         ({"data": [1, 2, 3], "value": 2}, True),
         ({"data": ["A", "B", "C"], "value": "b"}, False),
         ({"data": [1, 2, 3], "value": "2"}, False),
+        ({"data": ["1", "2", "3"], "value": 2}, False),
         ({"data": [1, 2, None], "value": None}, False),
         ({"data": [[1, 2], [3, 4]], "value": [1, 2]}, False),
         ({"data": [[1, 2], [3, 4]], "value": 2}, False),
