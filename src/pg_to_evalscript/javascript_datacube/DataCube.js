@@ -147,6 +147,10 @@ class DataCube {
         this.removeDimension(dimension)
     }
 
+    applyDimension(process, dimension) {
+        // todo
+    }
+
     flatten() {
         const flattenArr = (arr) => arr.reduce((flat, next) => flat.concat(next), []);
         return this._iter(this.data, v => v, () => false, r => {

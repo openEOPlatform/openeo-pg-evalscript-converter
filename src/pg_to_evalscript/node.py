@@ -72,6 +72,7 @@ class Node:
             "if": IfNode,
             "apply": ApplyNode,
             "count": CountNode,
+            "apply_dimension": ApplyDimensionNode,
         }
         if class_types_for_process.get(process_id):
             self.__class__ = class_types_for_process[process_id]
@@ -243,6 +244,28 @@ function apply(arguments) {{
     const {{data, dimension}} = arguments; 
     const newData = data.clone()
     newData.apply(process)
+    return newData;
+}}
+"""
+
+
+class ApplyDimensionNode(Node):
+    def is_process_defined(self, process_id):
+        return True
+
+    def write_process(self):
+        newline = "\n"
+        tab = "\t"
+        return f"""
+function apply_dimension(arguments) {{
+   function process(arguments) {{
+    {newline.join(node.write_function() for node in self.child_nodes)}
+    {newline.join(node.write_call() for node in self.child_nodes)}
+        return {self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id};
+    }}
+    const {{data, dimension}} = arguments;
+    const newData = data.clone()
+    newData.applyDimension(process, dimension)
     return newData;
 }}
 """

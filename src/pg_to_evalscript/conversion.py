@@ -159,7 +159,7 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
                 temporal_dimension_name,
                 level=level + 1,
             )
-        elif process_id == "apply":
+        elif process_id == "apply" or process_id == "apply_dimension":
             child_nodes, _, _ = generate_nodes_from_process_graph(
                 arguments["process"]["process_graph"],
                 bands_dimension_name,
