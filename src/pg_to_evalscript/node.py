@@ -281,6 +281,7 @@ function array_apply(arguments) {{
     }}
 
     {self.load_process_code()}
-    return array_apply(arguments)
+    const {{ data, context }} = arguments;
+    return array_apply({{ data: data, context: context, process: process }})
 }}
 """
