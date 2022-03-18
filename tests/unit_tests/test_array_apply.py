@@ -78,10 +78,5 @@ def test_array_apply(array_apply_process_code, example_input, expected_output):
     ],
 )
 def test_array_apply_inputs(array_apply_process_code, example_input, raises_exception, error_name):
-    process_js_code = (
-        f"const process = {json.dumps(example_input['process']) if 'process' in example_input else 'undefined'};"
-    )
-    process_arguments = f"{{'data': {json.dumps(example_input['data']) if 'data' in example_input else 'undefined'}, 'process': process}}"
-    run_input_validation(
-        array_apply_process_code + process_js_code, "array_apply", process_arguments, raises_exception, error_name
-    )
+    process_arguments = f"{{'data': {json.dumps(example_input['data']) if 'data' in example_input else 'undefined'}, 'process': {json.dumps(example_input['process']) if 'process' in example_input else 'undefined'}}}"
+    run_input_validation(array_apply_process_code, "array_apply", process_arguments, raises_exception, error_name)
