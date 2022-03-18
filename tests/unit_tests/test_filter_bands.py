@@ -145,3 +145,4 @@ def test_filter_bands_exceptions(filter_bands_process_code, example_input, raise
             "filter_bands",
             process_arguments,
         )
+        
