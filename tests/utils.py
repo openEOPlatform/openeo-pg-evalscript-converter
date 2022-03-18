@@ -13,26 +13,26 @@ def get_process_graph_json(name):
 
 def get_execute_test_script(example_input):
     return f"""
-process.stdout.write(JSON.stringify(evaluatePixel({json.dumps(example_input)})));
+console.log(JSON.stringify(evaluatePixel({json.dumps(example_input)})));
 """
 
 
 def run_evalscript(evalscript, example_input):
-    return run_javacript(evalscript + get_execute_test_script(example_input))
+    return run_javascript(evalscript + get_execute_test_script(example_input))
 
 
 def run_process(process_code, process_name, example_input):
     input_arguments = json.dumps(example_input) if type(example_input) is dict else example_input
-    return run_javacript(
-        process_code + f"process.stdout.write(JSON.stringify({process_name}({input_arguments})))"
+    return run_javascript(
+        process_code + f"console.log(JSON.stringify({process_name}({input_arguments})))"
     )
 
 
 def get_evalscript_input_object(evalscript):
-    return json.loads(run_javacript(evalscript + f"\nprocess.stdout.write(JSON.stringify(setup()))"))
+    return json.loads(run_javascript(evalscript + f"\nconsole.log(JSON.stringify(setup()))"))
 
 
-def run_javacript(javascript_code):
+def run_javascript(javascript_code):
     return subprocess.check_output(["node", "-e", javascript_code], stderr=subprocess.PIPE)
 
 
