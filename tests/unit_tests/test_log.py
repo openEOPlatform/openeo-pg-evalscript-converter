@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -33,19 +33,13 @@ def test_log(log_process_code, example_input, expected_output):
     "example_input,raises_exception,error_message",
     [
         ({"x": 1, "base": 10}, False, None),
-        ({}, True, "Mandatory argument `x` or `base` is not defined."),
-        ({"y": 0.5}, True, "Mandatory argument `x` or `base` is not defined."),
-        ({"x": 0.5}, True, "Mandatory argument `x` or `base` is not defined."),
-        ({"base": 10}, True, "Mandatory argument `x` or `base` is not defined."),
-        ({"x": "0.5", "base": 10}, True, "Argument `x` is not a number."),
-        ({"x": 0.5, "base": "10"}, True, "Argument `base` is not a number."),
+        ({}, True, "MISSING_PARAMETER"),
+        ({"y": 0.5}, True, "MISSING_PARAMETER"),
+        ({"x": 0.5}, True, "MISSING_PARAMETER"),
+        ({"base": 10}, True, "MISSING_PARAMETER"),
+        ({"x": "0.5", "base": 10}, True, "WRONG_TYPE"),
+        ({"x": 0.5, "base": "10"}, True, "WRONG_TYPE"),
     ],
 )
 def test_log_exceptions(log_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(log_process_code, "log", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(log_process_code, "log", example_input)
+    run_input_validation(log_process_code, "log", example_input, raises_exception, error_message)

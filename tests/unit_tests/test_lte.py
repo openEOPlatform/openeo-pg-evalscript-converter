@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -32,3 +32,16 @@ def test_lte(lte_code, example_input, expected_output):
     output = run_process(lte_code, "lte", example_input)
     output = json.loads(output)
     assert output == expected_output
+
+
+@pytest.mark.parametrize(
+    "example_input,raises_exception,error_name",
+    [
+        ({"x": 1, "y": 1}, False, None),
+        ({}, True, "MISSING_PARAMETER"),
+        ({"y": 0.5}, True, "MISSING_PARAMETER"),
+        ({"x": "0.5"}, True, "MISSING_PARAMETER"),
+    ],
+)
+def test_input_validation(lte_code, example_input, raises_exception, error_name):
+    run_input_validation(lte_code, "lte", example_input, raises_exception, error_name)

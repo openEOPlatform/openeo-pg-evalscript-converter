@@ -2,13 +2,33 @@ function neq(arguments) {
   const { x, y, delta = null, case_sensitive = true } = arguments;
   const supportedTypes = ["number", "string", "boolean"];
 
-  if (x === undefined) {
-    throw Error("Process neq requires argument x.");
-  }
+  validateParameter({
+    processName: "neq",
+    parameterName: "x",
+    value: x,
+    required: true,
+  });
 
-  if (y === undefined) {
-    throw Error("Process neq requires argument y.");
-  }
+  validateParameter({
+    processName: "neq",
+    parameterName: "y",
+    value: y,
+    required: true,
+  });
+
+  validateParameter({
+    processName: "neq",
+    parameterName: "delta",
+    value: delta,
+    allowedTypes: ["number"],
+  });
+
+  validateParameter({
+    processName: "neq",
+    parameterName: "case_sensitive",
+    value: case_sensitive,
+    allowedTypes: ["boolean"],
+  });
 
   if (x === null || y === null) {
     return null;

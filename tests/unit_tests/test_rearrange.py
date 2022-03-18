@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -35,21 +35,13 @@ def test_rearrange(rearrange_process_code, example_input, expected_output):
     "example_input,raises_exception,error_message",
     [
         ({"data": [1, 2], "order": [0, 1]}, False, None),
-        (
-            {"order": [0]},
-            True,
-            "Mandatory argument `data` is either null or not defined.",
-        ),
-        (
-            {"data": [0]},
-            True,
-            "Mandatory argument `order` is either null or not defined.",
-        ),
-        (
-            {"data": [1, 2], "order": [0, -1]},
-            True,
-            "Argument `order` must contain only integer values greater than or equal to 0.",
-        ),
+        ({"order": [0]}, True, "MISSING_PARAMETER"),
+        ({"data": None, "order": [0, 1]}, True, "NOT_NULL"),
+        ({"data": 1, "order": [0, 1]}, True, "NOT_ARRAY"),
+        ({"data": [0]}, True, "MISSING_PARAMETER"),
+        ({"data": [0], "order": None}, True, "NOT_NULL"),
+        ({"data": [0], "order": 1}, True, "NOT_ARRAY"),
+        ({"data": [1, 2], "order": [0, -1]}, True, "MIN_VALUE"),
         (
             {"data": [1], "order": [1]},
             True,
@@ -57,13 +49,5 @@ def test_rearrange(rearrange_process_code, example_input, expected_output):
         ),
     ],
 )
-def test_rearrange_exceptions(
-    rearrange_process_code, example_input, raises_exception, error_message
-):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(rearrange_process_code, "rearrange", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(rearrange_process_code, "rearrange", example_input)
+def test_rearrange_exceptions(rearrange_process_code, example_input, raises_exception, error_message):
+    run_input_validation(rearrange_process_code, "rearrange", example_input, raises_exception, error_message)

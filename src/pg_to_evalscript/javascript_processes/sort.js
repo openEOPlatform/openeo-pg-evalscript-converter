@@ -1,29 +1,40 @@
 function sort(arguments) {
   const { data, asc = true, nodata = null } = arguments;
 
-  if (!Array.isArray(data)) {
-    throw new Error("Argument `data` is not an array.");
-  }
+  validateParameter({
+    processName: "sort",
+    parameterName: "data",
+    value: data,
+    required: true,
+    nullable: false,
+    array: true,
+  });
 
-  if (typeof asc !== "boolean") {
-    throw new Error("Argument `asc` is not a boolean.");
-  }
+  validateParameter({
+    processName: "sort",
+    parameterName: "asc",
+    value: asc,
+    nullable: false,
+    allowedTypes: ["boolean"],
+  });
 
-  if (nodata !== null && typeof nodata !== "boolean") {
-    throw new Error("Argument `nodata` is not a boolean or null.");
-  }
+  validateParameter({
+    processName: "sort",
+    parameterName: "nodata",
+    value: nodata,
+    allowedTypes: ["boolean"],
+  });
 
   let newData = [];
   let arr_of_nulls = [];
 
   for (let i = 0; i < data.length; i++) {
-    if (
-      typeof data[i] !== "number" &&
-      typeof data[i] !== "string" &&
-      data[i] !== null
-    ) {
-      throw new Error("Element in `data` is not of correct type.");
-    }
+    validateParameter({
+      processName: "sort",
+      parameterName: "element of data",
+      value: data[i],
+      allowedTypes: ["number", "string"],
+    });
 
     if (data[i] === null) {
       arr_of_nulls.push(data[i]);

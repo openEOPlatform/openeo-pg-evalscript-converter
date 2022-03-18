@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -24,15 +24,9 @@ def test_sgn(sgn_process_code, example_input, expected_output):
     "example_input,raises_exception,error_message",
     [
         ({"x": 1}, False, None),
-        ({"x": True}, True, "Argument `x` is not a number."),
-        ({"y": 1}, True, "Mandatory argument `x` is not defined."),
+        ({"x": True}, True, "WRONG_TYPE"),
+        ({"y": 1}, True, "MISSING_PARAMETER"),
     ],
 )
 def test_sgn_exceptions(sgn_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(sgn_process_code, "sgn", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(sgn_process_code, "sgn", example_input)
+    run_input_validation(sgn_process_code, "sgn", example_input, raises_exception, error_message)
