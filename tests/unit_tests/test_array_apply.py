@@ -44,10 +44,9 @@ def array_apply_process_code():
     ],
 )
 def test_array_apply(array_apply_process_code, example_input, expected_output):
-    process_js_code = f"const process = {example_input['process']};"
-    process_arguments = f"{{'data': {example_input['data']}, 'process': process}}"
+    process_arguments = f"{{'data': {example_input['data']}, 'process': {example_input['process']}}}"
     output = run_process(
-        array_apply_process_code + process_js_code,
+        array_apply_process_code,
         "array_apply",
         process_arguments,
     )
