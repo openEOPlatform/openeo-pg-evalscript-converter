@@ -31,7 +31,7 @@ def drop_dimension_process_code():
             },
         ),
         (
-            {"B01": [1, 2, 3, 4], "B02": [5, 6, 7, 8], "B03": [9, 10, 11, 12], "B04": [13, 14, 15, 16]},
+            [{"B01": 1, "B02": 5, "B03": 9, "B04": 13}, {"B01": 2, "B02": 6, "B03": 10, "B04": 14}, {"B01": 3, "B02": 7, "B03": 11, "B04": 15}, {"B01": 4, "B02": 8, "B03": 12, "B04": 16}],
             "temporal_name",
             "cube.addDimension('x', 'x_label', 'spatial');"
             + "cube.addDimension('y', 'y_label', 'spatial');"
