@@ -269,9 +269,6 @@ function count(arguments) {{
 """
 
 class ArrayApplyNode(Node):
-    def is_process_defined(self, process_id):
-        return True
-        
     def write_process(self):
         newline = "\n"
         tab = "\t"

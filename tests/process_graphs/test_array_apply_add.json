@@ -31,9 +31,6 @@
                       "x": {
                         "from_parameter": "x"
                       },
-                      "index": {
-                        "from_parameter": "index"
-                      },
                       "y": 10
                     }
                   }
