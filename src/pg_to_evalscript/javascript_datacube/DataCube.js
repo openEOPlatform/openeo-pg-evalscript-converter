@@ -147,8 +147,37 @@ class DataCube {
         this.removeDimension(dimension)
     }
 
-    applyDimension(process, dimension) {
-        // todo
+    applyDimension(process, dimension, context) {
+        let newData = this._iter(this.data);
+        const axis = this.dimensions.findIndex(e => e.name === dimension);
+        const shape = this.getDataShape();
+        const coords = new Array(shape.length).fill(0);
+        coords[axis] = null;
+        let currInd = 0;
+        const labels = this.dimensions[axis].labels;
+
+        while (true) {
+            if (coords[currInd] === null) {
+                currInd++;
+            }
+            if (currInd >= shape.length) {
+                break;
+            }
+            const dataToProcess = this._select(newData, coords);
+            dataToProcess.labels = labels;
+            const newVals = process({
+                data: dataToProcess,
+                context
+            });
+            newData = this._set(newData, newVals, coords);
+            if (coords[currInd] + 1 >= shape[currInd]) {
+                currInd++;
+            } else {
+                coords[currInd]++;
+            }
+        }
+
+        this.data = newData;
     }
 
     flatten() {

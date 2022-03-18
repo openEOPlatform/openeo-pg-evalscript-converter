@@ -33,7 +33,7 @@ from tests.utils import (
         ("test_count_with_condition", [{"B01": 0, "B02": 1}, {"B01": 2, "B02": 3}, {"B01": 4, "B02": 5}, {"B01": None, "B02": None}], [1, 2]),
         ("test_count_without_condition", [{"B01": 0, "B02": 1}, {"B01": 2, "B02": 3}, {"B01": 4, "B02": 5}, {"B01": None, "B02": 3}], [3, 4]),
         ("test_array_apply_add", [{"B01": 0, "B02": 1, "B03": 2, "B04": 3, "B05": 4, "B06": 5}], [10, 11, 12, 13, 14, 15]),
-        ("test_apply_dimension_absolute", [{"B01": 0.1, "B02": 0.15}, {"B01": 0, "B02": 2}], [0.1, 0.15, 0, 2]),
+        ("test_apply_dimension_absolute", [{"B01": -0.1, "B02": 0.15}, {"B01": 0, "B02": 2}, {"B01": -1, "B02": -2}], [0.1, 0.15, 0, 2, 1, 2]),
     ],
 )
 def test_convertable_process_graphs(pg_name, example_input, expected_output):

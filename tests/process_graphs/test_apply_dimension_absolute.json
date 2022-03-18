@@ -14,16 +14,28 @@
       "data": {
         "from_node": "loadcollection1"
       },
+      "dimension": "t",
       "process": {
         "process_graph": {
-          "absolute1": {
-            "process_id": "absolute",
+          "array_apply": {
+            "process_id": "array_apply",
             "arguments": {
-              "x": {
-                "from_parameter": "x"
+              "data": {
+                "from_parameter": "data"
+              },
+              "process": {
+                "process_graph": {
+                  "add1": {
+                    "process_id": "absolute",
+                    "arguments": {
+                      "x": {
+                        "from_parameter": "x"
+                      }
+                    }
+                  }
+                }
               }
-            },
-            "result": true
+            }
           }
         }
       }
