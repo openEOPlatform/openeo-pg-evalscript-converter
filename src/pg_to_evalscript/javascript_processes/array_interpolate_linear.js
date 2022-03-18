@@ -1,15 +1,14 @@
 function array_interpolate_linear(arguments) {
   const { data } = arguments;
 
-  if (data === null || data === undefined) {
-    throw new Error(
-      "Mandatory argument `data` is either null or not defined."
-    );
-  }
-
-  if (!Array.isArray(data)) {
-    throw new Error("Argument `data` is not an array.");
-  }
+  validateParameter({
+    processName: "array_interpolate_linear",
+    parameterName: "data",
+    value: data,
+    required: true,
+    nullable: false,
+    array: true,
+  });
 
   const linear_interpolation = (v0, v1, t) => (1 - t) * v0 + t * v1;
   let newData = [...data];
@@ -27,9 +26,12 @@ function array_interpolate_linear(arguments) {
       continue;
     }
 
-    if (typeof newData[i] !== "number") {
-      throw new Error("Element in `data` is not of correct type.");
-    }
+    validateParameter({
+      processName: "array_interpolate_linear",
+      parameterName: "element of data",
+      value: newData[i],
+      allowedTypes: ["number"],
+    });
 
     end = newData[i];
 

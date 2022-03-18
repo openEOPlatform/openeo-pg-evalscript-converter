@@ -151,29 +151,54 @@ def test_common(common_code, example_input, expected_output):
             False,
             None,
         ),
-        # NOT_BOOLEAN
+        # check boolean
         (
-            {"processName": "test", "parameterName": "arg1", "value": True, "required": True, "boolean": True},
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": True,
+                "required": True,
+                "allowedTypes": ["boolean"],
+            },
             False,
             None,
         ),
         (
-            {"processName": "test", "parameterName": "arg1", "value": False, "required": True, "boolean": True},
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": False,
+                "required": True,
+                "allowedTypes": ["boolean"],
+            },
             False,
             None,
         ),
         (
-            {"processName": "test", "parameterName": "arg1", "value": 0, "required": True, "boolean": True},
+            {"processName": "test", "parameterName": "arg1", "value": 0, "required": True, "allowedTypes": ["boolean"]},
             True,
-            "NOT_BOOLEAN",
+            "WRONG_TYPE",
         ),
         (
-            {"processName": "test", "parameterName": "arg1", "value": "False", "required": True, "boolean": True},
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": "False",
+                "required": True,
+                "allowedTypes": ["boolean"],
+            },
             True,
-            "NOT_BOOLEAN",
+            "WRONG_TYPE",
         ),
+        ({"processName": "test", "parameterName": "arg1", "value": "False", "required": True}, False, None),
         (
-            {"processName": "test", "parameterName": "arg1", "value": "False", "required": True, "boolean": False},
+            {
+                "processName": "test",
+                "parameterName": "arg1",
+                "value": None,
+                "required": True,
+                "allowedTypes": ["boolean"],
+            },
             False,
             None,
         ),
