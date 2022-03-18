@@ -58,7 +58,9 @@ class DataCube {
       }
 
     removeDimension(dimension) {
-        this.dimensions = this.dimensions.filter(d => d.name !== dimension)
+        const idx = this.dimensions.findIndex(d => d.name === dimension);
+        this.dimensions = this.dimensions.filter(d => d.name !== dimension);
+        this.data = this._iter(this.data, v => v, coords => coords.length === idx)
     }
 
     addDimension(name, label, type) {
@@ -144,7 +146,7 @@ class DataCube {
         const finalSelectCoords = new Array(shape.length).fill(null);
         finalSelectCoords[axis] = 0;
         this.data = this._select(newData, finalSelectCoords);
-        this.removeDimension(dimension)
+        this.dimensions = this.dimensions.filter(d => d.name !== dimension);
     }
 
     flatten() {

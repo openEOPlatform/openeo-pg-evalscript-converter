@@ -159,3 +159,4 @@ def test_merge_cubes_exceptions(merge_cubes_process_code, example_input, raises_
             "merge_cubes",
             process_arguments,
         )
+        
