@@ -16,7 +16,7 @@ def add_dimension_process_code():
     [
         (
             {
-                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
                 "name": "test_new_dimension",
                 "label": "test_new_label",
             },
@@ -31,12 +31,12 @@ def add_dimension_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[[1, 2, 3], [4, 5, 6]]],
+                "data": [[[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
             },
         ),
         (
             {
-                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
                 "name": "test_bands_name",
                 "label": "test_new_label",
                 "type": "bands",
@@ -52,12 +52,12 @@ def add_dimension_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[[1, 2, 3], [4, 5, 6]]],
+                "data": [[[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
             },
         ),
         (
             {
-                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
                 "name": "test_spatial_name",
                 "label": 23,
                 "type": "spatial",
@@ -73,7 +73,7 @@ def add_dimension_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[[1, 2, 3], [4, 5, 6]]],
+                "data": [[[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
             },
         ),
     ],
@@ -98,7 +98,7 @@ def test_add_dimension(add_dimension_process_code, example_input, expected_outpu
     [
         (
             {
-                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
                 "name": "test_spatial_name",
                 "label": 23,
                 "type": "spatial",
@@ -108,7 +108,7 @@ def test_add_dimension(add_dimension_process_code, example_input, expected_outpu
         ),
         (
             {
-                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
                 "name": "temporal_name",
                 "label": 23,
             },
@@ -116,19 +116,19 @@ def test_add_dimension(add_dimension_process_code, example_input, expected_outpu
             "A dimension with the specified name already exists.",
         ),
         (
-            {"data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}], "label": 23},
+            {"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "label": 23},
             True,
             "Process add_dimension requires parameter name.",
         ),
         (
-            {"data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}], "name": "temporal_name"},
+            {"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "name": "temporal_name"},
             True,
             "Process add_dimension requires parameter label.",
         ),
-        ({"data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}], "name": 23, "label": 23}, True, "WRONG_TYPE"),
+        ({"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "name": 23, "label": 23}, True, "WRONG_TYPE"),
         (
             {
-                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
                 "name": "temporal_name",
                 "label": [1, 2, 3],
             },
@@ -137,7 +137,7 @@ def test_add_dimension(add_dimension_process_code, example_input, expected_outpu
         ),
         (
             {
-                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
+                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
                 "name": "temporal_name",
                 "label": 23,
                 "type": 123,
@@ -169,3 +169,4 @@ def test_add_dimension_exceptions(add_dimension_process_code, example_input, rai
             "add_dimension",
             process_arguments,
         )
+        

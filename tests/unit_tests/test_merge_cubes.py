@@ -15,8 +15,8 @@ def merge_cubes_process_code():
     [
         (
             {
-                "cube1": [{"B01": 1, "B02": 2}, {"B01": 4, "B02": 5}],
-                "cube2": [{"B03": 11, "B04": 12}, {"B03": 14, "B04": 15}],
+                "cube1": {"B01": [1, 2, 3], "B02": [4, 5, 6]},
+                "cube2": {"B03": [11, 12, 13], "B04": [14, 15, 16]},
             },
             {
                 "BANDS": "bands",
@@ -28,13 +28,13 @@ def merge_cubes_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03", "B04"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[1, 2], [4, 5], [11, 12], [14, 15]],
+                "data": [[1, 2, 3], [4, 5, 6], [11, 12, 13], [14, 15, 16]],
             },
         ),
         (
             {
-                "cube1": [{"B01": 1, "B02": 2}, {"B01": 4, "B02": 5}],
-                "cube2": [{"B02": 11, "B03": 12}, {"B02": 14, "B03": 15}],
+                "cube1": {"B01": [1, 2, 3], "B02": [4, 5, 6]},
+                "cube2": {"B02": [11, 12, 13], "B03": [14, 15, 16]},
                 "overlap_resolver": "({x,y}) => x + y",
             },
             {
@@ -47,13 +47,13 @@ def merge_cubes_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[1, 2], [15, 17], [14, 15]],
+                "data": [[1, 2, 3], [15, 17, 19], [14, 15, 16]],
             },
         ),
         (
             {
-                "cube1": [{"B01": 1, "B02": 2}, {"B01": 4, "B02": 5}],
-                "cube2": [{"B01": 11, "B02": 12}, {"B01": 14, "B02": 15}],
+                "cube1": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "cube2": {"B02": [11, 12, 13], "B03": [14, 15, 16], "B04": [42, 41, 40]},
                 "overlap_resolver": "({x,y}) => x + y",
             },
             {
@@ -64,15 +64,15 @@ def merge_cubes_process_code():
                 "temporal_dimension_name": "temporal_name",
                 "dimensions": [
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
-                    {"labels": ["B01", "B02"], "name": "bands_name", "type": "bands"},
+                    {"labels": ["B01", "B02", "B03", "B04"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[1, 2], [4, 5], [11, 12], [14, 15]], # [[12, 14], [18, 20]] -> this should be the correct result I believe, but the process merge_cubes is not correctly implemented yet
+                "data": [[1, 2, 3], [15, 17, 19], [21, 23, 25], [42, 41, 40]],
             },
         ),
         (
             {
-                "cube1": [{"B03": [3]}],
-                "cube2": [{"B03": [7]}],
+                "cube1": {"B03": [3]},
+                "cube2": {"B03": [7]},
                 "additional_code_specific_to_test_case": """
                     cube1.getDimensionByName(cube1.temporal_dimension_name).labels = ['01-01-2022']; 
                     cube2.getDimensionByName(cube2.temporal_dimension_name).labels = ['01-02-2022'];
@@ -88,7 +88,7 @@ def merge_cubes_process_code():
                     {"labels": ["01-01-2022", "01-02-2022"], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[[3]], [[7]]],
+                "data": [[3], [7]],
             },
         ),
     ],
@@ -118,16 +118,16 @@ def test_merge_cubes(merge_cubes_process_code, example_input, expected_output):
     [
         (
             {
-                "cube1": [{"B01": 1, "B02": 2}, {"B01": 4, "B02": 5}],
-                "cube2": [{"B03": 11, "B04": 12}, {"B03": 14, "B04": 15}],
+                "cube1": {"B01": [1, 2, 3], "B02": [4, 5, 6]},
+                "cube2": {"B03": [11, 12, 13], "B04": [14, 15, 16]},
             },
             False,
             None,
         ),
         (
             {
-                "cube1": [{"B01": 1, "B02": 2}, {"B01": 4, "B02": 5}],
-                "cube2": [{"B02": 11, "B03": 12}, {"B02": 14, "B03": 15}],
+                "cube1": {"B01": [1, 2, 3], "B02": [4, 5, 6]},
+                "cube2": {"B02": [11, 12, 13], "B03": [14, 15, 16]},
             },
             True,
             "Overlapping data cubes, but no overlap resolver has been specified.",
@@ -159,3 +159,4 @@ def test_merge_cubes_exceptions(merge_cubes_process_code, example_input, raises_
             "merge_cubes",
             process_arguments,
         )
+        
