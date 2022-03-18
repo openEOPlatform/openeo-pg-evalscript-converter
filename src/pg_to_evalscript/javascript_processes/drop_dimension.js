@@ -20,15 +20,20 @@ function drop_dimension(arguments) {
 
   const dim = data.getDimensionByName(name);
   if (!dim) {
-    throw new Error("A dimension with the specified name does not exist.");
+    throw new ProcessError({
+      name: "DimensionNotAvailable",
+      message: "A dimension with the specified name does not exist.",
+    });
   }
 
   const dimIndex = data.dimensions.findIndex((d) => d.name === name);
   const dimData = data.getDataShape();
   if (dimData[dimIndex] > 1) {
-    throw new Error(
-      "The number of dimension labels exceeds one, which requires a reducer."
-    );
+    throw new ProcessError({
+      name: "DimensionLabelCountMismatch",
+      message:
+        "The number of dimension labels exceeds one, which requires a reducer.",
+    });
   }
 
   let newData = data.clone();
