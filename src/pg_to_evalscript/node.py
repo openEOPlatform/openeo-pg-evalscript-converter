@@ -227,12 +227,8 @@ class IfNode(Node):
 
 
 class ApplyNode(Node):
-    def is_process_defined(self, process_id):
-        return True
-
     def write_process(self):
         newline = "\n"
-        tab = "\t"
         return f"""
 function apply(arguments) {{  
 
@@ -241,10 +237,10 @@ function apply(arguments) {{
     {newline.join(node.write_call() for node in self.child_nodes)}
         return {self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id};
     }}
-    const {{data, dimension}} = arguments; 
-    const newData = data.clone()
-    newData.apply(process)
-    return newData;
+
+    {self.load_process_code()}
+    return apply({{...arguments,process:process}});
+
 }}
 """
 
