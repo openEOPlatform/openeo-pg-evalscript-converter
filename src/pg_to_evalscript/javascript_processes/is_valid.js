@@ -1,9 +1,12 @@
 function is_valid(arguments) {
   const { x } = arguments;
 
-  if (x === undefined) {
-    throw Error("Process is_valid requires argument x.");
-  }
+  validateParameter({
+    processName: "is_valid",
+    parameterName: "x",
+    value: x,
+    required: true,
+  });
 
   if (x == null) {
     return false;

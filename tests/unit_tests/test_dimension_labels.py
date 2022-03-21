@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, load_datacube_code, run_process_with_additional_js_code
+from tests.utils import load_process_code, load_datacube_code, run_process
 
 
 @pytest.fixture
@@ -37,11 +37,10 @@ def test_dimension_labels(
         + (additional_js_code_specific_to_case or "")
     )
     process_arguments = f"{{'data': cube, 'dimension': '{dimension}'}}"
-    output = run_process_with_additional_js_code(
-        dimension_labels_process_code,
+    output = run_process(
+        dimension_labels_process_code + additional_js_code_to_run,
         "dimension_labels",
         process_arguments,
-        additional_js_code_to_run,
     )
     output = json.loads(output)
     assert output == expected_output
@@ -112,18 +111,17 @@ def test_dimension_labels_exceptions(
     process_arguments = f"{{'data': cube, 'dimension': '{dimension}'}}"
     if raises_exception:
         with pytest.raises(Exception) as exc:
-            run_process_with_additional_js_code(
-                dimension_labels_process_code,
+            run_process(
+                dimension_labels_process_code + additional_js_code_to_run,
                 "dimension_labels",
                 process_arguments,
-                additional_js_code_to_run,
             )
         assert error_message in str(exc.value)
 
     else:
-        run_process_with_additional_js_code(
-            dimension_labels_process_code,
+        run_process(
+            dimension_labels_process_code + additional_js_code_to_run,
             "dimension_labels",
             process_arguments,
-            additional_js_code_to_run,
         )
+        

@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, load_datacube_code, run_process_with_additional_js_code
+from tests.utils import load_process_code, load_datacube_code, run_process
 
 
 @pytest.fixture
@@ -105,11 +105,10 @@ def test_merge_cubes(merge_cubes_process_code, example_input, expected_output):
     process_arguments = (
         f"{{...{json.dumps(example_input)}, 'cube1': cube1, 'cube2': cube2, 'overlap_resolver': overlap_resolver}}"
     )
-    output = run_process_with_additional_js_code(
-        merge_cubes_process_code,
+    output = run_process(
+        merge_cubes_process_code + additional_js_code_to_run,
         "merge_cubes",
         process_arguments,
-        additional_js_code_to_run,
     )
     output = json.loads(output)
     assert output == expected_output
@@ -149,18 +148,17 @@ def test_merge_cubes_exceptions(merge_cubes_process_code, example_input, raises_
     )
     if raises_exception:
         with pytest.raises(Exception) as exc:
-            run_process_with_additional_js_code(
-                merge_cubes_process_code,
+            run_process(
+                merge_cubes_process_code + additional_js_code_to_run,
                 "merge_cubes",
                 process_arguments,
-                additional_js_code_to_run,
             )
         assert error_message in str(exc.value)
 
     else:
-        run_process_with_additional_js_code(
-            merge_cubes_process_code,
+        run_process(
+            merge_cubes_process_code + additional_js_code_to_run,
             "merge_cubes",
             process_arguments,
-            additional_js_code_to_run,
         )
+        

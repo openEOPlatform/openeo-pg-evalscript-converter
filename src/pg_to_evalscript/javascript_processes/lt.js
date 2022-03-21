@@ -2,13 +2,19 @@ function lt(arguments) {
   const { x, y } = arguments;
   const supportedTypes = ["number", "string"];
 
-  if (x === undefined) {
-    throw Error("Process lt requires argument x.");
-  }
+  validateParameter({
+    processName: "lt",
+    parameterName: "x",
+    value: x,
+    required: true,
+  });
 
-  if (y === undefined) {
-    throw Error("Process lt requires argument y.");
-  }
+  validateParameter({
+    processName: "lt",
+    parameterName: "y",
+    value: y,
+    required: true,
+  });
 
   if (x === null || y === null) {
     return null;
