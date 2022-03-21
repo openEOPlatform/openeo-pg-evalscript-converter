@@ -59,6 +59,7 @@ function setup() {{
 }}
 {self.write_update_output()}
 {self.write_common_definition()}
+{self.write_ndarray_definition()}
 {self.write_datacube_definition()}
 {newline.join([node.write_function() for node in self.nodes])}
 function evaluatePixel(samples) {{
@@ -73,6 +74,9 @@ function evaluatePixel(samples) {{
 
     def write_common_definition(self):
         return pkgutil.get_data("pg_to_evalscript", f"javascript_common/common.js").decode("utf-8")
+
+    def write_ndarray_definition(self):
+        return pkgutil.get_data("pg_to_evalscript", f"javascript_datacube/ndarray.js").decode("utf-8")
 
     def write_datacube_creation(self):
         return f"let {self.initial_data_name} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true)"
@@ -90,7 +94,7 @@ function evaluatePixel(samples) {{
             lambda x, y: x * y, sizes_without_original_temporal_dimensions, 1
         )
         collection_scenes_length = "* collection.scenes.length" * number_of_original_temporal_dimensions
-        number_of_final_dimensions = len(self._output_dimensions)
+        number_of_final_dimensions = len(self._output_dimensions) + 1 if self.encode_result else 0
         return f"""
 function updateOutput(outputs, collection) {{
     Object.values(outputs).forEach((output) => {{
