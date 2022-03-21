@@ -224,7 +224,6 @@ class DataCube {
             const shape = this.data.shape
             const cumulatives = fill(shape.slice(), 0);
             const coords = shape.slice();
-            const arr = []
             let total = 1;
 
             for (let d = shape.length - 1; d >= 0; d--) {
