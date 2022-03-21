@@ -71,7 +71,9 @@ class DataCube {
     removeDimension(dimension) {
         const idx = this.dimensions.findIndex(d => d.name === dimension);
         this.dimensions = this.dimensions.filter(d => d.name !== dimension);
-        this.data = this._iter(this.data, v => v, coords => coords.length === idx)
+        const newDataShape = this.data.shape;
+        newDataShape.splice(idx, 1);
+        this.data = ndarray(this.data.data, newDataShape)
     }
 
     addDimension(name, label, type) {
@@ -146,12 +148,7 @@ class DataCube {
     }
 
     getDataShape() {
-        let dimensions;
-        this._iter(this.data, (a, coords) => {
-            dimensions = coords;
-            return a
-        })
-        return dimensions.map(d => d + 1)
+        return this.data.shape;
     }
 
     _addDimension(axis) {
