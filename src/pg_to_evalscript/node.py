@@ -168,10 +168,8 @@ function reduce_dimension(arguments) {{
         return {self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id};
     }}
 
-    const {{data, dimension}} = arguments; 
-    const newData = data.clone()
-    newData.reduceByDimension(reducer, dimension)
-    return newData;
+    {self.load_process_code()}
+    return reduce_dimension({{...arguments,reducer:reducer}});  
 }}
 """
 
