@@ -16,28 +16,28 @@ def array_apply_process_code():
         (
             {
                 "data": [],
-                "process": f"({{x}}) => x + 10",
+                "process": "({x}) => x + 10",
             },
             [],
         ),
         (
             {
                 "data": [1, 2, 3, 4, 5],
-                "process": f"({{x}}) => x + 10",
+                "process": "({x}) => x + 10",
             },
             [11, 12, 13, 14, 15],
         ),
         (
             {
                 "data": [-1, 0, 1, 100],
-                "process": f"({{x}}) => x * 10",
+                "process": "({x}) => x * 10",
             },
             [-10, 0, 10, 1000],
         ),
         (
             {
                 "data": [1, 10, 2, 24, 23, -12],
-                "process": f"({{x}}) => (x - 10) / 2",
+                "process": "({x}) => (x - 10) / 2",
             },
             [-4.5, 0, -4, 7, 6.5, -11],
         ),
@@ -58,19 +58,19 @@ def test_array_apply(array_apply_process_code, example_input, expected_output):
     "example_input,raises_exception,error_name",
     [
         (
-            {"process": f"({{x}}) => x + 10;"},
+            {"process": "({x}) => x + 10;"},
             True,
             "MISSING_PARAMETER",
         ),
         (
-            {"data": None, "process": f"({{x}}) => x + 10;"},
+            {"data": None, "process": "({x}) => x + 10;"},
             True,
             "NOT_NULL",
         ),
         ({"data": [1, 2, 3, 4, 5]}, True, "MISSING_PARAMETER"),
         ({"data": [1, 2, 3, 4, 5], "process": None}, True, "NOT_NULL"),
         (
-            {"data": "[1,2,3,4,5]", "process": f"({{x}}) => x + 10;"},
+            {"data": "[1,2,3,4,5]", "process": "({x}) => x + 10;"},
             True,
             "NOT_ARRAY",
         ),
