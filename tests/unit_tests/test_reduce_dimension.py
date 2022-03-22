@@ -2,7 +2,12 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, load_datacube_code, run_process, run_input_validation
+from tests.utils import (
+    load_process_code,
+    load_datacube_code,
+    run_process,
+    run_input_validation,
+)
 
 
 @pytest.fixture
@@ -22,9 +27,18 @@ def reduce_dimension_process_code():
                 ],
                 "bands": ["B01", "B02", "B03"],
                 "reducer": "({data})=>0",
-                "dimension": "bands",
+                "dimension": "temporal",
             },
             [0, 0, 0],
+        ),
+        (
+            {
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
+                "bands": ["B01", "B02", "B03"],
+                "reducer": "({data})=>{return Math.min(...data)}",
+                "dimension": "temporal",
+            },
+            [1, 2, 3],
         ),
         (
             {
@@ -37,7 +51,22 @@ def reduce_dimension_process_code():
         ),
         (
             {
-                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": -5, "B03": 6}],
+                "data": [
+                    {"B01": 1, "B02": 2, "B03": 3},
+                    {"B01": 4, "B02": -5, "B03": 6},
+                ],
+                "bands": ["B01", "B02", "B03"],
+                "reducer": "({data})=>{return Math.min(...data)}",
+                "dimension": "temporal",
+            },
+            [1, -5, 3],
+        ),
+        (
+            {
+                "data": [
+                    {"B01": 1, "B02": 2, "B03": 3},
+                    {"B01": 4, "B02": -5, "B03": 6},
+                ],
                 "bands": ["B01", "B02", "B03"],
                 "reducer": "({data})=>{return Math.min(...data)}",
                 "dimension": "bands",
