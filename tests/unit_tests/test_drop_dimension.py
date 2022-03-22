@@ -27,15 +27,14 @@ def drop_dimension_process_code():
                 "dimensions": [
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [1, 2, 3],
+                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [3], 'stride': [1]},
             },
         ),
         (
-            [{"B01": 1, "B02": 5, "B03": 9, "B04": 13}, {"B01": 2, "B02": 6, "B03": 10, "B04": 14}, {"B01": 3, "B02": 7, "B03": 11, "B04": 15}, {"B01": 4, "B02": 8, "B03": 12, "B04": 16}],
-            "temporal_name",
+            [{"B01": 1}, {"B01": 2}, {"B01": 3}, {"B01": 4}],
+            "bands_name",
             "cube.addDimension('x', 'x_label', 'spatial');"
-            + "cube.addDimension('y', 'y_label', 'spatial');"
-            + "cube.data = [[[[1,2,3,4]], [[5,6,7,8]]], [[[9,10,11,12]], [[13,14,15,16]]]];",
+            + "cube.addDimension('y', 'y_label', 'spatial');",
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -45,9 +44,9 @@ def drop_dimension_process_code():
                 "dimensions": [
                     {"labels": ["y_label"], "name": "y", "type": "spatial"},
                     {"labels": ["x_label"], "name": "x", "type": "spatial"},
-                    {"labels": ["B01", "B02", "B03", "B04"], "name": "bands_name", "type": "bands"},
+                    {"labels": [], "name": "temporal_name", "type": "temporal"},
                 ],
-                "data": [[[1, 2, 3, 4], [5, 6, 7, 8]], [[9, 10, 11, 12], [13, 14, 15, 16]]],
+                "data": {'data': [1, 2, 3, 4], 'offset': 0, 'shape': [1,1,4], 'stride': [4,4,1]},
             },
         ),
         (
@@ -64,7 +63,7 @@ def drop_dimension_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[1, 2, 3], [4, 5, 6]],
+                "data": {'data': [1, 2, 3, 4, 5, 6], 'offset': 0, 'shape': [2,3], 'stride': [3,1]},
             },
         ),
     ],

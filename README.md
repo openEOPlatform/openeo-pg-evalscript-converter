@@ -229,6 +229,14 @@ pytest
 pipenv run black -l 120 .
 ```
 
+## Benchmark
+
+```
+pipenv shell
+cd tests
+python benchmark.py
+```
+
 ## Developing
 
 Install the package in editable mode so the changes take effect immediately.
