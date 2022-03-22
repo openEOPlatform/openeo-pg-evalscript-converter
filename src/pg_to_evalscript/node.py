@@ -265,9 +265,9 @@ function apply_dimension(arguments) {{
     {newline.join(node.write_call() for node in self.child_nodes)}
         return {self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id};
     }}
-    const {{data, dimension, context}} = arguments;
+    const {{data, dimension, target_dimension, context}} = arguments;
     const newData = data.clone()
-    newData.applyDimension(process, dimension, context)
+    newData.applyDimension(process, dimension, target_dimension, context)
     return newData;
 }}
 """
