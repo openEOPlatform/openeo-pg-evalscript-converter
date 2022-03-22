@@ -181,6 +181,13 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
                 temporal_dimension_name,
                 level=level + 1,
             )
+        elif process_id == "array_filter":
+            child_nodes, _, _ = generate_nodes_from_process_graph(
+                arguments["condition"]["process_graph"],
+                bands_dimension_name,
+                temporal_dimension_name,
+                level=level + 1,
+            )
         node = Node(
             node_id,
             process_id,

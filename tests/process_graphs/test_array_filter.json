@@ -1,5 +1,5 @@
 {
-  "loadcollection1": {
+  "loadcollection": {
     "process_id": "load_collection",
     "arguments": {
       "spatial_extent": null,
@@ -12,42 +12,45 @@
     "process_id": "reduce_dimension",
     "arguments": {
       "data": {
-        "from_node": "loadcollection1"
+        "from_node": "loadcollection"
       },
       "dimension": "t",
       "reducer": {
         "process_graph": {
-          "array_apply": {
-            "process_id": "array_apply",
+          "array_filter": {
+            "process_id": "array_filter",
             "arguments": {
               "data": {
                 "from_parameter": "data"
               },
-              "process": {
+              "condition": {
                 "process_graph": {
-                  "add1": {
-                    "process_id": "add",
+                  "gt": {
                     "arguments": {
                       "x": {
                         "from_parameter": "x"
                       },
-                      "y": 10
-                    }
+                      "y": 1
+                    },
+                    "process_id": "gt",
+                    "result": true
                   }
                 }
               }
-            }
+            },
+            "result": true
           },
           "sum": {
             "process_id": "sum",
             "arguments": {
-              "data": {"from_node": "array_apply"}
+              "data": {
+                "from_node": "array_filter"
+              }
             },
             "result": true
           }
         }
       }
-    },
-    "result": true
+    }
   }
 }

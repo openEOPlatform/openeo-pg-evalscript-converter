@@ -15,7 +15,7 @@ def filter_bands_process_code():
     [
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
                 "bands": ["abc", "def"],
             },
             {
@@ -28,11 +28,12 @@ def filter_bands_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": [], "name": "bands_name", "type": "bands"},
                 ],
+                "data": {'data': [], 'offset': 0, 'shape': [1, 0], 'stride': [0, 1]}
             },
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
                 "bands": ["B01", "B02", "B03"],
             },
             {
@@ -45,12 +46,12 @@ def filter_bands_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 3], 'stride': [3, 1]},
             },
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
                 "bands": ["B03"],
             },
             {
@@ -63,7 +64,7 @@ def filter_bands_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[3], [6], [9]],
+                "data": {'data': [3], 'offset': 0, 'shape': [1, 1], 'stride': [1, 1]},
             },
         ),
     ],
@@ -145,3 +146,4 @@ def test_filter_bands_exceptions(filter_bands_process_code, example_input, raise
             "filter_bands",
             process_arguments,
         )
+        

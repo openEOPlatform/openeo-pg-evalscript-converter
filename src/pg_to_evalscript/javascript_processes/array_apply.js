@@ -1,5 +1,5 @@
 function array_apply(arguments) {
-  const { data, process: proc, context = null } = arguments;
+  const { data, process, context = null } = arguments;
 
   validateParameter({
     processName: "array_apply",
@@ -13,10 +13,10 @@ function array_apply(arguments) {
   validateParameter({
     processName: "array_apply",
     parameterName: "process",
-    value: proc,
+    value: process,
     required: true,
     nullable: false,
-    allowedTypes: ["object"],
+    allowedTypes: ["function"],
   });
 
   let newData = [];

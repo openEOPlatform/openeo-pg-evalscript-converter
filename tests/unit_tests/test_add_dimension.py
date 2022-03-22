@@ -16,7 +16,7 @@ def add_dimension_process_code():
     [
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
                 "name": "test_new_dimension",
                 "label": "test_new_label",
             },
@@ -31,12 +31,12 @@ def add_dimension_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
+                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 1, 3], 'stride': [3, 3, 1]},
             },
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
                 "name": "test_bands_name",
                 "label": "test_new_label",
                 "type": "bands",
@@ -52,12 +52,12 @@ def add_dimension_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
+                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 1, 3], 'stride': [3, 3, 1]},
             },
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
                 "name": "test_spatial_name",
                 "label": 23,
                 "type": "spatial",
@@ -73,7 +73,7 @@ def add_dimension_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[[1, 2, 3], [4, 5, 6], [7, 8, 9]]],
+                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 1, 3], 'stride': [3, 3, 1]},
             },
         ),
     ],
@@ -169,3 +169,4 @@ def test_add_dimension_exceptions(add_dimension_process_code, example_input, rai
             "add_dimension",
             process_arguments,
         )
+        

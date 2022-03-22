@@ -15,7 +15,7 @@ def rename_labels_process_code():
     [
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
                 "dimension": "bands_name",
                 "label": "B01",
                 "target": ["A123"],
@@ -31,12 +31,12 @@ def rename_labels_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["A123", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 3], 'stride': [3, 1]},
             },
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
                 "dimension": "bands_name",
                 "label": "B03",
                 "target": ["A123456"],
@@ -52,12 +52,12 @@ def rename_labels_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "A123456"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 3], 'stride': [3, 1]},
             },
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
                 "dimension": "bands_name",
                 "label": "B03",
                 "target": ["A2", "A3"],
@@ -73,12 +73,12 @@ def rename_labels_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "A2", "A3"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 3], 'stride': [3, 1]},
             },
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
                 "dimension": "bands_name",
                 "label": "B03",
                 "target": ["A123456"],
@@ -94,7 +94,7 @@ def rename_labels_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["A123456"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 3], 'stride': [3, 1]},
             },
         ),
     ],
@@ -237,3 +237,4 @@ def test_rename_labels_exceptions(rename_labels_process_code, example_input, rai
             "rename_labels",
             process_arguments,
         )
+        
