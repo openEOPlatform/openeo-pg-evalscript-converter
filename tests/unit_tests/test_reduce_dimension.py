@@ -15,7 +15,12 @@ def reduce_dimension_process_code():
     [
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [6, 5, 4], "B03": [7, 0, 9]},
+                "data": [
+                    {"B01": 1, "B02": 2, "B03": 3},
+                    {"B01": 6, "B02": 5, "B03": 4},
+                    {"B01": 7, "B02": 0, "B03": -1},
+                ],
+                "bands": ["B01", "B02", "B03"],
                 "reducer": "({data})=>0",
                 "dimension": "bands",
             },
@@ -23,15 +28,25 @@ def reduce_dimension_process_code():
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [6, 5, 4], "B03": [7, 0, 9]},
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
+                "bands": ["B01", "B02", "B03"],
                 "reducer": "({data})=>{return Math.min(...data)}",
                 "dimension": "bands",
             },
-            [1, 4, 0],
+            [1],
+        ),
+        (
+            {
+                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": -5, "B03": 6}],
+                "bands": ["B01", "B02", "B03"],
+                "reducer": "({data})=>{return Math.min(...data)}",
+                "dimension": "bands",
+            },
+            [1, -5],
         ),
     ],
 )
-def test_apply(reduce_dimension_process_code, example_input, expected_result):
+def test_reduce_dimension(reduce_dimension_process_code, example_input, expected_result):
     additional_js_code_to_run = (
         load_datacube_code() + f"const cube = new DataCube({example_input['data']}, 'bands', 'temporal', true);"
     )
@@ -43,7 +58,7 @@ def test_apply(reduce_dimension_process_code, example_input, expected_result):
     )
     output = json.loads(output)
 
-    assert output["data"] == expected_result
+    assert output["data"]["data"] == expected_result
 
 
 @pytest.mark.parametrize(
@@ -51,7 +66,11 @@ def test_apply(reduce_dimension_process_code, example_input, expected_result):
     [
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [
+                    {"B01": 1, "B02": 2, "B03": 3},
+                    {"B01": 6, "B02": 5, "B03": 4},
+                    {"B01": 7, "B02": 0, "B03": -1},
+                ],
                 "dimension": "bands",
                 "reducer": "({data})=>1",
             },
@@ -60,7 +79,12 @@ def test_apply(reduce_dimension_process_code, example_input, expected_result):
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [
+                    {"B01": 1, "B02": 2, "B03": 3},
+                    {"B01": 6, "B02": 5, "B03": 4},
+                    {"B01": 7, "B02": 0, "B03": -1},
+                ],
+                "bands": ["B01", "B02", "B03"],
                 "dimension": "bands",
             },
             True,
@@ -68,7 +92,12 @@ def test_apply(reduce_dimension_process_code, example_input, expected_result):
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [
+                    {"B01": 1, "B02": 2, "B03": 3},
+                    {"B01": 6, "B02": 5, "B03": 4},
+                    {"B01": 7, "B02": 0, "B03": -1},
+                ],
+                "bands": ["B01", "B02", "B03"],
                 "reducer": "({data})=>1",
             },
             True,

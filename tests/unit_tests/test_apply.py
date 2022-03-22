@@ -16,7 +16,11 @@ def apply_process_code():
     [
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [
+                    {"B01": 1, "B02": 2, "B03": 3},
+                    {"B01": 4, "B02": 5, "B03": 6},
+                    {"B01": 7, "B02": 8, "B03": 9},
+                ],
                 "name": "test_apply",
             },
             "({x})=>x",
@@ -30,12 +34,16 @@ def apply_process_code():
                     {"name": "temporal_name", "labels": [], "type": "temporal"},
                     {"name": "bands_name", "labels": ["B01", "B02", "B03"], "type": "bands"},
                 ],
-                "data": [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+                "data": {"data": [1, 2, 3, 4, 5, 6, 7, 8, 9], "offset": 0, "shape": [3, 3], "stride": [3, 1]},
             },
         ),
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
+                "data": [
+                    {"B01": 1, "B02": 2, "B03": 3},
+                    {"B01": 4, "B02": 5, "B03": 6},
+                    {"B01": 7, "B02": 8, "B03": 9},
+                ],
                 "name": "test_apply",
             },
             "({x})=>-x",
@@ -49,12 +57,16 @@ def apply_process_code():
                     {"name": "temporal_name", "labels": [], "type": "temporal"},
                     {"name": "bands_name", "labels": ["B01", "B02", "B03"], "type": "bands"},
                 ],
-                "data": [[-1, -2, -3], [-4, -5, -6], [-7, -8, -9]],
+                "data": {"data": [-1, -2, -3, -4, -5, -6, -7, -8, -9], "offset": 0, "shape": [3, 3], "stride": [3, 1]},
             },
         ),
         (
             {
-                "data": {"B01": [1, -2, 3], "B02": [-4, 5, -6], "B03": [7, -8, 9]},
+                "data": [
+                    {"B01": 1, "B02": -2, "B03": 3},
+                    {"B01": -4, "B02": 5, "B03": -6},
+                    {"B01": 7, "B02": 8, "B03": 9},
+                ],
                 "name": "test_apply",
             },
             "function abs(args){return Math.abs(args.x);}",
@@ -68,7 +80,7 @@ def apply_process_code():
                     {"name": "temporal_name", "labels": [], "type": "temporal"},
                     {"name": "bands_name", "labels": ["B01", "B02", "B03"], "type": "bands"},
                 ],
-                "data": [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+                "data": {"data": [1, 2, 3, 4, 5, 6, 7, 8, 9], "offset": 0, "shape": [3, 3], "stride": [3, 1]},
             },
         ),
     ],
@@ -93,12 +105,26 @@ def test_apply(apply_process_code, example_input, process, expected_output):
     "example_input,raises_exception,error_name",
     [
         (
-            {"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "process": None},
+            {
+                "data": [
+                    {"B01": 1, "B02": -2, "B03": 3},
+                    {"B01": -4, "B02": 5, "B03": -6},
+                    {"B01": 7, "B02": 8, "B03": 9},
+                ],
+                "process": None,
+            },
             True,
             "MISSING_PARAMETER",
         ),
         (
-            {"data": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]}, "process": "()=>{}"},
+            {
+                "data": [
+                    {"B01": 1, "B02": -2, "B03": 3},
+                    {"B01": -4, "B02": 5, "B03": -6},
+                    {"B01": 7, "B02": 8, "B03": 9},
+                ],
+                "process": "()=>{}",
+            },
             False,
             None,
         ),
