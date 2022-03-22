@@ -147,6 +147,47 @@ class DataCube {
         this.dimensions.splice(axis, 1)
     }
 
+    applyDimension(process, dimension, context) {
+        let data = ndarray(this.data.data.slice(), this.data.shape);
+        const axis = this.dimensions.findIndex(e => e.name === dimension);
+        const shape = data.shape;
+        const coords = fill(shape.slice(), 0);
+        coords[axis] = null;
+        const labels = this.dimensions[axis].labels;
+        const newValues = [];
+        let currInd = 0;
+
+        while (true) {
+            if (coords.length > 1 && coords[currInd] === null) {
+                currInd++;
+            }
+            if (currInd >= shape.length) {
+                break;
+            }
+
+            const dataToProcess = convert_to_1d_array(data.pick.apply(data, coords));
+            dataToProcess.labels = labels;
+            newValues.push(process({ data: dataToProcess, context }));
+
+            if (coords.length === 1) {
+                break;
+            }
+            if (coords[currInd] + 1 >= shape[currInd]) {
+                currInd++;
+            } else {
+                coords[currInd]++;
+            }
+        }
+
+        const newdata = [];
+        for (let i = 0; i < newValues[0].length; i++) {
+            for (let j = 0; j < newValues.length; j++) {
+                newdata.push(newValues[j][i]);
+            }
+        }
+        this.data = ndarray(newdata, shape);
+    }
+
     getDataShape() {
         return this.data.shape;
     }
