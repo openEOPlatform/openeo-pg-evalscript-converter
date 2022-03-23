@@ -15,6 +15,7 @@ function reduce_dimension(arguments) {
     value: dimension,
     nullable: false,
     required: true,
+    allowedTypes: ["string"],
   });
 
   validateParameter({

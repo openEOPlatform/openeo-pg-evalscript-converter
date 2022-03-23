@@ -137,6 +137,15 @@ def test_reduce_dimension(reduce_dimension_process_code, example_input, expected
             True,
             "MISSING_PARAMETER",
         ),
+        (
+            {
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
+                "dimension": 1,
+                "reducer": "({data})=>1",
+            },
+            True,
+            "WRONG_TYPE",
+        ),
     ],
 )
 def test_input_validation(reduce_dimension_process_code, example_input, raises_exception, error_name):
