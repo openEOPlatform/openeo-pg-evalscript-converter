@@ -109,7 +109,7 @@ class DataCube {
         return [...shape, ...flattenedData];
     }
 
-    reduceByDimension(reducer, dimension) {
+    reduceByDimension(reducer, dimension, context) {
         let newData = ndarray(this.data.data.slice(), this.data.shape)
         const axis = this.dimensions.findIndex(e => e.name === dimension)
         const shape = newData.shape
@@ -131,7 +131,8 @@ class DataCube {
             const dataToReduce = convert_to_1d_array(newData.pick.apply(newData, coords))
             dataToReduce.labels = labels
             const newVals = reducer({
-                data: dataToReduce
+                data: dataToReduce,
+                context: context
             })
             newValues.push(newVals)
             if (coords.length === 1) {
@@ -261,13 +262,14 @@ class DataCube {
     }
 
 
-    apply(process) {
+    apply(process, context) {
         if (isNotSubarray(this.data, this.data.shape)) {
             const newData = []
             const length = this.data.data.length
             for (let i = 0; i < length; i++) {
                 newData.push(process({
-                    "x": this.data.data[i]
+                    "x": this.data.data[i],
+                    context: context
                 }))
             }
             this.data.data = newData
@@ -286,7 +288,8 @@ class DataCube {
                     coords[d] = Math.floor(i / cumulatives[d]) % shape[d];
                 }
                 const args = coords.concat([process({
-                    "x": this.data.get.apply(this.data, coords)
+                    "x": this.data.get.apply(this.data, coords),
+                    context: context
                 })])
                 this.data.set.apply(this.data, args)
             }
