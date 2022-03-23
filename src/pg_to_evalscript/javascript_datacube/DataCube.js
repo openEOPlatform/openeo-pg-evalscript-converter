@@ -189,13 +189,13 @@ class DataCube {
             }
         }
 
-        const newdata = [];
+        const newData = [];
         for (let i = 0; i < newValues[0].length; i++) {
             for (let j = 0; j < newValues.length; j++) {
-                newdata.push(newValues[j][i]);
+                newData.push(newValues[j][i]);
             }
         }
-        this.data = ndarray(newdata, shape);
+        this.data = ndarray(newData, shape);
     }
 
     getDataShape() {
