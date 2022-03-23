@@ -210,13 +210,14 @@ class DataCube {
     }
 
 
-    apply(process) {
+    apply(process, context) {
         if (isNotSubarray(this.data, this.data.shape)) {
             const newData = []
             const length = this.data.data.length
             for (let i = 0; i < length; i++) {
                 newData.push(process({
-                    "x": this.data.data[i]
+                    "x": this.data.data[i],
+                    context: context
                 }))
             }
             this.data.data = newData
@@ -235,7 +236,8 @@ class DataCube {
                     coords[d] = Math.floor(i / cumulatives[d]) % shape[d];
                 }
                 const args = coords.concat([process({
-                    "x": this.data.get.apply(this.data, coords)
+                    "x": this.data.get.apply(this.data, coords),
+                    context: context
                 })])
                 this.data.set.apply(this.data, args)
             }

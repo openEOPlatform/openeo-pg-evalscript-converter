@@ -1,5 +1,5 @@
 function apply(arguments) {
-  const { data, process } = arguments;
+  const { data, process, context = null } = arguments;
 
   validateParameter({
     processName: "apply",
@@ -18,6 +18,6 @@ function apply(arguments) {
   });
 
   const newData = data.clone();
-  newData.apply(process);
+  newData.apply(process, context);
   return newData;
 }
