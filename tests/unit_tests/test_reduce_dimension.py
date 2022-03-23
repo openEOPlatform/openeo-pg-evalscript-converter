@@ -73,6 +73,16 @@ def reduce_dimension_process_code():
             },
             [1, -5],
         ),
+        (
+            {
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
+                "bands": ["B01", "B02", "B03"],
+                "context": {"pi": 3.14},
+                "reducer": "function test_context(args){return args.context.pi;}",
+                "dimension": "bands",
+            },
+            [3.14],
+        ),
     ],
 )
 def test_reduce_dimension(reduce_dimension_process_code, example_input, expected_result):

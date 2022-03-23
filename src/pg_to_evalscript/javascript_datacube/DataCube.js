@@ -109,7 +109,7 @@ class DataCube {
         return [...shape, ...flattenedData];
     }
 
-    reduceByDimension(reducer, dimension) {
+    reduceByDimension(reducer, dimension, context) {
         let newData = ndarray(this.data.data.slice(), this.data.shape)
         const axis = this.dimensions.findIndex(e => e.name === dimension)
         const shape = newData.shape
@@ -131,7 +131,8 @@ class DataCube {
             const dataToReduce = convert_to_1d_array(newData.pick.apply(newData, coords))
             dataToReduce.labels = labels
             const newVals = reducer({
-                data: dataToReduce
+                data: dataToReduce,
+                context: context
             })
             newValues.push(newVals)
             if (coords.length === 1) {

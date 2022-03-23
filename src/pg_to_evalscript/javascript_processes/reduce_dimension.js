@@ -1,5 +1,5 @@
 function reduce_dimension(arguments) {
-  const { data, dimension, reducer } = arguments;
+  const { data, dimension, reducer, context = null } = arguments;
 
   validateParameter({
     processName: "reduce_dimension",
@@ -27,6 +27,6 @@ function reduce_dimension(arguments) {
   });
 
   const newData = data.clone();
-  newData.reduceByDimension(reducer, dimension);
+  newData.reduceByDimension(reducer, dimension, context);
   return newData;
 }
