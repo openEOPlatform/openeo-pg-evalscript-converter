@@ -42,7 +42,8 @@ class DataCube {
             if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
                 this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(samples)
             }
-            return ndarray(new Float64Array(Object.values(samples)), [1, samples.length])
+            const newData = Object.values(samples)
+            return ndarray(newData, [1, newData.length])
         }
     }
 
