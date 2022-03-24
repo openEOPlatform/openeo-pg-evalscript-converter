@@ -159,37 +159,6 @@ class DataCube {
         this.data = ndarray(this.data.data, this.data.shape)
     }
 
-    _select(arr, coordArr) {
-        // coordArr: 1D list of n coordinates. If m-th place has `null`, the entire axis is included and the dimension is kept
-        function coordInSlice(c1, sliceArr) {
-            return sliceArr.every((e, i) => e === null || e === c1[i])
-        }
-        return this._iter(arr, (a, coords) => {
-            if (coordInSlice(coords, coordArr)) {
-                return a
-            }
-        }, coords => coords.length >= coordArr.length || coordArr[coords.length] === null ? false : true)
-    }
-
-    _set(arr, vals, coordArr) {
-        // Set values at coordArr
-        function coordInSlice(c1, sliceArr) {
-            return c1.length === sliceArr.length && sliceArr.every((e, i) => e === null || e === c1[i])
-        }
-        const exec_set = (a, coords) => {
-            if (coordInSlice(coords, coordArr)) {
-                let valueToSet;
-                if (Array.isArray(vals)) {
-                    valueToSet = this._select(vals, coordArr.map((c, i) => c === null ? coords[i] : null).filter(c => c !== null))
-                } else {
-                    valueToSet = vals
-                }
-                return valueToSet
-            }
-            return a
-        }
-        return this._iter(arr, exec_set)
-    }
 
     _filter(dim, coordArr) {
         const shape = this.data.shape
