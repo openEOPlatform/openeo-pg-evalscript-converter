@@ -68,6 +68,10 @@ class DataCube {
             );
     }
 
+    filterTemporal(extend, dimension) {
+        
+    }
+
     removeDimension(dimension) {
         const idx = this.dimensions.findIndex(d => d.name === dimension);
         this.dimensions = this.dimensions.filter(d => d.name !== dimension);
