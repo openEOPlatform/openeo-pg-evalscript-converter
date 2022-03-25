@@ -37,6 +37,13 @@
                 }
               }
             }
+          },
+          "sum": {
+            "process_id": "sum",
+            "arguments": {
+              "data": {"from_node": "array_apply"}
+            },
+            "result": true
           }
         }
       }

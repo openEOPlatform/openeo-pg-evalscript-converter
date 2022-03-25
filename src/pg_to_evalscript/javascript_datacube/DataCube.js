@@ -27,44 +27,57 @@ class DataCube {
 
     makeArrayFromSamples(samples) {
         if (Array.isArray(samples)) {
+            if(samples.length === 0) {
+                return ndarray([])
+            }
+            if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
+                this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(samples[0])
+            }
             let newData = []
             for (let entry of samples) {
-                if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
-                    this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(entry)
-                }
-                newData.push(Object.values(entry))
+                newData = newData.concat(extractValues(entry))
             }
-            return newData
+            return ndarray(newData, [samples.length, extractValues(samples[0]).length])
         } else {
             if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
                 this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(samples)
             }
-            return Object.values(samples)
+            return ndarray(new Float64Array(Object.values(samples)), [1, samples.length])
         }
     }
 
     getBandIndices(bands) {
-        return bands.map(b => this.getDimensionByName(this.bands_dimension_name).labels.indexOf(b))
+        const bandsLabels = this.getDimensionByName(this.bands_dimension_name).labels
+        const indices = []
+        for (let band of bands) {
+            const ind = bandsLabels.indexOf(band)
+            if (ind !== -1) {
+                indices.push(ind)
+            }
+        }
+        return indices
     }
 
     filterBands(bands) {
         const indices = this.getBandIndices(bands);
         const axis = this.dimensions.findIndex((e) => e.name === this.bands_dimension_name);
-        this.data = this._filter(this.data, axis, indices);
+        this._filter(axis, indices);
         this.getDimensionByName(this.bands_dimension_name).labels =
-          this.getDimensionByName(this.bands_dimension_name).labels.filter((lab) =>
-            bands.includes(lab)
-          );
-      }
+            this.getDimensionByName(this.bands_dimension_name).labels.filter((lab) =>
+                bands.includes(lab)
+            );
+    }
 
     removeDimension(dimension) {
         const idx = this.dimensions.findIndex(d => d.name === dimension);
         this.dimensions = this.dimensions.filter(d => d.name !== dimension);
-        this.data = this._iter(this.data, v => v, coords => coords.length === idx)
+        const newDataShape = this.data.shape;
+        newDataShape.splice(idx, 1);
+        this.data = ndarray(this.data.data, newDataShape)
     }
 
     addDimension(name, label, type) {
-        this.data = this._addDimension(this.data, 0)
+        this._addDimension(0)
         this.dimensions.unshift({
             name: name,
             labels: [label],
@@ -73,14 +86,21 @@ class DataCube {
     }
 
     clone() {
-        const copy = new DataCube(this._iter(this.data), this.bands_dimension_name, this.temporal_dimension_name)
-        copy.dimensions = JSON.parse(JSON.stringify(this.dimensions))
+        const copy = new DataCube(ndarray(this.data.data.slice(), this.data.shape), this.bands_dimension_name, this.temporal_dimension_name)
+        const newDimensions = []
+        for (let dim of this.dimensions) {
+            newDimensions.push({
+                name: dim.name,
+                labels: dim.labels.slice(),
+                type: dim.type
+            })
+        }
+        copy.dimensions = newDimensions
         return copy
     }
 
     flattenToArray() {
-        const flattenedData = this.flatten();
-        return Array.isArray(flattenedData) ? flattenedData : [flattenedData]
+        return flattenToNativeArray(this.data)
     }
 
     encodeData() {
@@ -89,93 +109,53 @@ class DataCube {
         return [...shape, ...flattenedData];
     }
 
-
-    _iter(arr, execute = v => v, removeDim = () => false, execute_on_result = r => r, coords = []) {
-        if (Array.isArray(arr)) {
-            let result = []
-            for (let i = 0; i < arr.length; i++) {
-                const val = this._iter(arr[i], execute, removeDim, execute_on_result, [...coords, i])
-                if (val !== undefined) {
-                    result.push(val)
-                }
-            }
-            result = execute_on_result(result, coords)
-            if (result.length === 0) {
-                return
-            }
-            const shouldRemoveDim = removeDim(coords)
-            if (shouldRemoveDim && result.length !== 1) {
-                throw new Error('Can only remove dimension of length 1!')
-            } else if (shouldRemoveDim) {
-                return result[0]
-            }
-            return result
-        } else {
-            return execute(arr, coords)
-        }
-    }
-
-    reduceByDimension(reducer, dimension) {
-        let newData = this._iter(this.data)
+    reduceByDimension(reducer, dimension, context) {
+        let newData = ndarray(this.data.data.slice(), this.data.shape)
         const axis = this.dimensions.findIndex(e => e.name === dimension)
-        const shape = this.getDataShape()
-        const coords = new Array(shape.length).fill(0);
+        const shape = newData.shape
+        const newShape = shape.slice()
+        newShape.splice(axis, 1)
+        const coords = fill(shape.slice(), 0);
         coords[axis] = null;
-        let currInd = 0;
         const labels = this.dimensions[axis].labels
+        const newValues = []
+        let currInd = 0;
 
         while (true) {
-            if (coords[currInd] === null) {
+            if (coords.length > 1 && coords[currInd] === null) {
                 currInd++
             }
             if (currInd >= shape.length) {
                 break;
             }
-            const dataToReduce = this._select(newData, coords)
+            const dataToReduce = convert_to_1d_array(newData.pick.apply(newData, coords))
             dataToReduce.labels = labels
             const newVals = reducer({
-                data: dataToReduce
+                data: dataToReduce,
+                context: context
             })
-            newData = this._set(newData, newVals, coords)
+            newValues.push(newVals)
+            if (coords.length === 1) {
+                break;
+            }
             if (coords[currInd] + 1 >= shape[currInd]) {
                 currInd++
             } else {
                 coords[currInd]++
             }
         }
-        const finalSelectCoords = new Array(shape.length).fill(null);
-        finalSelectCoords[axis] = 0;
-        this.data = this._select(newData, finalSelectCoords);
-        this.dimensions = this.dimensions.filter(d => d.name !== dimension);
-    }
-
-    flatten() {
-        const flattenArr = (arr) => arr.reduce((flat, next) => flat.concat(next), []);
-        return this._iter(this.data, v => v, () => false, r => {
-            return flattenArr(r)
-        })
+        this.data = ndarray(newValues, newShape)
+        this.dimensions.splice(axis, 1)
     }
 
     getDataShape() {
-        let dimensions;
-        this._iter(this.data, (a, coords) => {
-            dimensions = coords;
-            return a
-        })
-        return dimensions.map(d => d + 1)
+        return this.data.shape;
     }
 
-    _addDimension(arr, axis) {
+    _addDimension(axis) {
         // new dimension is added before the axis
-        if (!Array.isArray(arr)) {
-            return [arr]
-        }
-        return this._iter(arr, v => v, () => false, (r, c) => {
-            if (c.length === axis) {
-                return [r]
-            }
-            return r
-        })
+        this.data.shape.splice(axis, 0, 1)
+        this.data = ndarray(this.data.data, this.data.shape)
     }
 
     _select(arr, coordArr) {
@@ -210,17 +190,58 @@ class DataCube {
         return this._iter(arr, exec_set)
     }
 
-    _filter(arr, dim, coordArr) {
-        const exec_filter = (a, coords) => {
-            if (coordArr.includes(coords[dim])) {
-                return a
+    _filter(dim, coordArr) {
+        const shape = this.data.shape
+        const length = this.data.data.length
+        const stepSlice = shape.slice(dim)
+        shape[dim] = coordArr.length
+        const newData = []
+        let step = 1
+
+        for (let s of stepSlice) {
+            step *= s
+        }
+
+        for (let i = 0; i < length; i++) {
+            if (coordArr.includes(i % step)) {
+                newData.push(this.data.data[i])
             }
         }
-        return this._iter(arr, exec_filter)
+        this.data = ndarray(newData, shape)
     }
 
-    apply(process) {
-      const newData = this._iter(this.data, x=>process({"x": x}));
-      this.data = newData;
+
+    apply(process, context) {
+        if (isNotSubarray(this.data, this.data.shape)) {
+            const newData = []
+            const length = this.data.data.length
+            for (let i = 0; i < length; i++) {
+                newData.push(process({
+                    "x": this.data.data[i],
+                    context: context
+                }))
+            }
+            this.data.data = newData
+        } else {
+            const shape = this.data.shape
+            const cumulatives = fill(shape.slice(), 0);
+            const coords = shape.slice();
+            let total = 1;
+
+            for (let d = shape.length - 1; d >= 0; d--) {
+                cumulatives[d] = total;
+                total *= shape[d];
+            }
+            for (let i = 0; i < total; i++) {
+                for (let d = shape.length - 1; d >= 0; d--) {
+                    coords[d] = Math.floor(i / cumulatives[d]) % shape[d];
+                }
+                const args = coords.concat([process({
+                    "x": this.data.get.apply(this.data, coords),
+                    context: context
+                })])
+                this.data.set.apply(this.data, args)
+            }
+        }
     }
 }
