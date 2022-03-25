@@ -32,8 +32,10 @@ function ndvi(arguments) {
     allowedTypes: ["string"],
   });
 
-  const newData = data.clone();
-  const bandsDim = newData.dimensions.find((d) => d.type === newData.BANDS);
+  const clonedData = data.clone();
+  const bandsDim = clonedData.dimensions.find(
+    (d) => d.type === clonedData.BANDS
+  );
   if (!bandsDim) {
     throw new ProcessError({
       name: "DimensionAmbiguous",
@@ -64,15 +66,33 @@ function ndvi(arguments) {
     });
   }
 
-  /**
-   * calculate NDVI
-   */
-
+  const [nirIdx, redIdx] = clonedData.getBandIndices([nir, red]);
   if (target_band !== null) {
+    const newShape = clonedData.getDataShape();
+    const axis = clonedData.dimensions.findIndex(
+      (d) => d.type === clonedData.BANDS
+    );
     bandsDim.labels.push(target_band);
-    return newData;
+    const dataArr = clonedData.data.data;
+    for (
+      let step = 0;
+      step < newShape.filter((_, i) => i !== axis).reduce((a, b) => a * b, 1);
+      step++
+    ) {
+      const n = dataArr[nirIdx + step * newShape[axis] + step];
+      const r = dataArr[redIdx + step * newShape[axis] + step];
+      const ndvi = (n - r) / (n + r);
+      dataArr.splice(newShape[axis] + step * newShape[axis] + step, 0, ndvi);
+    }
+    newShape[axis]++;
+    clonedData.data = ndarray(dataArr, newShape);
+    return clonedData;
   }
 
-  newData.removeDimension(bandsDim.name);
-  return newData;
+  clonedData.reduceByDimension(
+    ({ data }) => (data[nirIdx] - data[redIdx]) / (data[nirIdx] + data[redIdx]),
+    bandsDim.name
+  );
+  clonedData.removeDimension(bandsDim.name);
+  return clonedData;
 }
