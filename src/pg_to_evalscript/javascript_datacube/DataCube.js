@@ -1,5 +1,5 @@
 class DataCube {
-    constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples) {
+    constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples, scenes) {
         this.TEMPORAL = "temporal"
         this.BANDS = "bands"
         this.OTHER = "other"
@@ -19,10 +19,25 @@ class DataCube {
         } else {
             this.data = data;
         }
+        if (scenes) {
+            let dates = [];
+            for (let scene of scenes) {
+                dates.push(scene.date);
+            }
+            this.setDimensionLabels(this.temporal_dimension_name, dates);
+        }
     }
 
     getDimensionByName(name) {
         return this.dimensions.find(d => d.name === name)
+    }
+
+    setDimensionLabels(dimension, labels) {
+        for (let dim of this.dimensions) {
+            if (dim.name === dimension) {
+                dim.labels = labels
+            }
+        }
     }
 
     makeArrayFromSamples(samples) {
@@ -69,7 +84,7 @@ class DataCube {
     }
 
     filterTemporal(extend, dimension) {
-        
+
     }
 
     removeDimension(dimension) {
