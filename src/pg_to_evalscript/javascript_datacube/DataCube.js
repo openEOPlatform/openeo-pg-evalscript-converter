@@ -1,5 +1,9 @@
 class DataCube {
     constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples) {
+        // data: SH samples or an ndarray
+        // bands_dimension_name: name  to use for the default bands dimension
+        // temporal_dimension_name: name to use for the default temporal dimension
+        // fromSamples: boolean, if true `data` is expected to be in format as argument `samples` passed to `evaluatePixel` in an evalscript, else ndarray
         this.TEMPORAL = "temporal"
         this.BANDS = "bands"
         this.OTHER = "other"
@@ -26,12 +30,15 @@ class DataCube {
     }
 
     makeArrayFromSamples(samples) {
+        // Converts `samples` object to ndarray of shape [number of samples, number of bands]
+        // `samples` is eqivalent to the first argument of `evaluatePixel` method in an evalscript
+        // Either object or array of objects (non-temporal and temporal scripts respectively)
         if (Array.isArray(samples)) {
             if (samples.length === 0) {
                 return ndarray([])
             }
             if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
-                this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(samples[0])
+                this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(samples[0]) // Sets bands names as bands dimension labels
             }
             let newData = []
             for (let entry of samples) {
