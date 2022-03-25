@@ -155,6 +155,7 @@ class DataCube {
         const coords = fill(shape.slice(), 0);
         coords[axis] = null;
         const labels = this.dimensions[axis].labels;
+        const targetDimensionLabels = [];
         const newValues = [];
         let currInd = 0;
 
@@ -166,6 +167,10 @@ class DataCube {
             const dim = this.getDimensionByName(dimension);
             dim.name = target_dimension;
             dim.type = this.OTHER;
+
+            for (let i = 0; i < shape[axis]; i++) {
+                targetDimensionLabels.push(i);
+            }
         }
 
         while (true) {
@@ -177,7 +182,7 @@ class DataCube {
             }
 
             const dataToProcess = convert_to_1d_array(data.pick.apply(data, coords));
-            dataToProcess.labels = target_dimension ? [...Array(dataToProcess.length).keys()] : labels;
+            dataToProcess.labels = target_dimension ? targetDimensionLabels : labels;
             newValues.push(process({ data: dataToProcess, context }));
 
             if (coords.length === 1) {
