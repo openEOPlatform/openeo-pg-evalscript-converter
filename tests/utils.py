@@ -16,7 +16,7 @@ def with_stdout_call(code):
 
 
 def get_execute_test_script(example_input):
-    return with_stdout_call(json.dumps(example_input))
+    return with_stdout_call(f"evaluatePixel({json.dumps(example_input)})")
 
 
 def run_evalscript(evalscript, example_input):
