@@ -108,6 +108,10 @@ class DataCube {
     }
 
     flattenToArray() {
+        if ((!this.data.shape || this.data.shape.length === 0) && this.data.data.length === 1) {
+            // If there is no data.shape or it's [], we have a scalar.
+            return this.data.data[0]
+        }
         return flattenToNativeArray(this.data)
     }
 

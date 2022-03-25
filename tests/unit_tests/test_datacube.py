@@ -144,3 +144,22 @@ def test_apply(datacube_code, example_data, example_data_shape, expected_data):
     output = run_javascript(testing_code)
     output = json.loads(output)
     assert output["data"]["data"] == expected_data
+
+
+@pytest.mark.parametrize(
+    "example_data,example_data_shape,expected_data",
+    [
+        ([1, 2, 3, 4], [2, 2], [1, 2, 3, 4]),
+        ([1, 2, 3, 4], [4], [1, 2, 3, 4]),
+        ([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2], [1, 2, 3, 4, 5, 6, 7, 8]),
+        ([1], [], 1),
+    ],
+)
+def test_flattenToArray(datacube_code, example_data, example_data_shape, expected_data):
+    testing_code = datacube_code(
+        f"ndarray({example_data},{example_data_shape})", from_samples=False, json_samples=False
+    ) + with_stdout_call("datacube.flattenToArray()")
+    output = run_javascript(testing_code).decode("utf-8")
+    output = json.loads(output)
+
+    assert output == expected_data
