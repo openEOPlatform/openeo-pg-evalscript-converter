@@ -123,3 +123,24 @@ def test_reduceByDimension(
     output = json.loads(output)
     assert output["data"]["data"] == expected_data
     assert output["data"].get("shape") == expected_shape
+
+
+@pytest.mark.parametrize(
+    "example_data,example_data_shape,expected_data",
+    [
+        ([1, 2, 3, 4], [2, 2], [3, 6, 9, 12]),
+        ([1, 2, 3, 4], [4], [3, 6, 9, 12]),
+        ([1], [], [3]),
+        ([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2], [3, 6, 9, 12, 15, 18, 21, 24]),
+    ],
+)
+def test_apply(datacube_code, example_data, example_data_shape, expected_data):
+    process = "({x}) => x * 3"
+    testing_code = (
+        datacube_code(f"ndarray({example_data},{example_data_shape})", from_samples=False, json_samples=False)
+        + f"\ndatacube.apply({process});"
+        + with_stdout_call("datacube")
+    )
+    output = run_javascript(testing_code)
+    output = json.loads(output)
+    assert output["data"]["data"] == expected_data

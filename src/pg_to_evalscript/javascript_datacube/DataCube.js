@@ -172,41 +172,20 @@ class DataCube {
         this.data = ndarray(newData, shape)
     }
 
-    apply(process, context) {
-        if (isNotSubarray(this.data, this.data.shape)) {
-            const newData = []
-            const length = this.data.data.length
-            for (let i = 0; i < length; i++) {
-                newData.push(process({
-                    "x": this.data.data[i],
-                    context: context
-                }))
-            }
-            this.data.data = newData
-        } else {
-            const shape = this.data.shape
-            const cumulatives = fill(shape.slice(), 0);
-            const coords = shape.slice();
-            let total = 1;
 
-            for (let d = shape.length - 1; d >= 0; d--) {
-                cumulatives[d] = total;
-                total *= shape[d];
-            }
-            for (let i = 0; i < total; i++) {
-                for (let d = shape.length - 1; d >= 0; d--) {
-                    coords[d] = Math.floor(i / cumulatives[d]) % shape[d];
-                }
-                const args = coords.concat([process({
-                    "x": this.data.get.apply(this.data, coords),
-                    context: context
-                })])
-                this.data.set.apply(this.data, args)
-            }
+    apply(process, context) {
+        // process: function, accepts `data` (labeled array) and `context` (any)
+        const allCoords = this._iterateCoords(this.data.shape)
+        for (let coords of allCoords) {
+            const args = coords.concat([process({
+                "x": this.data.get.apply(this.data, coords),
+                context: context
+            })])
+            this.data.set.apply(this.data, args)
         }
     }
 
-    * _iterateCoords(shape, nullAxes) {
+    * _iterateCoords(shape, nullAxes=[]) {
         // Generator that visits all coordinates of array with `shape`, keeping nullAxes `null`
         // shape: sizes of dimensions
         // nullAxes: array with axes that should be kept null
