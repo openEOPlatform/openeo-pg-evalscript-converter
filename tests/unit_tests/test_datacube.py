@@ -7,10 +7,10 @@ from tests.utils import load_datacube_code, with_stdout_call, run_javascript
 
 @pytest.fixture
 def datacube_code():
-    def wrapped(samples, from_samples=True, json_samples=True):
+    def wrapped(samples, bands_dimension_name="b", temporal_dimension_name="t", from_samples=True, json_samples=True):
         return (
             load_datacube_code()
-            + f"\nconst datacube = new DataCube({json.dumps(samples) if json_samples else samples}, 'b', 't', {json.dumps(from_samples)})"
+            + f"\nconst datacube = new DataCube({json.dumps(samples) if json_samples else samples}, '{bands_dimension_name}', '{temporal_dimension_name}', {json.dumps(from_samples)})"
         )
 
     return wrapped
@@ -163,3 +163,56 @@ def test_flattenToArray(datacube_code, example_data, example_data_shape, expecte
     output = json.loads(output)
 
     assert output == expected_data
+
+
+@pytest.mark.parametrize(
+    "bands,expected_indices",
+    [
+        (["B01"], [0]),
+        (["B02"], [1]),
+        (["B03"], [2]),
+        (["B01", "B02", "B03"], [0, 1, 2]),
+        (["B01", "B02", "non-existent"], [0, 1]),
+        (["non-existent"], []),
+    ],
+)
+def test_getBandIndices(datacube_code, bands, expected_indices):
+    testing_code = datacube_code([{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}]) + with_stdout_call(
+        f"datacube.getBandIndices({bands})"
+    )
+    output = run_javascript(testing_code).decode("utf-8")
+    output = json.loads(output)
+
+    assert output == expected_indices
+
+
+@pytest.mark.parametrize(
+    "example_data,bands_dimension_name,temporal_dimension_name,dimensions,expected_data",
+    [
+        (
+            [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 4, "B02": 5, "B03": 6}],
+            "bands",
+            "temp",
+            [
+                {"name": "temp", "labels": [], "type": "temporal"},
+                {"name": "bands", "labels": [], "type": "bands"},
+            ],
+            {"data": [1, 2, 3, 4, 5, 6], "shape": [2, 3], "stride": [3, 1], "offset": 0},
+        ),
+    ],
+)
+def test_clone(datacube_code, example_data, bands_dimension_name, temporal_dimension_name, dimensions, expected_data):
+    testing_code = (
+        datacube_code(
+            example_data, bands_dimension_name=bands_dimension_name, temporal_dimension_name=temporal_dimension_name
+        )
+        + (f"\ndatacube.dimensions = {json.dumps(dimensions)}" if dimensions else "")
+        + with_stdout_call("datacube.clone()")
+    )
+    output = run_javascript(testing_code)
+    output = json.loads(output)
+
+    assert output["data"] == expected_data
+    assert output["dimensions"] == dimensions
+    assert output["temporal_dimension_name"] == temporal_dimension_name
+    assert output["bands_dimension_name"] == bands_dimension_name
