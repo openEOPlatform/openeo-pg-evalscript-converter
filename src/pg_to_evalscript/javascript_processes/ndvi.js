@@ -32,10 +32,7 @@ function ndvi(arguments) {
     allowedTypes: ["string"],
   });
 
-  const clonedData = data.clone();
-  const bandsDim = clonedData.dimensions.find(
-    (d) => d.type === clonedData.BANDS
-  );
+  let bandsDim = data.dimensions.find((d) => d.type === data.BANDS);
   if (!bandsDim) {
     throw new ProcessError({
       name: "DimensionAmbiguous",
@@ -66,6 +63,8 @@ function ndvi(arguments) {
     });
   }
 
+  const clonedData = data.clone();
+  bandsDim = clonedData.dimensions.find((d) => d.type === clonedData.BANDS);
   const [nirIdx, redIdx] = clonedData.getBandIndices([nir, red]);
   if (target_band !== null) {
     const newShape = clonedData.getDataShape();
