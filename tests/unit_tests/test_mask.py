@@ -15,8 +15,8 @@ def mask_process_code():
     [
         (
             {
-                "data": {"B01": [1, 2, 3], "B02": [4, 5, 6]},
-                "mask": {"B01": [11, 12, 13], "B02": [14, 15, 16]},
+                "data": [{"B01": 1}, {"B01": 2}, {"B01": 3}],
+                "mask": [{"B01": 1}, {"B01": 2}, {"B01": 3}],
             },
             {
                 "BANDS": "bands",
@@ -26,9 +26,9 @@ def mask_process_code():
                 "temporal_dimension_name": "temporal_name",
                 "dimensions": [
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
-                    {"labels": ["B01", "B02"], "name": "bands_name", "type": "bands"},
+                    {"labels": ["B01"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": [[11, 12, 13], [14, 15, 16]],
+                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [3, 1], 'stride': [1, 1]},
             },
         ),
     ],
