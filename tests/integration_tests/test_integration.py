@@ -30,8 +30,8 @@ from tests.utils import (
             [{"B01": 0.5, "B02": 0.75}, {"B01": 0, "B02": 1}, {"B01": -3, "B02": 4}, {"B01": None, "B02": None}],
             [1, 1.5, 0, 2, 0, 2, None, None],
         ),
-        ("test_graph_1", [], [None]),
-        ("test_mean_of_mean", [{"B04": 0, "B08":1}, {"B04":2, "B08":3}, {"B04":3, "B08":5}, {"B04":1, "B08": 4}], [2.375]),
+        ("test_graph_1", [], []),
+        ("test_mean_of_mean", [{"B04": 0, "B08":1}, {"B04":2, "B08":3}, {"B04":3, "B08":5}, {"B04":1, "B08": 4}], 2.375),
         (
             "test_count_with_condition",
             [{"B01": 0, "B02": 1}, {"B01": 2, "B02": 3}, {"B01": 4, "B02": 5}, {"B01": None, "B02": None}],
@@ -58,6 +58,7 @@ def test_convertable_process_graphs(pg_name, example_input, expected_output):
     assert len(result) == 1 and result[0]["invalid_node_id"] is None
 
     evalscript = result[0]["evalscript"].write()
+
     output = run_evalscript(evalscript, example_input)
     output = json.loads(output)
     
