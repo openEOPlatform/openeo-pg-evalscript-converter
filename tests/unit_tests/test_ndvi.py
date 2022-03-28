@@ -24,7 +24,7 @@ def ndvi_code():
                 "dimensions": [
                     {"labels": [], "name": "t", "type": "temporal"},
                 ],
-                "data": {"data": [0.23529411764705882], "offset": 0},
+                "data": {"data": [0.23529411764705882], "offset": 0, "shape": [1], "stride": [1]},
             },
         ),
         (
@@ -38,7 +38,7 @@ def ndvi_code():
                 "dimensions": [
                     {"labels": [], "name": "t", "type": "temporal"},
                 ],
-                "data": {"data": [0, -0.6], "offset": 0},
+                "data": {"data": [0, -0.6], "offset": 0, "shape": [2], "stride": [1]},
             },
         ),
         (
@@ -52,7 +52,7 @@ def ndvi_code():
                 "dimensions": [
                     {"labels": [], "name": "t", "type": "temporal"},
                 ],
-                "data": {"data": [0.23529411764705882], "offset": 0},
+                "data": {"data": [0.23529411764705882], "offset": 0, "shape": [1], "stride": [1]},
             },
         ),
         (
@@ -138,25 +138,25 @@ def test_ndvi(ndvi_code, example_input, expected_output):
             {"data": [{"nir": 2, "red": 2}]},
             "cube.getDimensionByName(cube.bands_dimension_name).type = 'fake_wrong_type';",
             True,
-            "Dimension of type `bands` is not available or is ambiguous.",
+            "DimensionAmbiguous",
         ),
         (
             {"data": [{"nir_fake_label": 2, "red": 2}]},
             None,
             True,
-            "The NIR band can't be resolved, please specify the specific NIR band name.",
+            "NirBandAmbiguous",
         ),
         (
             {"data": [{"nir": 2, "red_fake_label": 2}]},
             None,
             True,
-            "The red band can't be resolved, please specify the specific red band name.",
+            "RedBandAmbiguous",
         ),
         (
             {"data": [{"nir": 2, "red": 2, "ndvi": 1234}], "target_band": "ndvi"},
             None,
             True,
-            "A band with the specified target name exists.",
+            "BandExists",
         ),
     ],
 )
