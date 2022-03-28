@@ -55,9 +55,9 @@ def test_mask(mask_process_code, example_input, expected_output):
         "mask",
         process_arguments,
     )
-    print("output")
-
     output = json.loads(output)
 
-    print(output)
+    # print("output")
+    # print(output)
+    
     assert output == expected_output
