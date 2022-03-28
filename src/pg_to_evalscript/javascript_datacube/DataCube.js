@@ -35,7 +35,7 @@ class DataCube {
         // Either object or array of objects (non-temporal and temporal scripts respectively)
         if (Array.isArray(samples)) {
             if (samples.length === 0) {
-                return ndarray([])
+                return ndarray([], [0,0])
             }
             if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
                 this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(samples[0]) // Sets bands names as bands dimension labels
