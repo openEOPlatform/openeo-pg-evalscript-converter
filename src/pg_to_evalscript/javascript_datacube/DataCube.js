@@ -170,19 +170,21 @@ class DataCube {
         for (let coord of allCoords) {
             const dataToProcess = convert_to_1d_array(data.pick.apply(data, coord));
             dataToProcess.labels = target_dimension ? targetDimensionLabels : labels;
-            const newValues = process({ data: dataToProcess, context });
-
-            for (let i = 0; i < newValues.length; i++) {
-                const newCoord = coord.slice();
-                newCoord[axis] = i;
-
-                this.data.set(...newCoord, newValues[i]);
-            }
+            this._setArrayAlongAxis(coord, axis, process({ data: dataToProcess, context }));
         }
     }
 
     getDataShape() {
         return this.data.shape;
+    }
+
+    _setArrayAlongAxis(coord, axis, array) {
+        for (let i = 0; i < array.length; i++) {
+            const newCoord = coord.slice();
+            newCoord[axis] = i;
+
+            this.data.set(...newCoord, array[i]);
+        }
     }
 
     _addDimension(axis) {
