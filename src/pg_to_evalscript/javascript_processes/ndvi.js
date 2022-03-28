@@ -74,11 +74,10 @@ function ndvi(arguments) {
     );
     bandsDim.labels.push(target_band);
     const dataArr = clonedData.data.data;
-    for (
-      let step = 0;
-      step < newShape.filter((_, i) => i !== axis).reduce((a, b) => a * b, 1);
-      step++
-    ) {
+    const len = newShape
+      .filter((_, i) => i !== axis)
+      .reduce((a, b) => a * b, 1);
+    for (let step = 0; step < len; step++) {
       const n = dataArr[nirIdx + step * newShape[axis] + step];
       const r = dataArr[redIdx + step * newShape[axis] + step];
       const ndvi = (n - r) / (n + r);
