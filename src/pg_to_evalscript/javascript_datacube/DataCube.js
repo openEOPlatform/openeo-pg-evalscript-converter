@@ -176,7 +176,7 @@ class DataCube {
                 const newCoord = coord.slice();
                 newCoord[axis] = i;
 
-                this.data.set.apply(this.data, newCoord.concat(newValues[i]));
+                this.data.set(...newCoord, newValues[i]);
             }
         }
     }
