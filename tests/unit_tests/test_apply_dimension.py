@@ -43,6 +43,54 @@ def apply_dimension_process_code():
             },
             [3, 6, 9, 12, 15, 18],
         ),
+        (
+            {
+                "data": [
+                    {"B01": 1, "B02": 2},
+                    {"B01": 3, "B02": 4},
+                    {"B01": 5, "B02": 6},
+                ],
+                "process": "({data}) => {const sum = data.reduce((a, b) => a + b, 0); return data.map(el => el * sum)}",
+                "dimension": "temporal",
+            },
+            [9, 24, 27, 48, 45, 72]
+        ),
+        (
+            {
+                "data": [
+                    {"B01": 1, "B02": 2},
+                    {"B01": 3, "B02": 4},
+                    {"B01": 5, "B02": 6},
+                ],
+                "process": "({data}) => data",
+                "dimension": "bands",
+            },
+            [1, 2, 3, 4, 5, 6],
+        ),
+        (
+            {
+                "data": [
+                    {"B01": 1, "B02": 2},
+                    {"B01": 3, "B02": 4},
+                    {"B01": 5, "B02": 6},
+                ],
+                "process": "({data}) => data.map(el => el * 3)",
+                "dimension": "bands",
+            },
+            [3, 6, 9, 12, 15, 18],
+        ),
+        (
+            {
+                "data": [
+                    {"B01": 1, "B02": 2},
+                    {"B01": 3, "B02": 4},
+                    {"B01": 5, "B02": 6},
+                ],
+                "process": "({data}) => {const sum = data.reduce((a, b) => a + b, 0); return data.map(el => el * sum)}",
+                "dimension": "bands",
+            },
+            [3, 6, 21, 28, 55, 66]
+        ),
     ],
 )
 def test_apply_dimension(apply_dimension_process_code, example_input, expected_result):

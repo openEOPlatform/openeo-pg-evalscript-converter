@@ -147,15 +147,11 @@ class DataCube {
     }
 
     applyDimension(process, dimension, target_dimension, context) {
-        let data = ndarray(this.data.data.slice(), this.data.shape);
+        const data = this.data;
         const axis = this.dimensions.findIndex(e => e.name === dimension);
-        const shape = data.shape;
-        const coords = fill(shape.slice(), 0);
-        coords[axis] = null;
         const labels = this.dimensions[axis].labels;
+        const allCoords = this._iterateCoords(data.shape.slice(), [axis]) // get the generator, axis of the selected dimension is `null` (entire dimension is selected)
         const targetDimensionLabels = [];
-        const newValues = [];
-        let currInd = 0;
 
         if (target_dimension) {
             if (this.getDimensionByName(target_dimension)) {
@@ -166,40 +162,23 @@ class DataCube {
             dim.name = target_dimension;
             dim.type = this.OTHER;
 
-            for (let i = 0; i < shape[axis]; i++) {
+            for (let i = 0; i < data.shape[axis]; i++) {
                 targetDimensionLabels.push(i);
             }
         }
 
-        while (true) {
-            if (coords.length > 1 && coords[currInd] === null) {
-                currInd++;
-            }
-            if (currInd >= shape.length) {
-                break;
-            }
-
-            const dataToProcess = convert_to_1d_array(data.pick.apply(data, coords));
+        for (let coord of allCoords) {
+            const dataToProcess = convert_to_1d_array(data.pick.apply(data, coord));
             dataToProcess.labels = target_dimension ? targetDimensionLabels : labels;
-            newValues.push(process({ data: dataToProcess, context }));
+            const newValues = process({ data: dataToProcess, context });
 
-            if (coords.length === 1) {
-                break;
-            }
-            if (coords[currInd] + 1 >= shape[currInd]) {
-                currInd++;
-            } else {
-                coords[currInd]++;
+            for (let i = 0; i < newValues.length; i++) {
+                const newCoord = coord.slice();
+                newCoord[axis] = i;
+
+                this.data.set.apply(this.data, newCoord.concat(newValues[i]));
             }
         }
-
-        const newData = [];
-        for (let i = 0; i < newValues[0].length; i++) {
-            for (let j = 0; j < newValues.length; j++) {
-                newData.push(newValues[j][i]);
-            }
-        }
-        this.data = ndarray(newData, shape);
     }
 
     getDataShape() {
