@@ -93,6 +93,5 @@ function ndvi(arguments) {
     ({ data }) => (data[nirIdx] - data[redIdx]) / (data[nirIdx] + data[redIdx]),
     bandsDim.name
   );
-  clonedData.removeDimension(bandsDim.name);
   return clonedData;
 }
