@@ -20,7 +20,7 @@ function mask(arguments) {
     parameterName: "replacement",
     value: replacement,
     required: false,
-    allowedTypes: ["number" | "boolean" | "string"],
+    allowedTypes: ["number", "boolean", "string"],
   });
 
   // The data cubes have to be compatible so that each dimension in the mask 
@@ -52,10 +52,29 @@ function mask(arguments) {
   // replace pixel in data if the corresponding pixel in mask is
   // non-zero (for numbers) or true (for boolean values)
 
-  // let newData = data.clone();
+  let newData = data.clone();
+
+  let flatData = newData.flattenToArray();
+  let flatMask = mask.flattenToArray();
+  const replacement_val = replacement === undefined ? null : replacement;
+
+  // console.log('data within json', JSON.stringify({
+  //   data
+  //   // d: newData.data,
+  //   // flatData, 
+  //   // flatMask
+  // }));
 
 
-  // console.log('data within', {data});
+  for(let i=0; i<flatData.length; i++){
+    const shouldBeReplaced = (typeof flatMask[i] === 'number' && flatMask[i] !== 0) || (typeof flatMask[i] === 'boolean' && flatMask[i] === true);
+    if(shouldBeReplaced){
+      flatData[i] = replacement_val;
+    }
+  }
 
-  return mask;
+
+
+
+  return newData;
 }
