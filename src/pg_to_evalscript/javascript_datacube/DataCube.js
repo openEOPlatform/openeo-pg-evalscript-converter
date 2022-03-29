@@ -1,9 +1,9 @@
 class DataCube {
+    // data: SH samples or an ndarray
+    // bands_dimension_name: name  to use for the default bands dimension
+    // temporal_dimension_name: name to use for the default temporal dimension
+    // fromSamples: boolean, if true `data` is expected to be in format as argument `samples` passed to `evaluatePixel` in an evalscript, else ndarray
     constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples) {
-        // data: SH samples or an ndarray
-        // bands_dimension_name: name  to use for the default bands dimension
-        // temporal_dimension_name: name to use for the default temporal dimension
-        // fromSamples: boolean, if true `data` is expected to be in format as argument `samples` passed to `evaluatePixel` in an evalscript, else ndarray
         this.TEMPORAL = "temporal"
         this.BANDS = "bands"
         this.OTHER = "other"
@@ -29,10 +29,10 @@ class DataCube {
         return this.dimensions.find(d => d.name === name)
     }
 
+    // Converts `samples` object to ndarray of shape [number of samples, number of bands]
+    // `samples` is eqivalent to the first argument of `evaluatePixel` method in an evalscript
+    // Either object or array of objects (non-temporal and temporal scripts respectively)
     makeArrayFromSamples(samples) {
-        // Converts `samples` object to ndarray of shape [number of samples, number of bands]
-        // `samples` is eqivalent to the first argument of `evaluatePixel` method in an evalscript
-        // Either object or array of objects (non-temporal and temporal scripts respectively)
         if (Array.isArray(samples)) {
             if (samples.length === 0) {
                 return ndarray([], [0,0])
@@ -121,9 +121,9 @@ class DataCube {
         return [...shape, ...flattenedData];
     }
 
+    // reducer: function, accepts `data` (labeled array) and `context` (any)
+    // dimension: string, name of one of the existing dimensions
     reduceByDimension(reducer, dimension, context) {
-        // reducer: function, accepts `data` (labeled array) and `context` (any)
-        // dimension: string, name of one of the existing dimensions
         const data = this.data
         const axis = this.dimensions.findIndex(e => e.name === dimension)
         const labels = this.dimensions[axis].labels
@@ -176,9 +176,8 @@ class DataCube {
         this.data = ndarray(newData, shape)
     }
 
-
+    // process: function, accepts `data` (labeled array) and `context` (any)
     apply(process, context) {
-        // process: function, accepts `data` (labeled array) and `context` (any)
         const allCoords = this._iterateCoords(this.data.shape)
         for (let coords of allCoords) {
             this.data.set(...coords, process({
@@ -188,10 +187,10 @@ class DataCube {
         }
     }
 
+    // Generator that visits all coordinates of array with `shape`, keeping nullAxes `null`
+    // shape: sizes of dimensions
+    // nullAxes: array with axes that should be kept null
     * _iterateCoords(shape, nullAxes=[]) {
-        // Generator that visits all coordinates of array with `shape`, keeping nullAxes `null`
-        // shape: sizes of dimensions
-        // nullAxes: array with axes that should be kept null
         const cumulatives = fill(shape.slice(), 0);
         const coords = shape.slice();
         for (let axis of nullAxes) {
