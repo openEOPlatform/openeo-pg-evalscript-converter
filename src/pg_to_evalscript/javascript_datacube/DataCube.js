@@ -37,20 +37,22 @@ class DataCube {
             if (samples.length === 0) {
                 return ndarray([], [0,0])
             }
-            if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
-                this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(samples[0]) // Sets bands names as bands dimension labels
-            }
+            this._setDimensionLabelsIfEmpty(this.bands_dimension_name, Object.keys(samples[0]))
             let newData = []
             for (let entry of samples) {
                 newData = newData.concat(extractValues(entry))
             }
             return ndarray(newData, [samples.length, extractValues(samples[0]).length])
         } else {
-            if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
-                this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(samples)
-            }
+            this._setDimensionLabelsIfEmpty(this.bands_dimension_name, Object.keys(samples))
             const newData = Object.values(samples)
             return ndarray(newData, [1, newData.length])
+        }
+    }
+
+    _setDimensionLabelsIfEmpty(dimension, labels) {
+        if (this.getDimensionByName(dimension).labels.length === 0) {
+            this.getDimensionByName(dimension).labels = labels
         }
     }
 
@@ -109,7 +111,7 @@ class DataCube {
 
     flattenToArray() {
         if ((!this.data.shape || this.data.shape.length === 0) && this.data.data.length === 1) {
-            // If there is no data.shape or it's [], we have a scalar.
+            // We have a scalar.
             return this.data.data[0]
         }
         return flattenToNativeArray(this.data)
