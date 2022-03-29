@@ -83,8 +83,32 @@ class DataCube {
             );
     }
 
-    filterTemporal(extend, dimension) {
+    filterTemporal(extent, dimension) {
+        const dim = this.temporal_dimension_name;
+        const axis = this.dimensions.findIndex((e) => e.name === dim);
 
+        const start = parse_rfc3339(extent[0]);
+        const end = parse_rfc3339(extent[1]);
+
+        if (!start || !end) {
+            throw new Error("Invalid temporal extent.");
+        }
+
+        const temporalLabels = this.getDimensionByName(dim).labels;
+        const indexes = [];
+        for (let i = 0; i < temporalLabels.length; i++) {
+            const date = parse_rfc3339(temporalLabels[i]);
+            if (!date) {
+                throw new Error("Invalid temporal extent.");
+            }
+
+            if (date.value >= start.value && date.value < end.value) {
+                indexes.push(i);
+            }
+        }
+
+        this._filter(axis, indexes);
+        this.getDimensionByName(dim).labels = indexes.map(i => temporalLabels[i]);
     }
 
     removeDimension(dimension) {
