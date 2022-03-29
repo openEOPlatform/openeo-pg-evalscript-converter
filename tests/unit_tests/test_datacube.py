@@ -216,3 +216,97 @@ def test_clone(datacube_code, example_data, bands_dimension_name, temporal_dimen
     assert output["dimensions"] == dimensions
     assert output["temporal_dimension_name"] == temporal_dimension_name
     assert output["bands_dimension_name"] == bands_dimension_name
+
+
+@pytest.mark.parametrize(
+    "example_data,example_data_shape,dimensions,axis_to_filter,indices_to_keep,expected_data,expected_shape",
+    [
+        ([1, 2, 3, 4], [2, 2], None, 1, [0], [1, 3], [2, 1]),
+        ([1, 2, 3, 4], [2, 2], None, 0, [0], [1, 2], [1, 2]),
+        (
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            [2, 2, 2],
+            [
+                {"name": "x", "labels": [], "type": "other"},
+                {"name": "t", "labels": [], "type": "temporal"},
+                {"name": "b", "labels": [], "type": "bands"},
+            ],
+            0,
+            [1],
+            [5, 6, 7, 8],
+            [1, 2, 2],
+        ),
+        (
+            [1, 2, 3, 4, 5, 6],
+            [2, 3, 1],
+            [
+                {"name": "x", "labels": [], "type": "other"},
+                {"name": "t", "labels": [], "type": "temporal"},
+                {"name": "b", "labels": [], "type": "bands"},
+            ],
+            1,
+            [0, 2],
+            [1, 3, 4, 6],
+            [2, 2, 1],
+        ),
+        (
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            [2, 2, 2],
+            [
+                {"name": "x", "labels": [], "type": "other"},
+                {"name": "t", "labels": [], "type": "temporal"},
+                {"name": "b", "labels": [], "type": "bands"},
+            ],
+            1,
+            [0, 1],
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            [2, 2, 2],
+        ),
+        (
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            [4, 1, 2],
+            [
+                {"name": "x", "labels": [], "type": "other"},
+                {"name": "t", "labels": [], "type": "temporal"},
+                {"name": "b", "labels": [], "type": "bands"},
+            ],
+            0,
+            [0, 1, 3],
+            [1, 2, 3, 4, 7, 8],
+            [3, 1, 2],
+        ),
+        (
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            [4, 1, 2],
+            [
+                {"name": "x", "labels": [], "type": "other"},
+                {"name": "t", "labels": [], "type": "temporal"},
+                {"name": "b", "labels": [], "type": "bands"},
+            ],
+            2,
+            [0],
+            [1, 3, 5, 7],
+            [4, 1, 1],
+        ),
+    ],
+)
+def test_filter(
+    datacube_code,
+    example_data,
+    example_data_shape,
+    dimensions,
+    axis_to_filter,
+    indices_to_keep,
+    expected_data,
+    expected_shape,
+):
+    testing_code = (
+        datacube_code(f"ndarray({example_data},{example_data_shape})", from_samples=False, json_samples=False)
+        + (f"\ndatacube.dimensions = {json.dumps(dimensions)}" if dimensions else "")
+        + f"\ndatacube._filter({axis_to_filter},{json.dumps(indices_to_keep)});"
+        + with_stdout_call("datacube")
+    )
+    output = run_javascript(testing_code)
+    output = json.loads(output)
+    assert output["data"]["data"] == expected_data
+    assert output["data"].get("shape") == expected_shape

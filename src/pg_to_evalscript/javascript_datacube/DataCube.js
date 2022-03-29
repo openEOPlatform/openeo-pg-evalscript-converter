@@ -35,7 +35,7 @@ class DataCube {
     makeArrayFromSamples(samples) {
         if (Array.isArray(samples)) {
             if (samples.length === 0) {
-                return ndarray([], [0,0])
+                return ndarray([], [0, 0])
             }
             this._setDimensionLabelsIfEmpty(this.bands_dimension_name, Object.keys(samples[0]))
             let newData = []
@@ -158,24 +158,23 @@ class DataCube {
         this.data = ndarray(this.data.data, this.data.shape)
     }
 
-    _filter(dim, coordArr) {
-        const shape = this.data.shape
+    // axis: integer, index of the dimension to filter
+    // coordArr: array of indices of the dimension to keep
+    _filter(axis, coordArr) {
         const length = this.data.data.length
-        const stepSlice = shape.slice(dim)
-        shape[dim] = coordArr.length
+        const stride = this.data.stride[axis]
+        const axisSize = this.data.shape[axis]
         const newData = []
-        let step = 1
-
-        for (let s of stepSlice) {
-            step *= s
-        }
 
         for (let i = 0; i < length; i++) {
-            if (coordArr.includes(i % step)) {
+            if (coordArr.includes(Math.floor(i / stride) % axisSize)) {
                 newData.push(this.data.data[i])
             }
         }
-        this.data = ndarray(newData, shape)
+
+        const newShape = this.data.shape
+        newShape[axis] = coordArr.length
+        this.data = ndarray(newData, newShape)
     }
 
     // process: function, accepts `data` (labeled array) and `context` (any)
@@ -192,7 +191,7 @@ class DataCube {
     // Generator that visits all coordinates of array with `shape`, keeping nullAxes `null`
     // shape: sizes of dimensions
     // nullAxes: array with axes that should be kept null
-    * _iterateCoords(shape, nullAxes=[]) {
+    * _iterateCoords(shape, nullAxes = []) {
         const cumulatives = fill(shape.slice(), 0);
         const coords = shape.slice();
         for (let axis of nullAxes) {
