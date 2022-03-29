@@ -167,8 +167,8 @@ def test_apply_dimension(apply_dimension_process_code, example_input, expected_r
 )
 def test_input_validation(apply_dimension_process_code, example_input, raises_exception, error_name):
 
-    data = example_input["data"] if "data" in example_input else None
-    process = example_input["process"] if "process" in example_input else None
+    data = example_input.get("data")
+    process = example_input.get("process")
 
     cube = f"const cube = new DataCube({data}, 'bands', 'temporal', true);" if data else f"const cube=undefined;"
     additional_js_code_to_run = load_datacube_code() + cube
