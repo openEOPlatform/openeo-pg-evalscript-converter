@@ -32,20 +32,10 @@ function ndvi(arguments) {
     allowedTypes: ["string"],
   });
 
-  let nirName, redName;
-  for (let i = 0; i < data.bands_metadata.length; i++) {
-    if (nirName && redName) {
-      break;
-    }
-
-    if (data.bands_metadata[i].common_name === nir) {
-      nirName = data.bands_metadata[i].name;
-    }
-
-    if (data.bands_metadata[i].common_name === red) {
-      redName = data.bands_metadata[i].name;
-    }
-  }
+  const nirBand = data.getBand({ commonName: nir });
+  const redBand = data.getBand({ commonName: red });
+  const nirName = nirBand ? nirBand.name : undefined;
+  const redName = redBand ? redBand.name : undefined;
 
   let bandsDim = data.dimensions.find((d) => d.type === data.BANDS);
   if (!bandsDim) {

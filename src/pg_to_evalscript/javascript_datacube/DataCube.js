@@ -59,6 +59,16 @@ class DataCube {
         return indices
     }
 
+    getBand({ name = null, commonName = null }) {
+        for (let band of this.bands_metadata) {
+            if (band.name === name || band.common_name === commonName) {
+                return band;
+            }
+        }
+
+        return null;
+    }
+
     filterBands(bands) {
         const indices = this.getBandIndices(bands);
         const axis = this.dimensions.findIndex((e) => e.name === this.bands_dimension_name);
