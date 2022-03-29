@@ -248,7 +248,10 @@ def test_ndvi(ndvi_code, example_input, expected_output):
         },
         {"description": "The mask of data/no data pixels.", "name": "dataMask"},
     ]
-    js_code = load_datacube_code() + f"const cube = new DataCube({example_input['data']}, 'bands', 't', true, {bands_metadata});"
+    js_code = (
+        load_datacube_code()
+        + f"const cube = new DataCube({example_input['data']}, 'bands', 't', true, {bands_metadata});"
+    )
     process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
     output = run_process(ndvi_code + js_code, "ndvi", process_arguments)
     output = json.loads(output)
