@@ -96,6 +96,22 @@ class DataCube {
         })
     }
 
+    extendDimensionWithData(dimension, dataToAdd) {
+        const finalShape = this.getDataShape()
+        finalShape[dimension]++;
+        
+        const dataArr = this.data.data;
+        for (let i = 0; i < dataToAdd.length; i++) {
+            dataArr.splice(
+                i * finalShape[dimension] + finalShape[dimension] - 1, 
+                0, 
+                dataToAdd[i]
+                );
+            }
+            
+        this.data = ndarray(dataArr, finalShape)
+    }
+
     clone() {
         const copy = new DataCube(ndarray(this.data.data.slice(), this.data.shape), this.bands_dimension_name, this.temporal_dimension_name)
         const newDimensions = []

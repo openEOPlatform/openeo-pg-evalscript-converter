@@ -72,24 +72,22 @@ function ndvi(arguments) {
   bandsDim = clonedData.dimensions.find((d) => d.type === clonedData.BANDS);
   const [nirIdx, redIdx] = clonedData.getBandIndices([nirName, redName]);
   if (target_band !== null) {
-    const newShape = clonedData.getDataShape();
+    const shape = clonedData.getDataShape();
     const axis = clonedData.dimensions.findIndex(
       (d) => d.type === clonedData.BANDS
     );
-    bandsDim.labels.push(target_band);
     const dataArr = clonedData.data.data;
-    const len = newShape
-      .filter((_, i) => i !== axis)
-      .reduce((a, b) => a * b, 1);
-    for (let step = 0; step < len; step++) {
-      const n = dataArr[nirIdx + step * newShape[axis] + step];
-      const r = dataArr[redIdx + step * newShape[axis] + step];
-      const ndvi = (n - r) / (n + r);
-      dataArr.splice(newShape[axis] + step * newShape[axis] + step, 0, ndvi);
+
+    const ndvis = [];
+    const len = shape.filter((_, i) => i !== axis).reduce((a, b) => a * b, 1);
+    for (let i = 0; i < len; i++) {
+      const n = dataArr[nirIdx + i * shape[axis]];
+      const r = dataArr[redIdx + i * shape[axis]];
+      ndvis.push((n - r) / (n + r));
     }
 
-    newShape[axis]++;
-    clonedData.data = ndarray(dataArr, newShape);
+    bandsDim.labels.push(target_band);
+    clonedData.extendDimensionWithData(axis, ndvis);
     return clonedData;
   }
 
