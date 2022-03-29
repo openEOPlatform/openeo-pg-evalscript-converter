@@ -13,10 +13,11 @@ def mask_process_code():
 @pytest.mark.parametrize(
     "example_input,expected_output",
     [
+        # basic, same dimensions and labels in data and mask, mask contains numbers
         (
             {
                 "data": [{"B01": 1}, {"B01": 2}, {"B01": 3}],
-                "mask": [{"B01": 1}, {"B01": 2}, {"B01": 3}],
+                "mask": [{"B01": 0}, {"B01": 1}, {"B01": 0}],
             },
             {
                 "BANDS": "bands",
@@ -28,26 +29,90 @@ def mask_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [3, 1], 'stride': [1, 1]},
+                "data": {'data': [1, None, 3], 'offset': 0, 'shape': [3, 1], 'stride': [1, 1]},
+            },
+        ),
+
+        # basic, same dimensions and labels in data and mask, mask contains booleans
+        (
+            {
+                "data": [{"B01": 1}, {"B01": 2}, {"B01": 3}],
+                "mask": [{"B01": False}, {"B01": True}, {"B01": False}],
+            },
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands_name",
+                "temporal_dimension_name": "temporal_name",
+                "dimensions": [
+                    {"labels": [], "name": "temporal_name", "type": "temporal"},
+                    {"labels": ["B01"], "name": "bands_name", "type": "bands"},
+                ],
+                "data": {'data': [1, None, 3], 'offset': 0, 'shape': [3, 1], 'stride': [1, 1]},
+            },
+        ),
+
+        # basic, same dimensions and labels in data and mask, mask contains booleans, replace with 'aaa'
+        (
+            {
+                "data": [{"B01": 1}, {"B01": 2}, {"B01": 3}],
+                "mask": [{"B01": False}, {"B01": True}, {"B01": False}],
+                "replacement": 'aaa',
+            },
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands_name",
+                "temporal_dimension_name": "temporal_name",
+                "dimensions": [
+                    {"labels": [], "name": "temporal_name", "type": "temporal"},
+                    {"labels": ["B01"], "name": "bands_name", "type": "bands"},
+                ],
+                "data": {'data': [1, 'aaa', 3], 'offset': 0, 'shape': [3, 1], 'stride': [1, 1]},
             },
         ),
     ],
 )
 def test_mask(mask_process_code, example_input, expected_output):
+    vars_definitions = (
+        f"const data = new DataCube({json.dumps(example_input['data'])}, 'bands_name', 'temporal_name', true);"
+        + f"const mask1 = new DataCube({json.dumps(example_input['mask'])}, 'bands_name', 'temporal_name', true);"
+    )
+
+    if 'replacement' in example_input:
+        vars_definitions = ( 
+            vars_definitions 
+            + f"const replacement = {json.dumps(example_input['replacement'])};"
+        ) 
+    
     additional_js_code_to_run = (
         load_datacube_code()
-        + f"const data = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
-        + f"const mask1 = new DataCube({example_input['mask']}, 'bands_name', 'temporal_name', true);"
-    )
-    process_arguments = (
-        f"{{...{json.dumps(example_input)}, 'data': data, 'mask': mask1}}"
+        + vars_definitions
     )
 
-    # print("---------- js code -------------")
+    arguments = (
+        f"...{json.dumps(example_input)}"
+        + f", 'data': data, 'mask': mask1"
+    )
+
+    if 'replacement' in example_input:
+        arguments = ( arguments  + f", 'replacement': replacement" )
+
+    process_arguments = ( f"{{" + arguments + f"}}" )
+
+
+    # print("// ---------- additional js code -------------")
     # print(additional_js_code_to_run)
-    # print(mask_process_code)
 
-    # print("------------ arg ------------")
+    # print("// ---------- mask process code -------------")
+    # print(mask_process_code)
+    
+    # print("// ------------ vars_def ------------")
+    # print(vars_definitions)
+    
+    # print("// ------------ arg ------------")
     # print(process_arguments)
 
     output = run_process(
