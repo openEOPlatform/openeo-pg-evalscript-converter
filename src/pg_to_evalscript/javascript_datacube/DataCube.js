@@ -181,11 +181,10 @@ class DataCube {
         // process: function, accepts `data` (labeled array) and `context` (any)
         const allCoords = this._iterateCoords(this.data.shape)
         for (let coords of allCoords) {
-            const args = coords.concat([process({
+            this.data.set(...coords, process({
                 "x": this.data.get.apply(this.data, coords),
                 context: context
-            })])
-            this.data.set.apply(this.data, args)
+            }))
         }
     }
 
