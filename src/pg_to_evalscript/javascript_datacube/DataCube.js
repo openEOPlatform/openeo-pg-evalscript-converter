@@ -1,5 +1,5 @@
 class DataCube {
-    constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples) {
+    constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples, bands_metadata) {
         this.TEMPORAL = "temporal"
         this.BANDS = "bands"
         this.OTHER = "other"
@@ -19,6 +19,7 @@ class DataCube {
         } else {
             this.data = data;
         }
+        this.bands_metadata = bands_metadata
     }
 
     getDimensionByName(name) {
