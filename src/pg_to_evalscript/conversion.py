@@ -70,6 +70,7 @@ def convert_from_process_graph(
     bands_dimension_name="bands",
     temporal_dimension_name="t",
     encode_result=True,
+    bands_metadata=[],
 ):
     all_nodes_valid, subgraphs = check_validity_and_subgraphs(
         process_graph, temporal_dimension_name, bands_dimension_name
@@ -86,6 +87,7 @@ def convert_from_process_graph(
             sample_type=sample_type,
             units=units,
             encode_result=encode_result,
+            bands_metadata=bands_metadata,
         )
         output_dimensions = evalscript.determine_output_dimensions()
         evalscript.set_output_dimensions(output_dimensions)
@@ -112,6 +114,7 @@ def convert_from_process_graph(
                 sample_type=sample_type,
                 units=units,
                 encode_result=encode_result,
+                bands_metadata=bands_metadata,
             )
             output_dimensions = evalscript.determine_output_dimensions()
             evalscript.set_output_dimensions(output_dimensions)
