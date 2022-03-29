@@ -32,6 +32,21 @@ function ndvi(arguments) {
     allowedTypes: ["string"],
   });
 
+  let nirName, redName;
+  for (let i = 0; i < data.bands_metadata.length; i++) {
+    if (nirName && redName) {
+      break;
+    }
+
+    if (data.bands_metadata[i].common_name === nir) {
+      nirName = data.bands_metadata[i].name;
+    }
+
+    if (data.bands_metadata[i].common_name === red) {
+      redName = data.bands_metadata[i].name;
+    }
+  }
+
   let bandsDim = data.dimensions.find((d) => d.type === data.BANDS);
   if (!bandsDim) {
     throw new ProcessError({
@@ -40,7 +55,7 @@ function ndvi(arguments) {
     });
   }
 
-  if (!bandsDim.labels.includes(nir)) {
+  if (!bandsDim.labels.includes(nirName)) {
     throw new ProcessError({
       name: "NirBandAmbiguous",
       message:
@@ -48,7 +63,7 @@ function ndvi(arguments) {
     });
   }
 
-  if (!bandsDim.labels.includes(red)) {
+  if (!bandsDim.labels.includes(redName)) {
     throw new ProcessError({
       name: "RedBandAmbiguous",
       message:
@@ -65,7 +80,7 @@ function ndvi(arguments) {
 
   const clonedData = data.clone();
   bandsDim = clonedData.dimensions.find((d) => d.type === clonedData.BANDS);
-  const [nirIdx, redIdx] = clonedData.getBandIndices([nir, red]);
+  const [nirIdx, redIdx] = clonedData.getBandIndices([nirName, redName]);
   if (target_band !== null) {
     const newShape = clonedData.getDataShape();
     const axis = clonedData.dimensions.findIndex(
@@ -82,6 +97,7 @@ function ndvi(arguments) {
       const ndvi = (n - r) / (n + r);
       dataArr.splice(newShape[axis] + step * newShape[axis] + step, 0, ndvi);
     }
+
     newShape[axis]++;
     clonedData.data = ndarray(dataArr, newShape);
     return clonedData;
