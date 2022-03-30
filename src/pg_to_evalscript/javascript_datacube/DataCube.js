@@ -83,6 +83,22 @@ class DataCube {
         return indices
     }
 
+    getFilteredTemporalIndices(temporalDimension, start, end) {
+        const temporalLabels = this.getDimensionByName(temporalDimension).labels;
+        const indices = [];
+        for (let i = 0; i < temporalLabels.length; i++) {
+            const date = parse_rfc3339(temporalLabels[i]);
+            if (!date) {
+                throw new Error("Invalid ISO date string.");
+            }
+
+            if (date.value >= start.value && date.value < end.value) {
+                indices.push(i);
+            }
+        }
+        return indices;
+    }
+
     filterBands(bands) {
         const indices = this.getBandIndices(bands);
         const axis = this.dimensions.findIndex((e) => e.name === this.bands_dimension_name);
@@ -96,6 +112,7 @@ class DataCube {
     filterTemporal(extent, dimension) {
         const dim = this.temporal_dimension_name;
         const axis = this.dimensions.findIndex((e) => e.name === dim);
+        const temporalLabels = this.getDimensionByName(dim).labels;
 
         const start = parse_rfc3339(extent[0]);
         const end = parse_rfc3339(extent[1]);
@@ -104,21 +121,10 @@ class DataCube {
             throw new Error("Invalid temporal extent.");
         }
 
-        const temporalLabels = this.getDimensionByName(dim).labels;
-        const indexes = [];
-        for (let i = 0; i < temporalLabels.length; i++) {
-            const date = parse_rfc3339(temporalLabels[i]);
-            if (!date) {
-                throw new Error("Invalid temporal extent.");
-            }
+        const indices = this.getFilteredTemporalIndices(dim, start, end);
 
-            if (date.value >= start.value && date.value < end.value) {
-                indexes.push(i);
-            }
-        }
-
-        this._filter(axis, indexes);
-        this.getDimensionByName(dim).labels = indexes.map(i => temporalLabels[i]);
+        this._filter(axis, indices);
+        this.getDimensionByName(dim).labels = indices.map(i => temporalLabels[i]);
     }
 
     removeDimension(dimension) {

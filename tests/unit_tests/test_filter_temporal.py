@@ -13,9 +13,10 @@ def filter_temporal_process_code():
 @pytest.mark.parametrize(
     "example_input,expected_output",
     [
+        # temporal extent inludes all data
         (
             {
-                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 1, "B02": 2, "B03": 3}, {"B01": 1, "B02": 2, "B03": 3}],
+                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 11, "B02": 12, "B03": 13}, {"B01": 21, "B02": 22, "B03": 23}],
                 "scenes": [
                     {"date":"2022-03-21T00:00:00.000Z"},
                     {"date":"2022-03-19T00:00:00.000Z"},
@@ -37,7 +38,199 @@ def filter_temporal_process_code():
                     {'labels': ['B01', 'B02', 'B03'], 'name': 'bands_name', 'type': 'bands'}
                 ],
                 'data': {
-                    'data': [1, 2, 3, 1, 2, 3, 1, 2, 3],
+                    'data': [1, 2, 3, 11, 12, 13, 21, 22, 23],
+                    'offset': 0,
+                    'shape': [3, 3],
+                    'stride': [3, 1]
+                }
+            },
+        ),
+        # temporal extent is within data range, but includes no data (note it's left-closed)
+        (
+            {
+                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 11, "B02": 12, "B03": 13}, {"B01": 21, "B02": 22, "B03": 33}],
+                "scenes": [
+                    {"date":"2022-03-21T00:00:00.000Z"},
+                    {"date":"2022-03-19T00:00:00.000Z"},
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [
+                    "2022-03-17T00:00:00.000Z",
+                    "2022-03-19T00:00:00.000Z",
+                ],
+            },
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands_name",
+                "temporal_dimension_name": "temporal_name",
+                'dimensions': [
+                    {'labels': [], 'name': 'temporal_name', 'type': 'temporal'},
+                    {'labels': ['B01', 'B02', 'B03'], 'name': 'bands_name', 'type': 'bands'}
+                ],
+                'data': {
+                    'data': [],
+                    'offset': 0,
+                    'shape': [0, 3],
+                    'stride': [3, 1]
+                }
+            },
+        ),
+        # temporal extent is out of data range, includes no data (note it's left-closed)
+        (
+            {
+                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 11, "B02": 12, "B03": 13}, {"B01": 21, "B02": 22, "B03": 33}],
+                "scenes": [
+                    {"date":"2022-03-21T00:00:00.000Z"},
+                    {"date":"2022-03-19T00:00:00.000Z"},
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [
+                    "2022-03-10T00:00:00.000Z",
+                    "2022-03-16T00:00:00.000Z",
+                ],
+            },
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands_name",
+                "temporal_dimension_name": "temporal_name",
+                'dimensions': [
+                    {'labels': [], 'name': 'temporal_name', 'type': 'temporal'},
+                    {'labels': ['B01', 'B02', 'B03'], 'name': 'bands_name', 'type': 'bands'}
+                ],
+                'data': {
+                    'data': [],
+                    'offset': 0,
+                    'shape': [0, 3],
+                    'stride': [3, 1]
+                }
+            },
+        ),
+        # temporal extent inludes end of data range (note it's left-closed)
+        (
+            {
+                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 11, "B02": 12, "B03": 13}, {"B01": 21, "B02": 22, "B03": 33}],
+                "scenes": [
+                    {"date":"2022-03-21T00:00:00.000Z"},
+                    {"date":"2022-03-19T00:00:00.000Z"},
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [
+                    "2022-03-19T00:00:00.000Z",
+                    "2022-03-25T00:00:00.000Z",
+                ],
+            },
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands_name",
+                "temporal_dimension_name": "temporal_name",
+                'dimensions': [
+                    {'labels': ['2022-03-21T00:00:00.000Z', '2022-03-19T00:00:00.000Z'], 'name': 'temporal_name', 'type': 'temporal'},
+                    {'labels': ['B01', 'B02', 'B03'], 'name': 'bands_name', 'type': 'bands'}
+                ],
+                'data': {
+                    'data': [1, 2, 3, 11, 12, 13],
+                    'offset': 0,
+                    'shape': [2, 3],
+                    'stride': [3, 1]
+                }
+            },
+        ),
+        # temporal extent includes middle of data range
+        (
+            {
+                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 11, "B02": 12, "B03": 13}, {"B01": 21, "B02": 22, "B03": 33}],
+                "scenes": [
+                    {"date":"2022-03-21T00:00:00.000Z"},
+                    {"date":"2022-03-19T00:00:00.000Z"},
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [
+                    "2022-03-18T00:00:00.000Z",
+                    "2022-03-20T00:00:00.000Z",
+                ],
+            },
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands_name",
+                "temporal_dimension_name": "temporal_name",
+                'dimensions': [
+                    {'labels': ['2022-03-19T00:00:00.000Z'], 'name': 'temporal_name', 'type': 'temporal'},
+                    {'labels': ['B01', 'B02', 'B03'], 'name': 'bands_name', 'type': 'bands'}
+                ],
+                'data': {
+                    'data': [11, 12, 13],
+                    'offset': 0,
+                    'shape': [1, 3],
+                    'stride': [3, 1]
+                }
+            },
+        ),
+        # temporal extent includes start of data range (note it's left-closed)
+        (
+            {
+                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 11, "B02": 12, "B03": 13}, {"B01": 21, "B02": 22, "B03": 23}],
+                "scenes": [
+                    {"date":"2022-03-21T00:00:00.000Z"},
+                    {"date":"2022-03-19T00:00:00.000Z"},
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [
+                    "2022-03-16T00:00:00.000Z",
+                    "2022-03-19T00:00:00.000Z",
+                ],
+            },
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands_name",
+                "temporal_dimension_name": "temporal_name",
+                'dimensions': [
+                    {'labels': ['2022-03-16T00:00:00.000Z'], 'name': 'temporal_name', 'type': 'temporal'},
+                    {'labels': ['B01', 'B02', 'B03'], 'name': 'bands_name', 'type': 'bands'}
+                ],
+                'data': {
+                    'data': [21, 22, 23],
+                    'offset': 0,
+                    'shape': [1, 3],
+                    'stride': [3, 1]
+                }
+            },
+        ),
+        # temporal extent includes minimum range to include all data (note it's right-closed)
+        (
+            {
+                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 11, "B02": 12, "B03": 13}, {"B01": 21, "B02": 22, "B03": 23}],
+                "scenes": [
+                    {"date":"2022-03-21T00:00:00.000Z"},
+                    {"date":"2022-03-19T00:00:00.000Z"},
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [
+                    "2022-03-16T00:00:00.000Z",
+                    "2022-03-21T00:00:00.001Z",
+                ],
+            },
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands_name",
+                "temporal_dimension_name": "temporal_name",
+                'dimensions': [
+                    {'labels': ['2022-03-21T00:00:00.000Z', '2022-03-19T00:00:00.000Z', '2022-03-16T00:00:00.000Z'], 'name': 'temporal_name', 'type': 'temporal'},
+                    {'labels': ['B01', 'B02', 'B03'], 'name': 'bands_name', 'type': 'bands'}
+                ],
+                'data': {
+                    'data': [1, 2, 3, 11, 12, 13, 21, 22, 23],
                     'offset': 0,
                     'shape': [3, 3],
                     'stride': [3, 1]
