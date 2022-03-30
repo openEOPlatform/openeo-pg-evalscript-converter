@@ -92,7 +92,7 @@ class DataCube {
                 throw new Error("Invalid ISO date string in temporal dimension label.");
             }
 
-            if (date.value >= start.value && date.value < end.value) {
+            if ((start === null || date.value >= start.value) && (end === null || date.value < end.value)) {
                 indices.push(i);
             }
         }
@@ -124,17 +124,33 @@ class DataCube {
         const axis = this.dimensions.findIndex((e) => e.name === dimensionName);
         const temporalLabels = dimension.labels;
 
-        const start = parse_rfc3339(extent[0]);
-        const end = parse_rfc3339(extent[1]);
-
-        if (!start || !end || extent.length !== 2) {
-            throw new Error("Invalid temporal extent. Temporal extent must be an array of exactly two ISO date strings.");
-        }
-
-        const indices = this.getFilteredTemporalIndices(dimensionName, start, end);
+        const parsedExtent = this.parseTemporalExtent(extent);
+        const indices = this.getFilteredTemporalIndices(dimensionName, parsedExtent.start, parsedExtent.end);
 
         this._filter(axis, indices);
         dimension.labels = indices.map(i => temporalLabels[i]);
+    }
+
+    parseTemporalExtent(extent) {
+        if (extent.length !== 2) {
+            throw new Error("Invalid temporal extent. Temporal extent must be an array of exactly two elements.");
+        }
+
+        if (extent[0] === null && extent[1] === null) {
+            throw new Error("Invalid temporal extent. Only one of the boundaries can be null.");
+        }
+
+        const start = parse_rfc3339(extent[0]);
+        const end = parse_rfc3339(extent[1]);
+
+        if ((extent[0] !== null && !start) || (extent[1] !== null && !end)) {
+            throw new Error("Invalid temporal extent. Boundary must be ISO date string or null.");
+        }
+
+        return {
+            start: extent[0] === null ? null : start,
+            end: extent[1] === null ? null : end
+        }
     }
 
     removeDimension(dimension) {

@@ -238,6 +238,72 @@ def filter_temporal_process_code():
                 }
             },
         ),
+        # open end interval
+        (
+            {
+                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 11, "B02": 12, "B03": 13}, {"B01": 21, "B02": 22, "B03": 23}],
+                "scenes": [
+                    {"date":"2022-03-21T00:00:00.000Z"},
+                    {"date":"2022-03-19T00:00:00.000Z"},
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "dimension": "temporal_name",
+                "extent": [
+                    "2022-03-17T00:00:00.000Z",
+                    None,
+                ],
+            },
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands_name",
+                "temporal_dimension_name": "temporal_name",
+                'dimensions': [
+                    {'labels': ['2022-03-21T00:00:00.000Z', '2022-03-19T00:00:00.000Z'], 'name': 'temporal_name', 'type': 'temporal'},
+                    {'labels': ['B01', 'B02', 'B03'], 'name': 'bands_name', 'type': 'bands'}
+                ],
+                'data': {
+                    'data': [1, 2, 3, 11, 12, 13],
+                    'offset': 0,
+                    'shape': [2, 3],
+                    'stride': [3, 1]
+                }
+            },
+        ),
+        # open start interval
+        (
+            {
+                "data": [{"B01": 1, "B02": 2, "B03": 3}, {"B01": 11, "B02": 12, "B03": 13}, {"B01": 21, "B02": 22, "B03": 23}],
+                "scenes": [
+                    {"date":"2022-03-21T00:00:00.000Z"},
+                    {"date":"2022-03-19T00:00:00.000Z"},
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "dimension": "temporal_name",
+                "extent": [
+                    None,
+                    "2022-03-20T00:00:00.000Z",
+                ],
+            },
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands_name",
+                "temporal_dimension_name": "temporal_name",
+                'dimensions': [
+                    {'labels': ['2022-03-19T00:00:00.000Z', '2022-03-16T00:00:00.000Z'], 'name': 'temporal_name', 'type': 'temporal'},
+                    {'labels': ['B01', 'B02', 'B03'], 'name': 'bands_name', 'type': 'bands'}
+                ],
+                'data': {
+                    'data': [11, 12, 13, 21, 22, 23],
+                    'offset': 0,
+                    'shape': [2, 3],
+                    'stride': [3, 1]
+                }
+            },
+        ),
     ],
 )
 def test_filter_temporal(filter_temporal_process_code, example_input, expected_output):
@@ -320,7 +386,7 @@ def test_filter_temporal(filter_temporal_process_code, example_input, expected_o
                 "extent": [],
             },
             True,
-            "Invalid temporal extent. Temporal extent must be an array of exactly two ISO date strings."
+            "Invalid temporal extent. Temporal extent must be an array of exactly two elements."
         ),
         (
             {
@@ -333,7 +399,7 @@ def test_filter_temporal(filter_temporal_process_code, example_input, expected_o
                 ],
             },
             True,
-            "Invalid temporal extent. Temporal extent must be an array of exactly two ISO date strings."
+            "Invalid temporal extent. Temporal extent must be an array of exactly two elements."
         ),
         (
             {
@@ -348,7 +414,35 @@ def test_filter_temporal(filter_temporal_process_code, example_input, expected_o
                 ],
             },
             True,
-            "Invalid temporal extent. Temporal extent must be an array of exactly two ISO date strings."
+            "Invalid temporal extent. Temporal extent must be an array of exactly two elements."
+        ),
+        (
+            {
+                "data": [{"B01": 1}],
+                "scenes": [
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [
+                    None,
+                    None,
+                ],
+            },
+            True,
+            "Invalid temporal extent. Only one of the boundaries can be null."
+        ),
+        (
+            {
+                "data": [{"B01": 1}],
+                "scenes": [
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [
+                    "INVALID_DATE",
+                    None,
+                ],
+            },
+            True,
+            "Invalid temporal extent. Boundary must be ISO date string or null."
         ),
         (
             {
