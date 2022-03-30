@@ -109,10 +109,20 @@ class DataCube {
             );
     }
 
-    filterTemporal(extent, dimension) {
-        const dim = this.temporal_dimension_name;
-        const axis = this.dimensions.findIndex((e) => e.name === dim);
-        const temporalLabels = this.getDimensionByName(dim).labels;
+    filterTemporal(extent, dim) {
+        const dimensionName = dim ? dim : this.temporal_dimension_name;
+        const dimension = this.getDimensionByName(dimensionName);
+
+        if (dimension === undefined) {
+            throw new Error(`Dimension not available.`);
+        }
+
+        if (dimension.type !== this.TEMPORAL) {
+            throw new Error(`Dimension is not of type temporal.`);
+        }
+
+        const axis = this.dimensions.findIndex((e) => e.name === dimensionName);
+        const temporalLabels = dimension.labels;
 
         const start = parse_rfc3339(extent[0]);
         const end = parse_rfc3339(extent[1]);
@@ -121,10 +131,10 @@ class DataCube {
             throw new Error("Invalid temporal extent. Temporal extent must be an array of exactly two ISO date strings.");
         }
 
-        const indices = this.getFilteredTemporalIndices(dim, start, end);
+        const indices = this.getFilteredTemporalIndices(dimensionName, start, end);
 
         this._filter(axis, indices);
-        this.getDimensionByName(dim).labels = indices.map(i => temporalLabels[i]);
+        dimension.labels = indices.map(i => temporalLabels[i]);
     }
 
     removeDimension(dimension) {

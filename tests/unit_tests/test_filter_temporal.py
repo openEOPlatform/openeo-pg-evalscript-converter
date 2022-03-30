@@ -22,6 +22,7 @@ def filter_temporal_process_code():
                     {"date":"2022-03-19T00:00:00.000Z"},
                     {"date":"2022-03-16T00:00:00.000Z"},
                 ],
+                "dimension": "temporal_name",
                 "extent": [
                     "2022-03-10T00:00:00.000Z",
                     "2022-03-25T00:00:00.000Z",
@@ -277,6 +278,21 @@ def test_filter_temporal(filter_temporal_process_code, example_input, expected_o
                 "scenes": [
                     {"date":"2022-03-16T00:00:00.000Z"},
                 ],
+                "extent": [
+                    "2022-03-10T00:00:00.000Z",
+                    "2022-03-25T00:00:00.000Z",
+                ],
+                "dimension": "temporal_name",
+            },
+            False,
+            None,
+        ),
+        (
+            {
+                "data": [{"B01": 1}],
+                "scenes": [
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
             },
             True,
             "MISSING_PARAMETER"
@@ -344,7 +360,6 @@ def test_filter_temporal(filter_temporal_process_code, example_input, expected_o
                     "2022-03-10T00:00:00.000Z",
                     "2022-03-25T00:00:00.000Z",
                 ],
-                "dimension": "temporal"
             },
             False,
             None,
@@ -363,6 +378,36 @@ def test_filter_temporal(filter_temporal_process_code, example_input, expected_o
             },
             True,
             "WRONG_TYPE",
+        ),
+        (
+            {
+                "data": [{"B01": 1}],
+                "scenes": [
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [
+                    "2022-03-10T00:00:00.000Z",
+                    "2022-03-25T00:00:00.000Z",
+                ],
+                "dimension": "NON_EXISTENT_DIMENSION",
+            },
+            True,
+            "Dimension not available.",
+        ),
+        (
+            {
+                "data": [{"B01": 1}],
+                "scenes": [
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [
+                    "2022-03-10T00:00:00.000Z",
+                    "2022-03-25T00:00:00.000Z",
+                ],
+                "dimension": "bands_name",
+            },
+            True,
+            "Dimension is not of type temporal.",
         ),
     ],
 )
