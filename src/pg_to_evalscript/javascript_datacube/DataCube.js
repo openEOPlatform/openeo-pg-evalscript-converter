@@ -89,7 +89,7 @@ class DataCube {
         for (let i = 0; i < temporalLabels.length; i++) {
             const date = parse_rfc3339(temporalLabels[i]);
             if (!date) {
-                throw new Error("Invalid ISO date string.");
+                throw new Error("Invalid ISO date string in temporal dimension label.");
             }
 
             if (date.value >= start.value && date.value < end.value) {
@@ -117,8 +117,8 @@ class DataCube {
         const start = parse_rfc3339(extent[0]);
         const end = parse_rfc3339(extent[1]);
 
-        if (!start || !end) {
-            throw new Error("Invalid temporal extent.");
+        if (!start || !end || extent.length !== 2) {
+            throw new Error("Invalid temporal extent. Temporal extent must be an array of exactly two ISO date strings.");
         }
 
         const indices = this.getFilteredTemporalIndices(dim, start, end);

@@ -257,12 +257,119 @@ def test_filter_temporal(filter_temporal_process_code, example_input, expected_o
 @pytest.mark.parametrize(
     "example_input,raises_exception,error_message",
     [
+         (
+            {
+                "data": [{"B01": 1}],
+                "scenes": [
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [
+                    "2022-03-10T00:00:00.000Z",
+                    "2022-03-25T00:00:00.000Z",
+                ],
+            },
+            False,
+            None,
+        ),
+        (
+            {
+                "data": [{"B01": 1}],
+                "scenes": [
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+            },
+            True,
+            "MISSING_PARAMETER"
+        ),
+        (
+            {
+                "data": [{"B01": 1}],
+                "scenes": [
+                    {"date":"INVALID_DATE_FORMAT"},
+                ],
+                "extent": [
+                    "2022-03-10T00:00:00.000Z",
+                    "2022-03-25T00:00:00.000Z",
+                ],
+            },
+            True,
+            "Invalid ISO date string in temporal dimension label.",
+        ),
+        (
+            {
+                "data": [{"B01": 1}],
+                "scenes": [
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [],
+            },
+            True,
+            "Invalid temporal extent. Temporal extent must be an array of exactly two ISO date strings."
+        ),
+        (
+            {
+                "data": [{"B01": 1}],
+                "scenes": [
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [
+                    "2022-03-10T00:00:00.000Z",
+                ],
+            },
+            True,
+            "Invalid temporal extent. Temporal extent must be an array of exactly two ISO date strings."
+        ),
+        (
+            {
+                "data": [{"B01": 1}],
+                "scenes": [
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [
+                    "2022-03-10T00:00:00.000Z",
+                    "2022-03-10T00:00:00.000Z",
+                    "2022-03-25T00:00:00.000Z",
+                ],
+            },
+            True,
+            "Invalid temporal extent. Temporal extent must be an array of exactly two ISO date strings."
+        ),
+        (
+            {
+                "data": [{"B01": 1}],
+                "scenes": [
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [
+                    "2022-03-10T00:00:00.000Z",
+                    "2022-03-25T00:00:00.000Z",
+                ],
+                "dimension": "temporal"
+            },
+            False,
+            None,
+        ),
+        (
+            {
+                "data": [{"B01": 1}],
+                "scenes": [
+                    {"date":"2022-03-16T00:00:00.000Z"},
+                ],
+                "extent": [
+                    "2022-03-10T00:00:00.000Z",
+                    "2022-03-25T00:00:00.000Z",
+                ],
+                "dimension": 15
+            },
+            True,
+            "WRONG_TYPE",
+        ),
     ],
 )
 def test_filter_temporal_exceptions(filter_temporal_process_code, example_input, raises_exception, error_message):
     additional_js_code_to_run = (
         load_datacube_code()
-        + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
+        + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true, {example_input['scenes']});"
     )
     process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
     if raises_exception:
