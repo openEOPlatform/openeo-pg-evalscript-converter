@@ -15,12 +15,12 @@ def with_stdout_call(code):
     return f"\nprocess.stdout.write(JSON.stringify({code}))"
 
 
-def get_execute_test_script(example_input):
-    return with_stdout_call(f"evaluatePixel({json.dumps(example_input)})")
+def get_execute_test_script(example_input, scenes=None):
+    return with_stdout_call(f"evaluatePixel({json.dumps(example_input)}, {json.dumps(scenes)})")
 
 
-def run_evalscript(evalscript, example_input):
-    return run_javascript(evalscript + get_execute_test_script(example_input))
+def run_evalscript(evalscript, example_input, scenes=None):
+    return run_javascript(evalscript + get_execute_test_script(example_input, scenes))
 
 
 def run_process(process_code, process_name, example_input):
