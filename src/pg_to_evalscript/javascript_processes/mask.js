@@ -27,54 +27,44 @@ function mask(arguments) {
   // must also be available in the raster data cube with the same
   // name, type, reference system, resolution and labels.
 
-  // check that each dimension, present in both data and mask,
-  // have the same: name, type, reference system, resolution and labels
+  // check that each dimension, present in mask
+  // - is present in data
+  // - has the same:
+  //    - name, (taken care of by searching for dimension by name)
+  //    - type,
+  //    - reference system, (not sure how to check that)
+  //    - resolution, (not sure how to check that)
+  //    - labels
 
+  for (let maskDim of mask.dimensions) {
+    const dataDim = data.getDimensionByName(maskDim.name);
 
-  // for (let dimension of cube1.dimensions) {
-  //   const dimension2 = cube2.getDimensionByName(dimension.name);
+    if (!dataDim) {
+      throw new Error(`Dimension \`${maskDim.name}\` from argument \`mask\` not in argument \`data\`.`);
+    }
 
-  //   if (!dimension2) {
-  //     throw new Error(`dimension \`${dimension.name}\` from argument \`data\` not in argument \`mask\`.`);
-  //   }
+    if (maskDim.type !== dataDim.type) {
+      throw new Error(`Type of the dimension \`${maskDim.name}\` from argument \`mask\` is not the same as in argument \`data\`.`);
+    }
 
-  //   if (dimension.type !== dimension2.type){
-  //     throw new Error(`dimension \`${dimension.name}\` from argument \`data\` not of same type as in argument \`mask\`.`);
-  //   }
-
-  //   if (dimension.labels.length !== dimension2.labels.length || dimension.labels.every((l) => dimension2.labels.includes(l))) {
-  //     throw new Error(`labels for dimension \`${dimension.name}\` from argument \`data\` not same as in argument \`mask\`.`);
-  //   }
-
-  // }
-
-
-  // replace pixel in data if the corresponding pixel in mask is
-  // non-zero (for numbers) or true (for boolean values)
+    if (maskDim.labels.length !== dataDim.labels.length || !maskDim.labels.every((l) => dataDim.labels.includes(l))) {
+      throw new Error(`Labels for dimension \`${maskDim.name}\` from argument \`mask\` are not the same as in argument \`data\`.`);
+    }
+  }
 
   let newData = data.clone();
-
   let flatData = newData.flattenToArray();
   let flatMask = mask.flattenToArray();
   const replacement_val = replacement === undefined ? null : replacement;
 
-  // console.log('data within json', JSON.stringify({
-  //   data
-  //   // d: newData.data,
-  //   // flatData, 
-  //   // flatMask
-  // }));
-
-
-  for(let i=0; i<flatData.length; i++){
+  // replace pixel in data if the corresponding pixel in mask is
+  // non-zero (for numbers) or true (for boolean values)
+  for (let i = 0; i < flatData.length; i++) {
     const shouldBeReplaced = (typeof flatMask[i] === 'number' && flatMask[i] !== 0) || (typeof flatMask[i] === 'boolean' && flatMask[i] === true);
-    if(shouldBeReplaced){
+    if (shouldBeReplaced) {
       flatData[i] = replacement_val;
     }
   }
-
-
-
 
   return newData;
 }
