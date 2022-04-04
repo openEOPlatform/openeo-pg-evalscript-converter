@@ -11,7 +11,7 @@ function merge_cubes(arguments) {
   }
 
   if (overlap_resolver && context) {
-    overlap_resolver.context = { ...context, ...overlap_resolver.context };
+    overlap_resolver.context = Object.assign(context, overlap_resolver.context);
   }
 
   for (let dimension of cube1.dimensions) {
