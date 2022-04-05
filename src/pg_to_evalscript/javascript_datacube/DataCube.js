@@ -131,6 +131,22 @@ class DataCube {
         dimension.labels = indices.map(i => temporalLabels[i]);
     }
 
+    aggregateTemporal(intervals, reducer, labels, dim, context) {
+        const dimensionName = dim ? dim : this.temporal_dimension_name;
+        const dimension = this.getDimensionByName(dimensionName);
+
+        const axis = this.dimensions.findIndex((e) => e.name === dimensionName);
+        
+        for (let interval of intervals) {
+            let parsedInterval = this.parseTemporalExtent(interval);
+
+            const indices = this.getFilteredTemporalIndices(dimensionName, parsedInterval.start, parsedInterval.end);
+            
+            // todo
+        }
+    }
+
+
     parseTemporalExtent(extent) {
         if (extent.length !== 2) {
             throw new Error("Invalid temporal extent. Temporal extent must be an array of exactly two elements.");
