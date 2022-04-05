@@ -131,19 +131,18 @@ class DataCube {
         dimension.labels = indices.map(i => temporalLabels[i]);
     }
 
-    aggregateTemporal(intervals, reducer, labelsz, dim, context) {
-        const dimensionName = dim ? dim : this.temporal_dimension_name;
+    aggregateTemporal(intervals, reducer, labels, dim, context) {
+        const dimensionName = dim ? dim : this.dimensions.filter(d => d.type === this.TEMPORAL)[0].name;
         const dimension = this.getDimensionByName(dimensionName);
 
         const axis = this.dimensions.findIndex((e) => e.name === dimensionName);
-
         const data = this.data;
-        const labels = this.dimensions[axis].labels;
-
         const newValues = [];
+        const computedLabels = [];
 
         for (let interval of intervals) {
-            let parsedInterval = this.parseTemporalExtent(interval);
+            computedLabels.push(interval[0]);
+            const parsedInterval = this.parseTemporalExtent(interval);
             const indices = this.getFilteredTemporalIndices(dimensionName, parsedInterval.start, parsedInterval.end);
 
             const allCoords = this._iterateCoords(data.shape.slice(), [axis]);
@@ -151,18 +150,18 @@ class DataCube {
                 const entireDataToReduce = convert_to_1d_array(data.pick.apply(data, coord));
                 const dataToReduce = indices.map((index) => entireDataToReduce[index]);
 
-                // dataToReduce.labels = labels;
                 const newVals = reducer({
                     data: dataToReduce,
-                    context: context
+                    context: context,
                 });
-                newValues.push(newVals)
+                newValues.push(newVals);
             }
         }
 
-        const newShape = data.shape.slice()
+        const newShape = data.shape.slice();
         newShape[axis] = intervals.length;
         this.data = ndarray(newValues, newShape);
+        dimension.labels = labels && labels.length > 0 ? labels : computedLabels;
     }
 
     parseTemporalExtent(extent) {

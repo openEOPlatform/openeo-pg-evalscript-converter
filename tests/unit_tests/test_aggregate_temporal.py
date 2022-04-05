@@ -45,7 +45,27 @@ def scenes():
             },
             {
                 'dimensions': [
-                    {'labels': ['2022-03-21T00:00:00.000Z', '2022-03-19T00:00:00.000Z', '2022-03-16T00:00:00.000Z'], 'name': 'temporal_name', 'type': 'temporal'},
+                    {'labels': ['2022-03-16T00:00:00.000Z', '2022-03-18T00:00:00.000Z'], 'name': 'temporal_name', 'type': 'temporal'},
+                    {'labels': ['B01', 'B02'], 'name': 'bands_name', 'type': 'bands'}
+                ],
+                'data': {
+                    'data': [16, 5, 18, 1],
+                }
+            },
+        ),
+        (
+            {
+                "intervals": [
+                    [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
+                    [ "2022-03-18T00:00:00.000Z", "2022-03-22T00:00:00.000Z" ],
+                ],
+                "labels": [ "interval1", "interval2" ],
+                "reducer": "({data})=>{return Math.min(...data)}",
+                "dimension": "temporal_name",
+            },
+            {
+                'dimensions': [
+                    {'labels': ['interval1', 'interval2'], 'name': 'temporal_name', 'type': 'temporal'},
                     {'labels': ['B01', 'B02'], 'name': 'bands_name', 'type': 'bands'}
                 ],
                 'data': {
@@ -67,7 +87,7 @@ def test_aggregate_temporal(aggregate_temporal_process_code, data, scenes, examp
         process_arguments,
     )
     output = json.loads(output)
-    # assert output['dimensions'] == expected_output['dimensions']
+    assert output['dimensions'] == expected_output['dimensions']
     assert output['data']['data'] == expected_output['data']['data']
 
 
