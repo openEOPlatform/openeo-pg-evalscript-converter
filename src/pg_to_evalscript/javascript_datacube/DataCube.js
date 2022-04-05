@@ -143,11 +143,10 @@ class DataCube {
         dimension.labels = indices.map(i => temporalLabels[i]);
     }
 
-    aggregateTemporal(intervals, reducer, labels, dim, context) {
-        const dimensionName = dim ? dim : this.dimensions.filter(d => d.type === this.TEMPORAL)[0].name;
-        const dimension = this.getDimensionByName(dimensionName);
+    aggregateTemporal(intervals, reducer, labels, dimensionName, context) {
+        const dimension = dimensionName ? this.getDimensionByName(dimensionName) : this.getTemporalDimension();
 
-        const axis = this.dimensions.findIndex((e) => e.name === dimensionName);
+        const axis = this.dimensions.findIndex((e) => e.name === dimension.name);
         const data = this.data;
         const newValues = [];
         const computedLabels = [];
@@ -155,7 +154,7 @@ class DataCube {
         for (let interval of intervals) {
             computedLabels.push(interval[0]);
             const parsedInterval = this.parseTemporalExtent(interval);
-            const indices = this.getFilteredTemporalIndices(dimensionName, parsedInterval.start, parsedInterval.end);
+            const indices = this.getFilteredTemporalIndices(dimension.name, parsedInterval.start, parsedInterval.end);
 
             const allCoords = this._iterateCoords(data.shape.slice(), [axis]);
             for (let coord of allCoords) {
