@@ -131,21 +131,39 @@ class DataCube {
         dimension.labels = indices.map(i => temporalLabels[i]);
     }
 
-    aggregateTemporal(intervals, reducer, labels, dim, context) {
+    aggregateTemporal(intervals, reducer, labelsz, dim, context) {
         const dimensionName = dim ? dim : this.temporal_dimension_name;
         const dimension = this.getDimensionByName(dimensionName);
 
         const axis = this.dimensions.findIndex((e) => e.name === dimensionName);
-        
+
+        const data = this.data;
+        const labels = this.dimensions[axis].labels;
+
+        const newValues = [];
+
         for (let interval of intervals) {
             let parsedInterval = this.parseTemporalExtent(interval);
-
             const indices = this.getFilteredTemporalIndices(dimensionName, parsedInterval.start, parsedInterval.end);
-            
-            // todo
-        }
-    }
 
+            const allCoords = this._iterateCoords(data.shape.slice(), [axis]);
+            for (let coord of allCoords) {
+                const entireDataToReduce = convert_to_1d_array(data.pick.apply(data, coord));
+                const dataToReduce = indices.map((index) => entireDataToReduce[index]);
+
+                // dataToReduce.labels = labels;
+                const newVals = reducer({
+                    data: dataToReduce,
+                    context: context
+                });
+                newValues.push(newVals)
+            }
+        }
+
+        const newShape = data.shape.slice()
+        newShape[axis] = intervals.length;
+        this.data = ndarray(newValues, newShape);
+    }
 
     parseTemporalExtent(extent) {
         if (extent.length !== 2) {

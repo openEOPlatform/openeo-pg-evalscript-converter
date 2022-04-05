@@ -60,7 +60,7 @@ def test_aggregate_temporal(aggregate_temporal_process_code, data, scenes, examp
         load_datacube_code()
         + f"const cube = new DataCube({data}, 'bands_name', 'temporal_name', true, {scenes});"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'scenes': {scenes}}}"
+    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'scenes': {scenes}, 'reducer': {example_input['reducer']}}}"
     output = run_process(
         aggregate_temporal_process_code + additional_js_code_to_run,
         "aggregate_temporal",
