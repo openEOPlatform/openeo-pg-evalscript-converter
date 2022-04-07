@@ -164,14 +164,28 @@ class DataCube {
 
     aggregateTemporal(intervals, reducer, labels, dimensionName, context) {
         const dimension = dimensionName ? this.getDimensionByName(dimensionName) : this.getTemporalDimension();
+        if (dimension === undefined) {
+            throw new Error(`Dimension not available.`);
+        }
+        if (dimension.type !== this.TEMPORAL) {
+            throw new Error(`Dimension is not of type temporal.`);
+        }
 
         const axis = this.dimensions.findIndex((e) => e.name === dimension.name);
         const data = this.data;
         const newValues = [];
         const computedLabels = [];
 
+        if (labels && labels.length > 0 && labels.length !== intervals.length) {
+            throw new Error('Number of labels must match number of intervals');
+        }
+
         for (let interval of intervals) {
+            if ((!labels || labels.length === 0) && computedLabels.includes(interval[0])) {
+                throw new Error('Distinct dimension labels required');
+            }
             computedLabels.push(interval[0]);
+
             const parsedInterval = this.parseTemporalExtent(interval);
             const indices = this.getFilteredTemporalIndices(dimension.name, parsedInterval.start, parsedInterval.end);
 

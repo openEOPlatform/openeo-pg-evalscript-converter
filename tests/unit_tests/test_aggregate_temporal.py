@@ -94,14 +94,93 @@ def test_aggregate_temporal(aggregate_temporal_process_code, data, scenes, examp
 @pytest.mark.parametrize(
     "example_input,raises_exception,error_message",
     [
+        (
+            {
+                "intervals": [
+                    [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
+                ],
+                "reducer": "({data}) => data.length",
+            },
+            False,
+            None,
+        ),
+        (
+            {
+                "reducer": "({data}) => data.length",
+            },
+            True,
+            "MISSING_PARAMETER",
+        ),
+        (
+            {
+                "intervals": False,
+                "reducer": "({data}) => data.length",
+            },
+            True,
+            "NOT_ARRAY",
+        ),
+        (
+            {
+                "intervals": [
+                    [ "INVALID_INTERVAL" ],
+                ],
+                "reducer": "({data}) => data.length",
+            },
+            True,
+            "Invalid temporal extent.",
+        ),
+        (
+            {
+                "intervals": [
+                    [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
+                ],
+                "reducer": "({data}) => data.length",
+                "labels": [ "interval1", "interval2" ],
+            },
+            True,
+            "Number of labels must match number of intervals",
+        ),
+        (
+            {
+                "intervals": [
+                    [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
+                    [ "2022-03-16T00:00:00.000Z", "2022-03-20T00:00:00.000Z" ],
+                ],
+                "reducer": "({data}) => data.length",
+            },
+            True,
+            "Distinct dimension labels required",
+        ),
+        (
+            {
+                "intervals": [
+                    [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
+                ],
+                "reducer": "({data}) => data.length",
+                "dimension": "NON_EXISTENT_DIMENSION",
+            },
+            True,
+            "Dimension not available.",
+        ),
+        (
+            {
+                "intervals": [
+                    [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
+                ],
+                "reducer": "({data}) => data.length",
+                "dimension": "bands_name",
+            },
+            True,
+            "Dimension is not of type temporal.",
+        ),
     ],
 )
-def test_aggregate_temporal_exceptions(aggregate_temporal_process_code, example_input, raises_exception, error_message):
+def test_aggregate_temporal_exceptions(aggregate_temporal_process_code, data, scenes, example_input, raises_exception, error_message):
     additional_js_code_to_run = (
         load_datacube_code()
-        + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true, {example_input['scenes']});"
+        + f"const cube = new DataCube({data}, 'bands_name', 'temporal_name', true, {scenes});"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
+    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'scenes': {scenes}, 'reducer': {example_input['reducer']}}}"
     if raises_exception:
         with pytest.raises(Exception) as exc:
             run_process(
