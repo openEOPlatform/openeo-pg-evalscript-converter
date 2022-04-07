@@ -36,17 +36,14 @@ class DataCube {
         return this.dimensions.find(d => d.name === name)
     }
 
-    getTemporalDimension() {
+    getTemporalDimensions() {
         const temporalDimensions = this.dimensions.filter(d => d.type === this.TEMPORAL);
 
         if (temporalDimensions.length === 0) {
             throw new Error("No temporal dimension found.");
         }
-        if (temporalDimensions.length > 1) {
-            throw new Error(`Too many temporal dimensions found`);
-        }
 
-        return temporalDimensions[0];
+        return temporalDimensions;
     }
 
     setDimensionLabels(dimension, labels) {
@@ -123,16 +120,28 @@ class DataCube {
     }
 
     filterTemporal(extent, dimensionName) {
-        const dimension = dimensionName ? this.getDimensionByName(dimensionName) : this.getTemporalDimension();
+        if (dimensionName) {
+            const dimension = this.getDimensionByName(dimensionName);
 
-        if (dimension === undefined) {
-            throw new Error(`Dimension not available.`);
+            if (dimension === undefined) {
+                throw new Error(`Dimension not available.`);
+            }
+
+            if (dimension.type !== this.TEMPORAL) {
+                throw new Error(`Dimension is not of type temporal.`);
+            }
+
+            this._filterTemporalByDimension(extent, dimension);
+
+        } else {
+            const dimensions = this.getTemporalDimensions();
+            for (let dimension of dimensions) {
+                this._filterTemporalByDimension(extent, dimension);
+            }
         }
+    }
 
-        if (dimension.type !== this.TEMPORAL) {
-            throw new Error(`Dimension is not of type temporal.`);
-        }
-
+    _filterTemporalByDimension(extent, dimension) {
         const axis = this.dimensions.findIndex((e) => e.name === dimension.name);
         const temporalLabels = dimension.labels;
 
