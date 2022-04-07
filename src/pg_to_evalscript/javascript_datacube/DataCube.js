@@ -36,6 +36,16 @@ class DataCube {
         return this.dimensions.find(d => d.name === name)
     }
 
+    getTemporalDimension() {
+        const temporalDimensions = this.getTemporalDimensions();
+
+        if (temporalDimensions.length > 1) {
+            throw new Error(`Too many temporal dimensions found`);
+        }
+
+        return temporalDimensions[0];
+    }
+
     getTemporalDimensions() {
         const temporalDimensions = this.dimensions.filter(d => d.type === this.TEMPORAL);
 
