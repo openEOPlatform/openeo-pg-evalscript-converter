@@ -125,12 +125,6 @@ class Node:
 
     def write_process(self):
         process_definition = self.load_process_code()
-
-        #         if process_definition is None:
-        #             return f"""function {self.get_process_function_name()}(arguments) {{
-        #     const {{lmao}} = arguments;
-        #     return lmao + 42;
-        # }}"""
         return self.indent_by_level(process_definition)
 
     def write_call(self):
