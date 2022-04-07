@@ -41,7 +41,7 @@ def scenes():
                     [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
                     [ "2022-03-18T00:00:00.000Z", "2022-03-22T00:00:00.000Z" ],
                 ],
-                "reducer": "({data})=>{return Math.min(...data)}",
+                "reducer": "({data})=>{ return data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0) }",
             },
             {
                 'dimensions': [
@@ -49,7 +49,7 @@ def scenes():
                     {'labels': ['B01', 'B02'], 'name': 'bands_name', 'type': 'bands'}
                 ],
                 'data': {
-                    'data': [16, 5, 18, 1],
+                    'data': [16.5, 5.5, 19.5, 2.5],
                 }
             },
         ),
@@ -60,7 +60,7 @@ def scenes():
                     [ "2022-03-18T00:00:00.000Z", "2022-03-22T00:00:00.000Z" ],
                 ],
                 "labels": [ "interval1", "interval2" ],
-                "reducer": "({data})=>{return Math.min(...data)}",
+                "reducer": "({data})=>{ return data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0) }",
                 "dimension": "temporal_name",
             },
             {
@@ -69,7 +69,7 @@ def scenes():
                     {'labels': ['B01', 'B02'], 'name': 'bands_name', 'type': 'bands'}
                 ],
                 'data': {
-                    'data': [16, 5, 18, 1],
+                    'data': [16.5, 5.5, 19.5, 2.5],
                 }
             },
         ),
