@@ -100,16 +100,21 @@ class DataCube {
         const finalShape = this.getDataShape()
         finalShape[dimension]++;
         
+        const finalData = this.insertIntoDimension(dataToAdd, finalShape[dimension], finalShape[dimension] - 1)     
+        this.data = ndarray(finalData, finalShape)
+    }
+
+    insertIntoDimension(dataToAdd, dimensionSize, locationInDimension) {
         const dataArr = this.data.data;
         for (let i = 0; i < dataToAdd.length; i++) {
             dataArr.splice(
-                i * finalShape[dimension] + finalShape[dimension] - 1, 
+                i * dimensionSize + locationInDimension, 
                 0, 
                 dataToAdd[i]
-                );
-            }
-            
-        this.data = ndarray(dataArr, finalShape)
+            );
+        }
+
+        return dataArr;
     }
 
     clone() {
