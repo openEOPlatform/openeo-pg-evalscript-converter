@@ -96,15 +96,15 @@ class DataCube {
         })
     }
 
-    extendDimensionWithData(axis, dataToAdd) {
+    extendFinalDimensionWithData(axis, dataToAdd) {
         const finalShape = this.getDataShape()
         finalShape[axis]++;
         
-        const finalData = this.insertIntoDimension(dataToAdd, finalShape[axis], finalShape[axis] - 1)     
+        const finalData = this.insertIntoFinalDimension(dataToAdd, finalShape[axis], finalShape[axis] - 1)     
         this.data = ndarray(finalData, finalShape)
     }
 
-    insertIntoDimension(dataToAdd, dimensionSize, locationInDimension) {
+    insertIntoFinalDimension(dataToAdd, dimensionSize, locationInDimension) {
         const dataArr = this.data.data;
         for (let i = 0; i < dataToAdd.length; i++) {
             dataArr.splice(
