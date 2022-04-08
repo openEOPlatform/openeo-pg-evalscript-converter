@@ -14,7 +14,8 @@ convert_from_process_graph(
     sample_type="FLOAT32",
     units=None,
     bands_dimension_name="bands",
-    temporal_dimension_name="t"
+    temporal_dimension_name="t",
+    bands_metadata=[]
 )
 ```
 
@@ -43,6 +44,10 @@ convert_from_process_graph(
 * **`temporal_dimension_name`**: *str, optional*. Default: `t`
 
     Name of the default dimension of type `temporal` of the datacube, as set in `load_collection` and referred to in the openEO process graph.
+
+* **`bands_metadata`**: *list, optional*. Default: `[]`
+
+    List of metadata information for all bands of a certain collection.
 
 * **`encode_result`**: *bool, optional*. Default: `True`
 
