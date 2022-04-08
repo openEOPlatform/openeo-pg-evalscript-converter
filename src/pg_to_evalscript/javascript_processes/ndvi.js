@@ -32,8 +32,8 @@ function ndvi(arguments) {
     allowedTypes: ["string"],
   });
 
-  const nirBand = data.getBand({ commonName: nir });
-  const redBand = data.getBand({ commonName: red });
+  const nirBand = data.getBand({ name: nir, commonName: nir });
+  const redBand = data.getBand({ name: red, commonName: red });
   const nirName = nirBand ? nirBand.name : undefined;
   const redName = redBand ? redBand.name : undefined;
 
