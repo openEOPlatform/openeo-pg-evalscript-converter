@@ -192,7 +192,10 @@ class DataCube {
             const allCoords = this._iterateCoords(data.shape.slice(), [axis]);
             for (let coord of allCoords) {
                 const entireDataToReduce = convert_to_1d_array(data.pick.apply(data, coord));
-                const dataToReduce = indices.map((index) => entireDataToReduce[index]);
+                const dataToReduce = []; 
+                for (let index of indices) {
+                    dataToReduce.push(entireDataToReduce[index]);
+                }
 
                 const newVals = reducer({
                     data: dataToReduce,
