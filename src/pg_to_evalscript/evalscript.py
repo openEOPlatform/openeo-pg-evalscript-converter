@@ -81,7 +81,7 @@ function evaluatePixel(samples) {{
         return pkgutil.get_data("pg_to_evalscript", f"javascript_datacube/ndarray.js").decode("utf-8")
 
     def write_datacube_creation(self):
-        return f"let {self.initial_data_name} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {self.bands_metadata})"
+        return f"let {self.initial_data_name} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {json.dumps(self.bands_metadata)})"
 
     def write_update_output(self):
         if self._output_dimensions is None:
