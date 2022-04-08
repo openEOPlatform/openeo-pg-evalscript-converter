@@ -119,6 +119,10 @@ convert_from_process_graph(
 
     Should the result of the evalscript be encoded with the dimensions of the data or returned as is.
 
+* **`bands_metadata`**: *list, optional*. Default: `[]`
+
+    List of metadata information for all bands of a certain collection.
+
 ###### Methods
 
 * **`write()`**:
