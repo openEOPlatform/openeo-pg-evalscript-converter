@@ -30,8 +30,8 @@ from tests.utils import (
             [{"B01": 0.5, "B02": 0.75}, {"B01": 0, "B02": 1}, {"B01": -3, "B02": 4}, {"B01": None, "B02": None}],
             [1, 1.5, 0, 2, 0, 2, None, None],
         ),
-        ("test_graph_1", [], [None]),
-        ("test_mean_of_mean", [{"B04": 0, "B08":1}, {"B04":2, "B08":3}, {"B04":3, "B08":5}, {"B04":1, "B08": 4}], [2.375]),
+        ("test_graph_1", [], []),
+        ("test_mean_of_mean", [{"B04": 0, "B08":1}, {"B04":2, "B08":3}, {"B04":3, "B08":5}, {"B04":1, "B08": 4}], 2.375),
         (
             "test_count_with_condition",
             [{"B01": 0, "B02": 1}, {"B01": 2, "B02": 3}, {"B01": 4, "B02": 5}, {"B01": None, "B02": None}],
@@ -57,9 +57,55 @@ def test_convertable_process_graphs(pg_name, example_input, expected_output):
     assert len(result) == 1 and result[0]["invalid_node_id"] is None
 
     evalscript = result[0]["evalscript"].write()
+
     output = run_evalscript(evalscript, example_input)
     output = json.loads(output)
     
+    assert output == expected_output
+
+
+@pytest.mark.parametrize(
+    "pg_name,example_input,scenes,expected_output",
+    [
+        (
+            "test_filter_temporal",
+            [
+                {"B01": 3, "B02": 3},
+                {"B01": 5, "B02": 1}
+            ],
+            [
+                {"date":"2022-03-21T00:00:00.000Z"},
+                {"date":"2022-03-19T00:00:00.000Z"},
+            ],
+            [5, 1],
+        ),
+        (
+            "test_filter_temporal",
+            [
+                {"B01": -0.1, "B02": 0.15},
+                {"B01": 0, "B02": 2},
+                {"B01": -1, "B02": -2}
+            ],
+            [
+                {"date":"2022-03-21T00:00:00.000Z"},
+                {"date":"2022-03-19T00:00:00.000Z"},
+                {"date":"2022-03-16T00:00:00.000Z"},
+            ],
+            [0, 2, -1, -2],
+        ),
+    ],
+)
+def test_process_graphs_with_scenes(pg_name, example_input, scenes, expected_output):
+    process_graph = get_process_graph_json(pg_name)
+    result = convert_from_process_graph(process_graph, encode_result=False)
+
+    assert len(result) == 1 and result[0]["invalid_node_id"] is None
+
+    evalscript = result[0]["evalscript"].write()
+
+    output = run_evalscript(evalscript, example_input, scenes)
+    output = json.loads(output)
+
     assert output == expected_output
 
 

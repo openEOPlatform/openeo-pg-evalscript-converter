@@ -11,25 +11,25 @@ def get_process_graph_json(name):
         return json.load(f)
 
 
-def get_execute_test_script(example_input):
-    return f"""
-process.stdout.write(JSON.stringify(evaluatePixel({json.dumps(example_input)})));
-"""
+def with_stdout_call(code):
+    return f"\nprocess.stdout.write(JSON.stringify({code}))"
 
 
-def run_evalscript(evalscript, example_input):
-    return run_javascript(evalscript + get_execute_test_script(example_input))
+def get_execute_test_script(example_input, scenes=None):
+    return with_stdout_call(f"evaluatePixel({json.dumps(example_input)}, {json.dumps(scenes)})")
+
+
+def run_evalscript(evalscript, example_input, scenes=None):
+    return run_javascript(evalscript + get_execute_test_script(example_input, scenes))
 
 
 def run_process(process_code, process_name, example_input):
     input_arguments = json.dumps(example_input) if type(example_input) is dict else example_input
-    return run_javascript(
-        process_code + f"process.stdout.write(JSON.stringify({process_name}({input_arguments})))"
-    )
+    return run_javascript(process_code + with_stdout_call(f"{process_name}({input_arguments})"))
 
 
 def get_evalscript_input_object(evalscript):
-    return json.loads(run_javascript(evalscript + f"\nprocess.stdout.write(JSON.stringify(setup()))"))
+    return json.loads(run_javascript(evalscript + with_stdout_call("setup()")))
 
 
 def run_javascript(javascript_code):

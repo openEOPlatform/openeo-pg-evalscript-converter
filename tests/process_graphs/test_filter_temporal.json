@@ -1,0 +1,23 @@
+{
+  "loadcollection": {
+    "process_id": "load_collection",
+    "arguments": {
+      "spatial_extent": null,
+      "id": "S2L2A",
+      "temporal_extent": null,
+      "bands": ["B01", "B02"]
+    }
+  },
+  "filter_temporal1": {
+    "process_id": "filter_temporal",
+    "arguments": {
+      "data": {
+        "from_node": "loadcollection"
+      },
+      "extent": [
+        "2022-03-10T00:00:00.000Z",
+        "2022-03-20T00:00:00.000Z"
+      ]
+    }
+  }
+}
