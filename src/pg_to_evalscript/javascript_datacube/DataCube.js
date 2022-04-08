@@ -96,11 +96,11 @@ class DataCube {
         })
     }
 
-    extendDimensionWithData(dimension, dataToAdd) {
+    extendDimensionWithData(axis, dataToAdd) {
         const finalShape = this.getDataShape()
-        finalShape[dimension]++;
+        finalShape[axis]++;
         
-        const finalData = this.insertIntoDimension(dataToAdd, finalShape[dimension], finalShape[dimension] - 1)     
+        const finalData = this.insertIntoDimension(dataToAdd, finalShape[axis], finalShape[axis] - 1)     
         this.data = ndarray(finalData, finalShape)
     }
 
