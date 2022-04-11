@@ -3,7 +3,7 @@ class DataCube {
     // bands_dimension_name: name  to use for the default bands dimension
     // temporal_dimension_name: name to use for the default temporal dimension
     // fromSamples: boolean, if true `data` is expected to be in format as argument `samples` passed to `evaluatePixel` in an evalscript, else ndarray
-    constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples) {
+    constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples, bands_metadata) {
         this.TEMPORAL = "temporal"
         this.BANDS = "bands"
         this.OTHER = "other"
@@ -23,6 +23,7 @@ class DataCube {
         } else {
             this.data = data;
         }
+        this.bands_metadata = bands_metadata
     }
 
     getDimensionByName(name) {
@@ -68,6 +69,22 @@ class DataCube {
         return indices
     }
 
+    getBand(name) {
+        let bandToReturn = null
+        for (let band of this.bands_metadata) {
+            if (band.common_name === name) {
+                bandToReturn = band;
+            }
+
+            if (band.name === name) {
+                bandToReturn = band;
+                break;
+            }
+        }
+
+        return bandToReturn;
+    }
+
     filterBands(bands) {
         const indices = this.getBandIndices(bands);
         const axis = this.dimensions.findIndex((e) => e.name === this.bands_dimension_name);
@@ -93,6 +110,27 @@ class DataCube {
             labels: [label],
             type: type
         })
+    }
+
+    extendFinalDimensionWithData(axis, dataToAdd) {
+        const finalShape = this.getDataShape()
+        finalShape[axis]++;
+        
+        const finalData = this.insertIntoFinalDimension(dataToAdd, finalShape[axis], finalShape[axis] - 1)     
+        this.data = ndarray(finalData, finalShape)
+    }
+
+    insertIntoFinalDimension(dataToAdd, dimensionSize, locationInDimension) {
+        const dataArr = this.data.data;
+        for (let i = 0; i < dataToAdd.length; i++) {
+            dataArr.splice(
+                i * dimensionSize + locationInDimension, 
+                0, 
+                dataToAdd[i]
+            );
+        }
+
+        return dataArr;
     }
 
     clone() {

@@ -1,4 +1,5 @@
 import os
+import json
 import pkgutil
 from functools import reduce
 from collections import defaultdict
@@ -29,6 +30,7 @@ class Evalscript:
         datacube_definition_directory="javascript_datacube",
         output_dimensions=None,
         encode_result=True,
+        bands_metadata=[],
     ):
         self.input_bands = input_bands
         self.nodes = nodes
@@ -42,6 +44,7 @@ class Evalscript:
         self.temporal_dimension_name = temporal_dimension_name
         self._output_dimensions = output_dimensions
         self.encode_result = encode_result
+        self.bands_metadata = bands_metadata
 
     def write(self):
         if self.input_bands is None:
@@ -79,7 +82,7 @@ function evaluatePixel(samples) {{
         return pkgutil.get_data("pg_to_evalscript", f"javascript_datacube/ndarray.js").decode("utf-8")
 
     def write_datacube_creation(self):
-        return f"let {self.initial_data_name} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true)"
+        return f"let {self.initial_data_name} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {json.dumps(self.bands_metadata)})"
 
     def write_update_output(self):
         if self._output_dimensions is None:
