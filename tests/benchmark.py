@@ -2,7 +2,7 @@ import json
 
 from pg_to_evalscript import convert_from_process_graph
 
-from utils import get_process_graph_json, run_javacript
+from utils import get_process_graph_json, run_javascript
 
 
 def run_benchmark(pg_name, size):
@@ -23,7 +23,7 @@ def run_benchmark(pg_name, size):
     }}
     console.timeEnd("{test_name}")
     """
-    print(run_javacript(code).decode("utf-8").strip())
+    print(run_javascript(code).decode("utf-8").strip())
 
 
 if __name__ == "__main__":

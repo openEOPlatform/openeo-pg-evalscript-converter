@@ -170,7 +170,8 @@ function reduce_dimension(arguments) {{
     }}
 
     {self.load_process_code()}
-    return reduce_dimension({{...arguments,reducer:reducer}});  
+    arguments['reducer'] = reducer;
+    return reduce_dimension(arguments);  
 }}
 """
 
@@ -238,7 +239,8 @@ function apply(arguments) {{
     }}
 
     {self.load_process_code()}
-    return apply({{...arguments,process:process}});
+    arguments['process'] = process;
+    return apply(arguments);
 
 }}
 """

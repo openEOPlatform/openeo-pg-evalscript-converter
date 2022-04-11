@@ -1,4 +1,8 @@
 class DataCube {
+    // data: SH samples or an ndarray
+    // bands_dimension_name: name  to use for the default bands dimension
+    // temporal_dimension_name: name to use for the default temporal dimension
+    // fromSamples: boolean, if true `data` is expected to be in format as argument `samples` passed to `evaluatePixel` in an evalscript, else ndarray
     constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples) {
         this.TEMPORAL = "temporal"
         this.BANDS = "bands"
@@ -25,24 +29,30 @@ class DataCube {
         return this.dimensions.find(d => d.name === name)
     }
 
+    // Converts `samples` object to ndarray of shape [number of samples, number of bands]
+    // `samples` is eqivalent to the first argument of `evaluatePixel` method in an evalscript
+    // Either object or array of objects (non-temporal and temporal scripts respectively)
     makeArrayFromSamples(samples) {
         if (Array.isArray(samples)) {
-            if(samples.length === 0) {
-                return ndarray([])
+            if (samples.length === 0) {
+                return ndarray([], [0, 0])
             }
-            if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
-                this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(samples[0])
-            }
+            this._setDimensionLabelsIfEmpty(this.bands_dimension_name, Object.keys(samples[0]))
             let newData = []
             for (let entry of samples) {
                 newData = newData.concat(extractValues(entry))
             }
             return ndarray(newData, [samples.length, extractValues(samples[0]).length])
         } else {
-            if (this.getDimensionByName(this.bands_dimension_name).labels.length === 0) {
-                this.getDimensionByName(this.bands_dimension_name).labels = Object.keys(samples)
-            }
-            return ndarray(new Float64Array(Object.values(samples)), [1, samples.length])
+            this._setDimensionLabelsIfEmpty(this.bands_dimension_name, Object.keys(samples))
+            const newData = Object.values(samples)
+            return ndarray(newData, [1, newData.length])
+        }
+    }
+
+    _setDimensionLabelsIfEmpty(dimension, labels) {
+        if (this.getDimensionByName(dimension).labels.length === 0) {
+            this.getDimensionByName(dimension).labels = labels
         }
     }
 
@@ -100,6 +110,10 @@ class DataCube {
     }
 
     flattenToArray() {
+        if ((!this.data.shape || this.data.shape.length === 0) && this.data.data.length === 1) {
+            // We have a scalar.
+            return this.data.data[0]
+        }
         return flattenToNativeArray(this.data)
     }
 
@@ -109,43 +123,29 @@ class DataCube {
         return [...shape, ...flattenedData];
     }
 
+    // reducer: function, accepts `data` (labeled array) and `context` (any)
+    // dimension: string, name of one of the existing dimensions
     reduceByDimension(reducer, dimension, context) {
-        let newData = ndarray(this.data.data.slice(), this.data.shape)
+        const data = this.data
         const axis = this.dimensions.findIndex(e => e.name === dimension)
-        const shape = newData.shape
-        const newShape = shape.slice()
-        newShape.splice(axis, 1)
-        const coords = fill(shape.slice(), 0);
-        coords[axis] = null;
         const labels = this.dimensions[axis].labels
+        const allCoords = this._iterateCoords(data.shape.slice(), [axis]) // get the generator, axis of the selected dimension is `null` (entire dimension is selected)
         const newValues = []
-        let currInd = 0;
 
-        while (true) {
-            if (coords.length > 1 && coords[currInd] === null) {
-                currInd++
-            }
-            if (currInd >= shape.length) {
-                break;
-            }
-            const dataToReduce = convert_to_1d_array(newData.pick.apply(newData, coords))
-            dataToReduce.labels = labels
+        for (let coord of allCoords) {
+            const dataToReduce = convert_to_1d_array(data.pick.apply(data, coord)) // Convert selection to a native array
+            dataToReduce.labels = labels // Add dimension labels to array
             const newVals = reducer({
                 data: dataToReduce,
                 context: context
             })
             newValues.push(newVals)
-            if (coords.length === 1) {
-                break;
-            }
-            if (coords[currInd] + 1 >= shape[currInd]) {
-                currInd++
-            } else {
-                coords[currInd]++
-            }
         }
+
+        const newShape = data.shape.slice()
+        newShape.splice(axis, 1) // The selected dimension is removed
         this.data = ndarray(newValues, newShape)
-        this.dimensions.splice(axis, 1)
+        this.dimensions.splice(axis, 1) // Remove dimension information
     }
 
     getDataShape() {
@@ -158,90 +158,59 @@ class DataCube {
         this.data = ndarray(this.data.data, this.data.shape)
     }
 
-    _select(arr, coordArr) {
-        // coordArr: 1D list of n coordinates. If m-th place has `null`, the entire axis is included and the dimension is kept
-        function coordInSlice(c1, sliceArr) {
-            return sliceArr.every((e, i) => e === null || e === c1[i])
-        }
-        return this._iter(arr, (a, coords) => {
-            if (coordInSlice(coords, coordArr)) {
-                return a
-            }
-        }, coords => coords.length >= coordArr.length || coordArr[coords.length] === null ? false : true)
-    }
-
-    _set(arr, vals, coordArr) {
-        // Set values at coordArr
-        function coordInSlice(c1, sliceArr) {
-            return c1.length === sliceArr.length && sliceArr.every((e, i) => e === null || e === c1[i])
-        }
-        const exec_set = (a, coords) => {
-            if (coordInSlice(coords, coordArr)) {
-                let valueToSet;
-                if (Array.isArray(vals)) {
-                    valueToSet = this._select(vals, coordArr.map((c, i) => c === null ? coords[i] : null).filter(c => c !== null))
-                } else {
-                    valueToSet = vals
-                }
-                return valueToSet
-            }
-            return a
-        }
-        return this._iter(arr, exec_set)
-    }
-
-    _filter(dim, coordArr) {
-        const shape = this.data.shape
+    // axis: integer, index of the dimension to filter
+    // coordArr: array of indices of the dimension to keep
+    _filter(axis, coordArr) {
         const length = this.data.data.length
-        const stepSlice = shape.slice(dim)
-        shape[dim] = coordArr.length
+        const stride = this.data.stride[axis]
+        const axisSize = this.data.shape[axis]
         const newData = []
-        let step = 1
-
-        for (let s of stepSlice) {
-            step *= s
-        }
 
         for (let i = 0; i < length; i++) {
-            if (coordArr.includes(i % step)) {
+            if (coordArr.includes(Math.floor(i / stride) % axisSize)) {
                 newData.push(this.data.data[i])
             }
         }
-        this.data = ndarray(newData, shape)
+
+        const newShape = this.data.shape
+        newShape[axis] = coordArr.length
+        this.data = ndarray(newData, newShape)
     }
 
-
+    // process: function, accepts `data` (labeled array) and `context` (any)
     apply(process, context) {
-        if (isNotSubarray(this.data, this.data.shape)) {
-            const newData = []
-            const length = this.data.data.length
-            for (let i = 0; i < length; i++) {
-                newData.push(process({
-                    "x": this.data.data[i],
-                    context: context
-                }))
-            }
-            this.data.data = newData
-        } else {
-            const shape = this.data.shape
-            const cumulatives = fill(shape.slice(), 0);
-            const coords = shape.slice();
-            let total = 1;
+        const allCoords = this._iterateCoords(this.data.shape)
+        for (let coords of allCoords) {
+            this.data.set(...coords, process({
+                "x": this.data.get.apply(this.data, coords),
+                context: context
+            }))
+        }
+    }
 
+    // Generator that visits all coordinates of array with `shape`, keeping nullAxes `null`
+    // shape: sizes of dimensions
+    // nullAxes: array with axes that should be kept null
+    * _iterateCoords(shape, nullAxes = []) {
+        const cumulatives = fill(shape.slice(), 0);
+        const coords = shape.slice();
+        for (let axis of nullAxes) {
+            shape[axis] = 1
+            coords[axis] = null
+        }
+        let total = 1;
+        for (let d = shape.length - 1; d >= 0; d--) {
+            cumulatives[d] = total;
+            total *= shape[d];
+        }
+        for (let i = 0; i < total; i++) {
             for (let d = shape.length - 1; d >= 0; d--) {
-                cumulatives[d] = total;
-                total *= shape[d];
-            }
-            for (let i = 0; i < total; i++) {
-                for (let d = shape.length - 1; d >= 0; d--) {
-                    coords[d] = Math.floor(i / cumulatives[d]) % shape[d];
+                if (coords[d] === null) {
+                    continue
                 }
-                const args = coords.concat([process({
-                    "x": this.data.get.apply(this.data, coords),
-                    context: context
-                })])
-                this.data.set.apply(this.data, args)
+                coords[d] = Math.floor(i / cumulatives[d]) % shape[d];
             }
+            yield coords
         }
     }
 }
