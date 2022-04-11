@@ -65,7 +65,7 @@ function setup() {{
 {self.write_ndarray_definition()}
 {self.write_datacube_definition()}
 {newline.join([node.write_function() for node in self.nodes])}
-function evaluatePixel(samples) {{
+function evaluatePixel(samples, scenes) {{
     {self.write_datacube_creation()}
     {(newline + tab).join([node.write_call() for node in self.nodes])}
     return {self.write_output_variable()}{".encodeData()" if self.encode_result else '.flattenToArray()'}
@@ -82,7 +82,7 @@ function evaluatePixel(samples) {{
         return pkgutil.get_data("pg_to_evalscript", f"javascript_datacube/ndarray.js").decode("utf-8")
 
     def write_datacube_creation(self):
-        return f"let {self.initial_data_name} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {json.dumps(self.bands_metadata)})"
+        return f"let {self.initial_data_name} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {json.dumps(self.bands_metadata)}, scenes)"
 
     def write_update_output(self):
         if self._output_dimensions is None:

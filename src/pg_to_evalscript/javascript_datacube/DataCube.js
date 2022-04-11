@@ -3,7 +3,7 @@ class DataCube {
     // bands_dimension_name: name  to use for the default bands dimension
     // temporal_dimension_name: name to use for the default temporal dimension
     // fromSamples: boolean, if true `data` is expected to be in format as argument `samples` passed to `evaluatePixel` in an evalscript, else ndarray
-    constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples, bands_metadata) {
+    constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples, bands_metadata, scenes) {
         this.TEMPORAL = "temporal"
         this.BANDS = "bands"
         this.OTHER = "other"
@@ -23,11 +23,36 @@ class DataCube {
         } else {
             this.data = data;
         }
+        if (scenes) {
+            let dates = [];
+            for (let scene of scenes) {
+                dates.push(scene.date);
+            }
+            this.setDimensionLabels(this.temporal_dimension_name, dates);
+        }
         this.bands_metadata = bands_metadata
     }
 
     getDimensionByName(name) {
         return this.dimensions.find(d => d.name === name)
+    }
+
+    getTemporalDimensions() {
+        const temporalDimensions = this.dimensions.filter(d => d.type === this.TEMPORAL);
+
+        if (temporalDimensions.length === 0) {
+            throw new Error("No temporal dimension found.");
+        }
+
+        return temporalDimensions;
+    }
+
+    setDimensionLabels(dimension, labels) {
+        for (let dim of this.dimensions) {
+            if (dim.name === dimension) {
+                dim.labels = labels
+            }
+        }
     }
 
     // Converts `samples` object to ndarray of shape [number of samples, number of bands]
@@ -69,6 +94,22 @@ class DataCube {
         return indices
     }
 
+    getFilteredTemporalIndices(temporalDimension, start, end) {
+        const temporalLabels = this.getDimensionByName(temporalDimension).labels;
+        const indices = [];
+        for (let i = 0; i < temporalLabels.length; i++) {
+            const date = parse_rfc3339(temporalLabels[i]);
+            if (!date) {
+                throw new Error("Invalid ISO date string in temporal dimension label.");
+            }
+
+            if ((start === null || date.value >= start.value) && (end === null || date.value < end.value)) {
+                indices.push(i);
+            }
+        }
+        return indices;
+    }
+    
     getBand(name) {
         let bandToReturn = null
         for (let band of this.bands_metadata) {
@@ -93,6 +134,61 @@ class DataCube {
             this.getDimensionByName(this.bands_dimension_name).labels.filter((lab) =>
                 bands.includes(lab)
             );
+    }
+
+    filterTemporal(extent, dimensionName) {
+        if (dimensionName) {
+            const dimension = this.getDimensionByName(dimensionName);
+
+            if (dimension === undefined) {
+                throw new Error(`Dimension not available.`);
+            }
+
+            if (dimension.type !== this.TEMPORAL) {
+                throw new Error(`Dimension is not of type temporal.`);
+            }
+
+            this._filterTemporalByDimension(extent, dimension);
+
+        } else {
+            const dimensions = this.getTemporalDimensions();
+            for (let dimension of dimensions) {
+                this._filterTemporalByDimension(extent, dimension);
+            }
+        }
+    }
+
+    _filterTemporalByDimension(extent, dimension) {
+        const axis = this.dimensions.findIndex((e) => e.name === dimension.name);
+        const temporalLabels = dimension.labels;
+
+        const parsedExtent = this.parseTemporalExtent(extent);
+        const indices = this.getFilteredTemporalIndices(dimension.name, parsedExtent.start, parsedExtent.end);
+
+        this._filter(axis, indices);
+        dimension.labels = indices.map(i => temporalLabels[i]);
+    }
+
+    parseTemporalExtent(extent) {
+        if (extent.length !== 2) {
+            throw new Error("Invalid temporal extent. Temporal extent must be an array of exactly two elements.");
+        }
+
+        if (extent[0] === null && extent[1] === null) {
+            throw new Error("Invalid temporal extent. Only one of the boundaries can be null.");
+        }
+
+        const start = parse_rfc3339(extent[0]);
+        const end = parse_rfc3339(extent[1]);
+
+        if ((extent[0] !== null && !start) || (extent[1] !== null && !end)) {
+            throw new Error("Invalid temporal extent. Boundary must be ISO date string or null.");
+        }
+
+        return {
+            start: extent[0] === null ? null : start,
+            end: extent[1] === null ? null : end
+        }
     }
 
     removeDimension(dimension) {
