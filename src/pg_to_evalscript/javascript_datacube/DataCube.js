@@ -3,7 +3,7 @@ class DataCube {
     // bands_dimension_name: name  to use for the default bands dimension
     // temporal_dimension_name: name to use for the default temporal dimension
     // fromSamples: boolean, if true `data` is expected to be in format as argument `samples` passed to `evaluatePixel` in an evalscript, else ndarray
-    constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples, scenes) {
+    constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples, bands_metadata, scenes) {
         this.TEMPORAL = "temporal"
         this.BANDS = "bands"
         this.OTHER = "other"
@@ -30,6 +30,7 @@ class DataCube {
             }
             this.setDimensionLabels(this.temporal_dimension_name, dates);
         }
+        this.bands_metadata = bands_metadata
     }
 
     getDimensionByName(name) {
@@ -107,6 +108,22 @@ class DataCube {
             }
         }
         return indices;
+    }
+    
+    getBand(name) {
+        let bandToReturn = null
+        for (let band of this.bands_metadata) {
+            if (band.common_name === name) {
+                bandToReturn = band;
+            }
+
+            if (band.name === name) {
+                bandToReturn = band;
+                break;
+            }
+        }
+
+        return bandToReturn;
     }
 
     filterBands(bands) {
@@ -191,6 +208,27 @@ class DataCube {
         })
     }
 
+    extendFinalDimensionWithData(axis, dataToAdd) {
+        const finalShape = this.getDataShape()
+        finalShape[axis]++;
+        
+        const finalData = this.insertIntoFinalDimension(dataToAdd, finalShape[axis], finalShape[axis] - 1)     
+        this.data = ndarray(finalData, finalShape)
+    }
+
+    insertIntoFinalDimension(dataToAdd, dimensionSize, locationInDimension) {
+        const dataArr = this.data.data;
+        for (let i = 0; i < dataToAdd.length; i++) {
+            dataArr.splice(
+                i * dimensionSize + locationInDimension, 
+                0, 
+                dataToAdd[i]
+            );
+        }
+
+        return dataArr;
+    }
+
     clone() {
         const copy = new DataCube(ndarray(this.data.data.slice(), this.data.shape), this.bands_dimension_name, this.temporal_dimension_name)
         const newDimensions = []
@@ -244,8 +282,45 @@ class DataCube {
         this.dimensions.splice(axis, 1) // Remove dimension information
     }
 
+    applyDimension(process, dimension, target_dimension, context) {
+        const data = this.data;
+        const axis = this.dimensions.findIndex(e => e.name === dimension);
+        const labels = this.dimensions[axis].labels;
+        const allCoords = this._iterateCoords(data.shape.slice(), [axis]) // get the generator, axis of the selected dimension is `null` (entire dimension is selected)
+        const targetDimensionLabels = [];
+
+        if (target_dimension) {
+            if (this.getDimensionByName(target_dimension)) {
+                throw new Error("Dimension `target_dimension` already exists and cannot replace dimension `dimension`.");
+            }
+
+            const dim = this.getDimensionByName(dimension);
+            dim.name = target_dimension;
+            dim.type = this.OTHER;
+
+            for (let i = 0; i < data.shape[axis]; i++) {
+                targetDimensionLabels.push(i);
+            }
+        }
+
+        for (let coord of allCoords) {
+            const dataToProcess = convert_to_1d_array(data.pick.apply(data, coord));
+            dataToProcess.labels = target_dimension ? targetDimensionLabels : labels;
+            this._setArrayAlongAxis(coord, axis, process({ data: dataToProcess, context }));
+        }
+    }
+
     getDataShape() {
         return this.data.shape;
+    }
+
+    _setArrayAlongAxis(coord, axis, array) {
+        for (let i = 0; i < array.length; i++) {
+            const newCoord = coord.slice();
+            newCoord[axis] = i;
+
+            this.data.set(...newCoord, array[i]);
+        }
     }
 
     _addDimension(axis) {
