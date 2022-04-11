@@ -74,6 +74,7 @@ class Node:
             "count": CountNode,
             "array_apply": ArrayApplyNode,
             "array_filter": ArrayFilterNode,
+            "apply_dimension": ApplyDimensionNode,
         }
         if class_types_for_process.get(process_id):
             self.__class__ = class_types_for_process[process_id]
@@ -242,6 +243,23 @@ function apply(arguments) {{
     arguments['process'] = process;
     return apply(arguments);
 
+}}
+"""
+
+
+class ApplyDimensionNode(Node):
+    def write_process(self):
+        newline = "\n"
+        return f"""
+function apply_dimension(arguments) {{
+   function process(arguments) {{
+    {newline.join(node.write_function() for node in self.child_nodes)}
+    {newline.join(node.write_call() for node in self.child_nodes)}
+        return {self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id};
+    }}
+
+    {self.load_process_code()}
+    return apply_dimension({{...arguments, process}})
 }}
 """
 

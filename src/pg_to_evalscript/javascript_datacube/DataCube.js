@@ -186,8 +186,45 @@ class DataCube {
         this.dimensions.splice(axis, 1) // Remove dimension information
     }
 
+    applyDimension(process, dimension, target_dimension, context) {
+        const data = this.data;
+        const axis = this.dimensions.findIndex(e => e.name === dimension);
+        const labels = this.dimensions[axis].labels;
+        const allCoords = this._iterateCoords(data.shape.slice(), [axis]) // get the generator, axis of the selected dimension is `null` (entire dimension is selected)
+        const targetDimensionLabels = [];
+
+        if (target_dimension) {
+            if (this.getDimensionByName(target_dimension)) {
+                throw new Error("Dimension `target_dimension` already exists and cannot replace dimension `dimension`.");
+            }
+
+            const dim = this.getDimensionByName(dimension);
+            dim.name = target_dimension;
+            dim.type = this.OTHER;
+
+            for (let i = 0; i < data.shape[axis]; i++) {
+                targetDimensionLabels.push(i);
+            }
+        }
+
+        for (let coord of allCoords) {
+            const dataToProcess = convert_to_1d_array(data.pick.apply(data, coord));
+            dataToProcess.labels = target_dimension ? targetDimensionLabels : labels;
+            this._setArrayAlongAxis(coord, axis, process({ data: dataToProcess, context }));
+        }
+    }
+
     getDataShape() {
         return this.data.shape;
+    }
+
+    _setArrayAlongAxis(coord, axis, array) {
+        for (let i = 0; i < array.length; i++) {
+            const newCoord = coord.slice();
+            newCoord[axis] = i;
+
+            this.data.set(...newCoord, array[i]);
+        }
     }
 
     _addDimension(axis) {
