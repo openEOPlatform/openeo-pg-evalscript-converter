@@ -66,10 +66,8 @@ def test_iterateCoords(datacube_code, shape, null_axes, expected_coords):
 
 
 @pytest.mark.parametrize(
-    "example_data,expected_data_shape,dimensions,dimension_to_reduce,expected_data,expected_shape",
+    "example_data,example_data_shape,dimensions,dimension_to_reduce,expected_data,expected_shape",
     [
-        ([1, 2, 3, 4], [2, 2], None, "b", [3, 7], [2]),
-        ([1, 2, 3, 4], [2, 2], None, "t", [4, 6], [2]),
         (
             [1, 2, 3, 4, 5, 6, 7, 8],
             [2, 2, 2],
@@ -110,11 +108,11 @@ def test_iterateCoords(datacube_code, shape, null_axes, expected_coords):
     ],
 )
 def test_reduceByDimension(
-    datacube_code, example_data, expected_data_shape, dimensions, dimension_to_reduce, expected_data, expected_shape
+    datacube_code, example_data, example_data_shape, dimensions, dimension_to_reduce, expected_data, expected_shape
 ):
     reducer = "({data}) => data.reduce((a, b) => a + b, 0)"
     testing_code = (
-        datacube_code(f"ndarray({example_data},{expected_data_shape})", from_samples=False, json_samples=False)
+        datacube_code(f"ndarray({example_data},{example_data_shape})", from_samples=False, json_samples=False)
         + (f"\ndatacube.dimensions = {json.dumps(dimensions)}" if dimensions else "")
         + f"\ndatacube.reduceByDimension({reducer},'{dimension_to_reduce}');"
         + with_stdout_call("datacube")
