@@ -59,18 +59,20 @@ class DataCube {
         return indices
     }
 
-    getBand({ name = null, commonName = null }) {
+    getBand(name) {
+        let bandToReturn = null
         for (let band of this.bands_metadata) {
-            if (band.name === name && band.common_name === commonName) {
-                return band;
+            if (band.common_name === name) {
+                bandToReturn = band;
             }
-            
-            if (band.common_name === commonName) {
-                return band;
+
+            if (band.name === name) {
+                bandToReturn = band;
+                break;
             }
         }
 
-        return null;
+        return bandToReturn;
     }
 
     filterBands(bands) {
