@@ -124,4 +124,3 @@ def test_dimension_labels_exceptions(
             "dimension_labels",
             process_arguments,
         )
-        

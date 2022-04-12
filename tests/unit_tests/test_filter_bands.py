@@ -28,7 +28,7 @@ def filter_bands_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": [], "name": "bands_name", "type": "bands"},
                 ],
-                "data": {'data': [], 'offset': 0, 'shape': [1, 0], 'stride': [0, 1]}
+                "data": {"data": [], "offset": 0, "shape": [1, 0], "stride": [0, 1]},
             },
         ),
         (
@@ -46,7 +46,7 @@ def filter_bands_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 3], 'stride': [3, 1]},
+                "data": {"data": [1, 2, 3], "offset": 0, "shape": [1, 3], "stride": [3, 1]},
             },
         ),
         (
@@ -64,7 +64,7 @@ def filter_bands_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": {'data': [3], 'offset': 0, 'shape': [1, 1], 'stride': [1, 1]},
+                "data": {"data": [3], "offset": 0, "shape": [1, 1], "stride": [1, 1]},
             },
         ),
     ],
@@ -146,4 +146,3 @@ def test_filter_bands_exceptions(filter_bands_process_code, example_input, raise
             "filter_bands",
             process_arguments,
         )
-        

@@ -31,7 +31,7 @@ def rename_labels_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["A123", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 3], 'stride': [3, 1]},
+                "data": {"data": [1, 2, 3], "offset": 0, "shape": [1, 3], "stride": [3, 1]},
             },
         ),
         (
@@ -52,7 +52,7 @@ def rename_labels_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "A123456"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 3], 'stride': [3, 1]},
+                "data": {"data": [1, 2, 3], "offset": 0, "shape": [1, 3], "stride": [3, 1]},
             },
         ),
         (
@@ -73,7 +73,7 @@ def rename_labels_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "A2", "A3"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 3], 'stride': [3, 1]},
+                "data": {"data": [1, 2, 3], "offset": 0, "shape": [1, 3], "stride": [3, 1]},
             },
         ),
         (
@@ -94,7 +94,7 @@ def rename_labels_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["A123456"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 3], 'stride': [3, 1]},
+                "data": {"data": [1, 2, 3], "offset": 0, "shape": [1, 3], "stride": [3, 1]},
             },
         ),
     ],
@@ -237,4 +237,3 @@ def test_rename_labels_exceptions(rename_labels_process_code, example_input, rai
             "rename_labels",
             process_arguments,
         )
-        

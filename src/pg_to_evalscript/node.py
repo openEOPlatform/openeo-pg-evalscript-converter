@@ -284,8 +284,9 @@ function count(arguments) {{
 }}
 """
 
+
 class ArrayApplyNode(Node):
-    def write_process(self):   
+    def write_process(self):
         newline = "\n"
         tab = "\t"
         return f"""
@@ -301,6 +302,7 @@ function array_apply(arguments) {{
     return array_apply({{ data: data, context: context, process: process }})
 }}
 """
+
 
 class ArrayFilterNode(Node):
     def write_process(self):
