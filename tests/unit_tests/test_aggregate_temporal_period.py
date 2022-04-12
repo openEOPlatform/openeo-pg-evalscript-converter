@@ -10,16 +10,16 @@ def aggregate_temporal_period_process_code():
     return load_process_code("aggregate_temporal_period")
 
 
-@pytest.mark.skip("Not implemented yet.")
 @pytest.mark.parametrize(
-    "data,period,reducer,dimension,context,expected_output",
+    "data,period,reducer,dimension,context,additional_code_specific_to_test_case,expected_output",
     [
         (
             [{"B01": 1, "B02": 2}],
-            "",
+            "day",
             "({{data, context}}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-05'];",
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -27,7 +27,7 @@ def aggregate_temporal_period_process_code():
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
                 "dimensions": [
-                    {"labels": [], "name": "t", "type": "temporal"},
+                    {"labels": ['2020-005'], "name": "t", "type": "temporal"},
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {"data": [1, 2], "offset": 0, "shape": [1, 2], "stride": [2, 1]},
@@ -36,10 +36,11 @@ def aggregate_temporal_period_process_code():
     ],
 )
 def test_aggregate_temporal_period(
-    aggregate_temporal_period_process_code, data, period, reducer, dimension, context, expected_output
+    aggregate_temporal_period_process_code, data, period, reducer, dimension, context, additional_code_specific_to_test_case, expected_output
 ):
     additional_js_code_to_run = (
-        load_datacube_code() + f"let cube = new DataCube({json.dumps(data)}, 'bands', 't', true);"
+        load_datacube_code() + f"let cube = new DataCube({json.dumps(data)}, 'bands', 't', true);" +
+        (additional_code_specific_to_test_case or None)
     )
     process_arguments = f"{{'data': cube, 'period': {json.dumps(period)}, 'reducer': {json.dumps(reducer)}, 'dimension': {json.dumps(dimension)}, 'context': {json.dumps(context)}}}"
     output = run_process(
@@ -56,17 +57,17 @@ def test_aggregate_temporal_period(
     [
         (
             [{"B01": 1, "B02": 2}],
-            "period",
+            "day",
             "({{data, context}}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-05'];",
             False,
             None,
         ),
         (
             [{"B01": 1, "B02": 2}],
-            "period",
+            "day",
             "({{data, context}}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
@@ -76,7 +77,7 @@ def test_aggregate_temporal_period(
         ),
         (
             [{"B01": 1, "B02": 2}],
-            "period",
+            "day",
             "({{data, context}}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
@@ -116,7 +117,7 @@ def test_aggregate_temporal_period(
         ),
         (
             [{"B01": 1, "B02": 2}],
-            "period",
+            "day",
             None,
             None,
             None,
@@ -126,7 +127,7 @@ def test_aggregate_temporal_period(
         ),
         (
             [{"B01": 1, "B02": 2}],
-            "period",
+            "day",
             "({{data, context}}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             12.354,
             None,
@@ -136,7 +137,7 @@ def test_aggregate_temporal_period(
         ),
         (
             [{"B01": 1, "B02": 2}],
-            "period",
+            "day",
             "({{data, context}}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             [12,34,56],
             None,
@@ -146,7 +147,7 @@ def test_aggregate_temporal_period(
         ),
         (
             [{"B01": 1, "B02": 2}],
-            "period",
+            "day",
             "({{data, context}}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
@@ -156,13 +157,23 @@ def test_aggregate_temporal_period(
         ),
         (
             [{"B01": 1, "B02": 2}],
-            "period",
+            "day",
             "({{data, context}}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             "wrong_dimension_name",
             None,
             None,
             True,
             "DimensionNotAvailable",
+        ),
+        (
+            [{"B01": 1, "B02": 2}],
+            "unknown_period",
+            "({{data, context}}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
+            None,
+            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-05'];",
+            True,
+            "Value 'unknown_period' is not an allowed value for period."
         ),
     ],
 )
