@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, load_datacube_code, run_process
+from tests.utils import load_process_code, load_datacube_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -105,22 +105,15 @@ def test_dimension_labels_exceptions(
 ):
     additional_js_code_to_run = (
         load_datacube_code()
-        + f"const cube = new DataCube({data}, 'bands_name', 'temporal_name', true);"
+        + f"let cube = new DataCube({data}, 'bands_name', 'temporal_name', true);"
         + (additional_js_code_specific_to_case or "")
     )
-    process_arguments = f"{{'data': cube, 'dimension': '{dimension}'}}"
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(
-                dimension_labels_process_code + additional_js_code_to_run,
-                "dimension_labels",
-                process_arguments,
-            )
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(
-            dimension_labels_process_code + additional_js_code_to_run,
-            "dimension_labels",
-            process_arguments,
-        )
+    dimension = json.dumps(dimension) if dimension is not None else "undefined"
+    process_arguments = f"{{'data': cube, 'dimension': {dimension}}}"
+    run_input_validation(
+        dimension_labels_process_code + additional_js_code_to_run,
+        "dimension_labels",
+        process_arguments,
+        raises_exception,
+        error_message=error_message,
+    )

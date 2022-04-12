@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, load_datacube_code, run_process
+from tests.utils import load_process_code, load_datacube_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -222,18 +222,10 @@ def test_rename_labels_exceptions(rename_labels_process_code, example_input, rai
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
     )
     process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(
-                rename_labels_process_code + additional_js_code_to_run,
-                "rename_labels",
-                process_arguments,
-            )
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(
-            rename_labels_process_code + additional_js_code_to_run,
-            "rename_labels",
-            process_arguments,
-        )
+    run_input_validation(
+        rename_labels_process_code + additional_js_code_to_run,
+        "rename_labels",
+        process_arguments,
+        raises_exception,
+        error_message=error_message,
+    )
