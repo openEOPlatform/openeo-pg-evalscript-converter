@@ -75,7 +75,10 @@ function aggregate_temporal_period(arguments) {
       case "decade-ad":
         return `${d.getFullYear().toString().substring(0, 3)}1`;
       default:
-        return `${d.getFullYear()}`;
+        throw new ProcessError({
+          name: "UnknownPeriodValue",
+          message: `Value '${periodType}' is not an allowed value for period.`,
+        });
     }
   };
 
@@ -142,6 +145,21 @@ function aggregate_temporal_period(arguments) {
   }
 
   // add code for aggregating
+  const axis = newData.dimensions.findIndex(
+    (d) => (d.name = temporalDimensionToAggregate.name)
+  );
+  const newLabels = [];
+  for (let label of temporalDimensionToAggregate.labels) {
+    newLabels.push(formatLabelByPeriod(period, label));
+
+    // const allCoords = newData._iterateCoords(newData.data.shape.slice(), [
+    //   axis,
+    // ]);
+    // for (let coord of allCoords) {
+    // }
+  }
+
+  temporalDimensionToAggregate.labels = newLabels;
 
   return newData;
 }
