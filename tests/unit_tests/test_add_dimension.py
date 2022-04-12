@@ -31,7 +31,7 @@ def add_dimension_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 1, 3], 'stride': [3, 3, 1]},
+                "data": {"data": [1, 2, 3], "offset": 0, "shape": [1, 1, 3], "stride": [3, 3, 1]},
             },
         ),
         (
@@ -52,7 +52,7 @@ def add_dimension_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 1, 3], 'stride': [3, 3, 1]},
+                "data": {"data": [1, 2, 3], "offset": 0, "shape": [1, 1, 3], "stride": [3, 3, 1]},
             },
         ),
         (
@@ -73,7 +73,7 @@ def add_dimension_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [1, 1, 3], 'stride': [3, 3, 1]},
+                "data": {"data": [1, 2, 3], "offset": 0, "shape": [1, 1, 3], "stride": [3, 3, 1]},
             },
         ),
     ],
@@ -169,4 +169,3 @@ def test_add_dimension_exceptions(add_dimension_process_code, example_input, rai
             "add_dimension",
             process_arguments,
         )
-        
