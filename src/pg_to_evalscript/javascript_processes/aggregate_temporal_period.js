@@ -1,5 +1,5 @@
 function aggregate_temporal_period(arguments) {
-  const formatLabelByPeriod = (periodType, label) => {
+  const formatLabelByPeriod = (period, label) => {
     const dayInYear = (date) => {
       return (
         (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) -
@@ -25,10 +25,10 @@ function aggregate_temporal_period(arguments) {
       return num;
     };
 
-    const d = new Date(parse_rfc3339(label).value);
-    switch (periodType) {
+    const d = new Date(label);
+    switch (period) {
       case "hour":
-        const hourCount = d.getHours();
+        const hourCount = d.getHours() - 1;
         const days = d.getDate();
         const months = d.getMonth() + 1;
         return `${d.getFullYear()}-${padWithZeros(months, 2)}-${padWithZeros(
@@ -77,9 +77,81 @@ function aggregate_temporal_period(arguments) {
       default:
         throw new ProcessError({
           name: "UnknownPeriodValue",
-          message: `Value '${periodType}' is not an allowed value for period.`,
+          message: `Value '${period}' is not an allowed value for period.`,
         });
     }
+  };
+
+  const generateDatesInRange = (minDate, maxDate, period) => {
+    const addPeriodToDate = (currentDate, period) => {
+      let newDate = new Date(currentDate);
+      switch (period) {
+        case "hour":
+          newDate.setHours(newDate.getHours() + 1);
+          return newDate.toISOString();
+        case "day":
+          newDate.setDate(newDate.getDate() + 1);
+          return newDate.toISOString();
+        case "week":
+          newDate.setDate(newDate.getDate() + 7);
+          return newDate.toISOString();
+        case "dekad":
+          newDate.setDate(newDate.getDate() + 10);
+          return newDate.toISOString();
+        case "month":
+          newDate.setMonth(newDate.getMonth() + 1);
+          return newDate.toISOString();
+        case "season":
+          newDate.setMonth(newDate.getMonth() + 3);
+          return newDate.toISOString();
+        case "tropical-season":
+          newDate.setMonth(newDate.getMonth() + 6);
+          return newDate.toISOString();
+        case "year":
+          newDate.setFullYear(newDate.getFullYear() + 1);
+          return newDate.toISOString();
+        case "decade":
+          newDate.setFullYear(newDate.getFullYear() + 10);
+          return newDate.toISOString();
+        case "decade-ad":
+          newDate.setFullYear(newDate.getFullYear() + 10);
+          return newDate.toISOString();
+        default:
+          throw new ProcessError({
+            name: "UnknownPeriodValue",
+            message: `Value '${period}' is not an allowed value for period.`,
+          });
+      }
+    };
+
+    const dates = [];
+    let currentDate = minDate;
+
+    while (currentDate <= maxDate) {
+      dates.push(currentDate);
+      currentDate = addPeriodToDate(currentDate, period);
+    }
+
+    return dates;
+  };
+
+  const getMinMaxDate = (labels) => {
+    let minDate = parse_rfc3339(labels[0]).value;
+    let maxDate = new Date(minDate).toISOString();
+
+    for (let i = 1; i < labels.length; i++) {
+      const currentDate = parse_rfc3339(labels[i]).value;
+
+      if (currentDate < minDate) {
+        minDate = currentDate;
+      }
+
+      if (currentDate > maxDate) {
+        maxDate = currentDate;
+      }
+    }
+
+    return { minDate, maxDate };
   };
 
   const { data, period, reducer, dimension = null, context = null } = arguments;
@@ -150,9 +222,23 @@ function aggregate_temporal_period(arguments) {
   );
   const newLabels = [];
   const newValues = [];
-  for (let label of temporalDimensionToAggregate.labels) {
-    newLabels.push(formatLabelByPeriod(period, label));
 
+  if (temporalDimensionToAggregate.labels.length > 1) {
+    const { minDate, maxDate } = getMinMaxDate(
+      temporalDimensionToAggregate.labels
+    );
+
+    const dates = generateDatesInRange(minDate, maxDate, period);
+    for (let d of dates) {
+      newLabels.push(formatLabelByPeriod(period, d));
+    }
+  } else {
+    newLabels.push(
+      formatLabelByPeriod(period, temporalDimensionToAggregate.labels[0])
+    );
+  }
+
+  for (let _ of newLabels) {
     const allCoords = newData._iterateCoords(newData.data.shape.slice(), [
       axis,
     ]);
@@ -170,10 +256,10 @@ function aggregate_temporal_period(arguments) {
     }
   }
 
-  temporalDimensionToAggregate.labels = newLabels;
   const newShape = newData.getDataShape().slice();
   newShape[axis] = newLabels.length;
   newData.data = ndarray(newValues, newShape);
+  newData.setDimensionLabels(temporalDimensionToAggregate.name, newLabels);
 
   return newData;
 }

@@ -33,6 +33,46 @@ def aggregate_temporal_period_process_code():
                 "data": {"data": [-1, -2], "offset": 0, "shape": [1, 2], "stride": [2, 1]},
             },
         ),
+        (
+            [{"B01": 1, "B02": 2}, {"B01": 11, "B02": 12}],
+            "day",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
+            None,
+            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-05', '2020-01-07'];",
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {"labels": ['2020-005', '2020-006', '2020-007'], "name": "t", "type": "temporal"},
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {"data": [6, 7, 6, 7, 6, 7], "offset": 0, "shape": [3, 2], "stride": [2, 1]},
+            },
+        ),
+        (
+            [{"B01": 1, "B02": 2}, {"B01": 11, "B02": 12}],
+            "hour",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
+            None,
+            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-05T00:00:00.000Z', '2020-01-05T04:00:00.000Z'];",
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {"labels": ['2020-01-05-00', '2020-01-05-01', '2020-01-05-02', '2020-01-05-03', '2020-01-05-04'], "name": "t", "type": "temporal"},
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {"data": [6, 7, 6, 7, 6, 7, 6, 7, 6, 7], "offset": 0, "shape": [5, 2], "stride": [2, 1]},
+            },
+        ),
     ],
 )
 def test_aggregate_temporal_period(
