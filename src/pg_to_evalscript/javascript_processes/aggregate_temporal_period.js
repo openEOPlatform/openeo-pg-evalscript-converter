@@ -149,17 +149,31 @@ function aggregate_temporal_period(arguments) {
     (d) => (d.name = temporalDimensionToAggregate.name)
   );
   const newLabels = [];
+  const newValues = [];
   for (let label of temporalDimensionToAggregate.labels) {
     newLabels.push(formatLabelByPeriod(period, label));
 
-    // const allCoords = newData._iterateCoords(newData.data.shape.slice(), [
-    //   axis,
-    // ]);
-    // for (let coord of allCoords) {
-    // }
+    const allCoords = newData._iterateCoords(newData.data.shape.slice(), [
+      axis,
+    ]);
+
+    for (let coords of allCoords) {
+      const dataToReduce = convert_to_1d_array(
+        newData.data.pick.apply(newData.data, coords)
+      );
+
+      const newVals = reducer({
+        data: dataToReduce,
+        context: context,
+      });
+      newValues.push(newVals);
+    }
   }
 
   temporalDimensionToAggregate.labels = newLabels;
+  const newShape = newData.getDataShape().slice();
+  newShape[axis] = newLabels.length;
+  newData.data = ndarray(newValues, newShape);
 
   return newData;
 }
