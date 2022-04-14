@@ -27,7 +27,7 @@ def aggregate_temporal_period_process_code():
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
                 "dimensions": [
-                    {"labels": ['2020-005'], "name": "t", "type": "temporal"},
+                    {"labels": ["2020-005"], "name": "t", "type": "temporal"},
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {"data": [-1, -2], "offset": 0, "shape": [1, 2], "stride": [2, 1]},
@@ -47,7 +47,7 @@ def aggregate_temporal_period_process_code():
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
                 "dimensions": [
-                    {"labels": ['2020-005', '2020-006', '2020-007'], "name": "t", "type": "temporal"},
+                    {"labels": ["2020-005", "2020-006", "2020-007"], "name": "t", "type": "temporal"},
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {"data": [6, 7, 6, 7, 6, 7], "offset": 0, "shape": [3, 2], "stride": [2, 1]},
@@ -67,7 +67,11 @@ def aggregate_temporal_period_process_code():
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
                 "dimensions": [
-                    {"labels": ['2020-01-05-00', '2020-01-05-01', '2020-01-05-02', '2020-01-05-03', '2020-01-05-04'], "name": "t", "type": "temporal"},
+                    {
+                        "labels": ["2020-01-05-00", "2020-01-05-01", "2020-01-05-02", "2020-01-05-03", "2020-01-05-04"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {"data": [6, 7, 6, 7, 6, 7, 6, 7, 6, 7], "offset": 0, "shape": [5, 2], "stride": [2, 1]},
@@ -76,11 +80,19 @@ def aggregate_temporal_period_process_code():
     ],
 )
 def test_aggregate_temporal_period(
-    aggregate_temporal_period_process_code, data, period, reducer, dimension, context, additional_code_specific_to_test_case, expected_output
+    aggregate_temporal_period_process_code,
+    data,
+    period,
+    reducer,
+    dimension,
+    context,
+    additional_code_specific_to_test_case,
+    expected_output,
 ):
     additional_js_code_to_run = (
-        load_datacube_code() + f"let cube = new DataCube({json.dumps(data)}, 'bands', 't', true);" +
-        (additional_code_specific_to_test_case or None)
+        load_datacube_code()
+        + f"let cube = new DataCube({json.dumps(data)}, 'bands', 't', true);"
+        + (additional_code_specific_to_test_case or None)
     )
     process_arguments = f"{{'data': cube, 'period': {json.dumps(period)}, 'reducer': {reducer}, 'dimension': {json.dumps(dimension)}, 'context': {json.dumps(context)}}}"
     output = run_process(
@@ -180,7 +192,7 @@ def test_aggregate_temporal_period(
             [{"B01": 1, "B02": 2}],
             "day",
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val), 0)",
-            [12,34,56],
+            [12, 34, 56],
             None,
             None,
             True,
@@ -214,7 +226,7 @@ def test_aggregate_temporal_period(
             None,
             "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-05'];",
             True,
-            "Value 'unknown_period' is not an allowed value for period."
+            "Value 'unknown_period' is not an allowed value for period.",
         ),
     ],
 )
