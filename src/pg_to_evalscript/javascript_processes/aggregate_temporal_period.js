@@ -96,7 +96,12 @@ function aggregate_temporal_period(arguments) {
           newDate.setDate(newDate.getDate() + 7);
           return newDate.toISOString();
         case "dekad":
-          newDate.setDate(newDate.getDate() + 10);
+          if (newDate.getDate() > 20) {
+            newDate.setMonth(newDate.getMonth() + 1);
+            newDate.setDate(1);
+          } else {
+            newDate.setDate(newDate.getDate() + 10);
+          }
           return newDate.toISOString();
         case "month":
           newDate.setMonth(newDate.getMonth() + 1);
