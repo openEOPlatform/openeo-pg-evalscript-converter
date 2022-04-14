@@ -115,7 +115,7 @@ def scenes():
 def test_aggregate_temporal(aggregate_temporal_process_code, data, scenes, example_input, expected_output):
     additional_js_code_to_run = (
         load_datacube_code()
-        + f"const cube = new DataCube({data}, 'bands_name', 'temporal_name', true, {scenes});"
+        + f"const cube = new DataCube({data}, 'bands_name', 'temporal_name', true, [], {scenes});"
     )
     process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'scenes': {scenes}, 'reducer': {example_input['reducer']}}}"
     output = run_process(
@@ -215,7 +215,7 @@ def test_aggregate_temporal(aggregate_temporal_process_code, data, scenes, examp
 def test_aggregate_temporal_exceptions(aggregate_temporal_process_code, data, scenes, example_input, raises_exception, error_message):
     additional_js_code_to_run = (
         load_datacube_code()
-        + f"const cube = new DataCube({data}, 'bands_name', 'temporal_name', true, {scenes});"
+        + f"const cube = new DataCube({data}, 'bands_name', 'temporal_name', true, [], {scenes});"
     )
     process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'scenes': {scenes}, 'reducer': {example_input['reducer']}}}"
     if raises_exception:
