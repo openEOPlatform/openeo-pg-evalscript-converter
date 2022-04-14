@@ -94,6 +94,26 @@ def test_convertable_process_graphs(pg_name, example_input, expected_output):
             ],
             [0, 2, -1, -2],
         ),
+        (
+            "test_aggregate_temporal",
+            [
+                {"B01": 16, "B02": 6},
+                {"B01": 17, "B02": 5},
+                {"B01": 18, "B02": 4},
+                {"B01": 19, "B02": 3},
+                {"B01": 20, "B02": 2},
+                {"B01": 21, "B02": 1},
+            ],
+            [
+                {"date":"2022-03-16T00:00:00.000Z"},
+                {"date":"2022-03-17T00:00:00.000Z"},
+                {"date":"2022-03-18T00:00:00.000Z"},
+                {"date":"2022-03-19T00:00:00.000Z"},
+                {"date":"2022-03-20T00:00:00.000Z"},
+                {"date":"2022-03-21T00:00:00.000Z"},
+            ],
+            [16.5, 5.5, 19.5, 2.5],
+        ),
     ],
 )
 def test_process_graphs_with_scenes(pg_name, example_input, scenes, expected_output):
