@@ -68,7 +68,8 @@ function setup() {{
 function evaluatePixel(samples, scenes) {{
     {self.write_datacube_creation()}
     {(newline + tab).join([node.write_call() for node in self.nodes])}
-    return {self.write_output_variable()}{".encodeData()" if self.encode_result else '.flattenToArray()'}
+    const finalOutput = {self.write_output_variable()}{".encodeData()" if self.encode_result else '.flattenToArray()'}
+    return Array.isArray(finalOutput) ? finalOutput : [finalOutput];
 }}
 """
 
