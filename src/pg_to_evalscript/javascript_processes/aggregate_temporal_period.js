@@ -28,13 +28,13 @@ function aggregate_temporal_period(arguments) {
     const d = new Date(label);
     switch (period) {
       case "hour":
-        const hourCount = d.getHours() - 1;
+        const hourCount = d.toISOString().split("T")[1].substring(0, 2);
         const days = d.getDate();
         const months = d.getMonth() + 1;
         return `${d.getFullYear()}-${padWithZeros(months, 2)}-${padWithZeros(
           days,
           2
-        )}-${padWithZeros(hourCount, 2)}`;
+        )}-${hourCount}`;
       case "day":
         const dayCount = dayInYear(d);
         return `${d.getFullYear()}-${padWithZeros(dayCount, 3)}`;
@@ -200,9 +200,7 @@ function aggregate_temporal_period(arguments) {
   });
 
   const newData = data.clone();
-  const temporalDimensions = newData.dimensions.filter(
-    (d) => d.type === newData.TEMPORAL
-  );
+  const temporalDimensions = newData.getTemporalDimensions();
   if (!dimension && temporalDimensions.length > 1) {
     throw new ProcessError({
       name: "TooManyDimensions",
