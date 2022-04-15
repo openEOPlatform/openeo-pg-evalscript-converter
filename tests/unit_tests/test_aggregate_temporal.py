@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, load_datacube_code, run_process
+from tests.utils import load_process_code, load_datacube_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -218,18 +218,11 @@ def test_aggregate_temporal_exceptions(aggregate_temporal_process_code, data, sc
         + f"const cube = new DataCube({data}, 'bands_name', 'temporal_name', true, [], {scenes});"
     )
     process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'scenes': {scenes}, 'reducer': {example_input['reducer']}}}"
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(
-                aggregate_temporal_process_code + additional_js_code_to_run,
-                "aggregate_temporal",
-                process_arguments,
-            )
-        assert error_message in str(exc.value)
 
-    else:
-        run_process(
-            aggregate_temporal_process_code + additional_js_code_to_run,
-            "aggregate_temporal",
-            process_arguments,
-        )
+    run_input_validation(
+        aggregate_temporal_process_code + additional_js_code_to_run,
+        "aggregate_temporal",
+        process_arguments,
+        raises_exception,
+        error_message=error_message,
+    )
