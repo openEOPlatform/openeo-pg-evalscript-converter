@@ -82,7 +82,7 @@ function aggregate_temporal_period(arguments) {
     }
   };
 
-  const generateDatesInRange = (minDate, maxDate, period) => {
+  const generateDatesInRangeByPeriod = (minDate, maxDate, period) => {
     const addPeriodToDate = (currentDate, period) => {
       let newDate = new Date(currentDate);
       switch (period) {
@@ -233,7 +233,7 @@ function aggregate_temporal_period(arguments) {
       temporalDimensionToAggregate.labels
     );
 
-    const dates = generateDatesInRange(minDate, maxDate, period);
+    const dates = generateDatesInRangeByPeriod(minDate, maxDate, period);
     for (let d of dates) {
       newLabels.push(formatLabelByPeriod(period, d));
     }

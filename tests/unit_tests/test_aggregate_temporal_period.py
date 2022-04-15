@@ -36,7 +36,7 @@ def aggregate_temporal_period_process_code():
         (
             [{"B01": 1, "B02": 2}, {"B01": 11, "B02": 12}],
             "day",
-            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length) * -1, 0)",
             None,
             None,
             "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-05', '2020-01-07'];",
@@ -50,7 +50,7 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["2020-005", "2020-006", "2020-007"], "name": "t", "type": "temporal"},
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
-                "data": {"data": [6, 7, 6, 7, 6, 7], "offset": 0, "shape": [3, 2], "stride": [2, 1]},
+                "data": {"data": [-5, -5, -5, -5, -5, -5], "offset": 0, "shape": [3, 2], "stride": [2, 1]},
             },
         ),
         (
@@ -77,6 +77,354 @@ def aggregate_temporal_period_process_code():
                 "data": {"data": [6, 7, 6, 7, 6, 7, 6, 7, 6, 7], "offset": 0, "shape": [5, 2], "stride": [2, 1]},
             },
         ),
+        (
+            [{"B01": 21, "B02": 22}, {"B01": 31, "B02": 32}],
+            "week",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
+            None,
+            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-01', '2020-02-15'];",
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {
+                        "labels": ["2020-01", "2020-02", "2020-03", "2020-04", "2020-05", "2020-06", "2020-07"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {
+                    "data": [26, 27, 26, 27, 26, 27, 26, 27, 26, 27, 26, 27, 26, 27],
+                    "offset": 0,
+                    "shape": [7, 2],
+                    "stride": [2, 1],
+                },
+            },
+        ),
+        (
+            [{"B01": 21, "B02": 22}, {"B01": 31, "B02": 32}],
+            "dekad",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
+            None,
+            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-01', '2020-02-15'];",
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {
+                        "labels": ["2020-01", "2020-02", "2020-03", "2020-04", "2020-05"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {
+                    "data": [26, 27, 26, 27, 26, 27, 26, 27, 26, 27],
+                    "offset": 0,
+                    "shape": [5, 2],
+                    "stride": [2, 1],
+                },
+            },
+        ),
+        (
+            [{"B01": 21, "B02": 22}, {"B01": 31, "B02": 32}],
+            "month",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
+            None,
+            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-01', '2020-02-15'];",
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {
+                        "labels": ["2020-01", "2020-02"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {
+                    "data": [26, 27, 26, 27],
+                    "offset": 0,
+                    "shape": [2, 2],
+                    "stride": [2, 1],
+                },
+            },
+        ),
+        (
+            [{"B01": 21, "B02": 22}, {"B01": 31, "B02": 32}],
+            "season",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
+            None,
+            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-01', '2020-02-15'];",
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {
+                        "labels": ["2020-djf"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {
+                    "data": [26, 27],
+                    "offset": 0,
+                    "shape": [1, 2],
+                    "stride": [2, 1],
+                },
+            },
+        ),
+        (
+            [{"B01": 21, "B02": 22}, {"B01": 31, "B02": 32}],
+            "season",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
+            None,
+            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-01', '2020-04-15'];",
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {
+                        "labels": ["2020-djf", "2020-mam"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {
+                    "data": [26, 27, 26, 27],
+                    "offset": 0,
+                    "shape": [2, 2],
+                    "stride": [2, 1],
+                },
+            },
+        ),
+        (
+            [{"B01": 21, "B02": 22}, {"B01": 31, "B02": 32}],
+            "tropical-season",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
+            None,
+            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-01', '2020-02-15'];",
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {
+                        "labels": ["2020-ndjfma"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {
+                    "data": [26, 27],
+                    "offset": 0,
+                    "shape": [1, 2],
+                    "stride": [2, 1],
+                },
+            },
+        ),
+        (
+            [{"B01": 21, "B02": 22}, {"B01": 31, "B02": 32}],
+            "tropical-season",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
+            None,
+            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-01', '2020-09-15'];",
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {
+                        "labels": ["2020-ndjfma", "2020-mjjaso"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {
+                    "data": [26, 27, 26, 27],
+                    "offset": 0,
+                    "shape": [2, 2],
+                    "stride": [2, 1],
+                },
+            },
+        ),
+        (
+            [{"B01": 21, "B02": 22}],
+            "week",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length) * -3, 0)",
+            None,
+            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-17'];",
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {
+                        "labels": ["2020-03"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {
+                    "data": [-63, -66],
+                    "offset": 0,
+                    "shape": [1, 2],
+                    "stride": [2, 1],
+                },
+            },
+        ),
+        (
+            [{"B01": 21, "B02": 22}],
+            "dekad",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length) * -3, 0)",
+            None,
+            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-17'];",
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {
+                        "labels": ["2020-02"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {
+                    "data": [-63, -66],
+                    "offset": 0,
+                    "shape": [1, 2],
+                    "stride": [2, 1],
+                },
+            },
+        ),
+        (
+            [{"B01": 21, "B02": 22}],
+            "month",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length) * -3, 0)",
+            None,
+            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-17'];",
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {
+                        "labels": ["2020-01"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {
+                    "data": [-63, -66],
+                    "offset": 0,
+                    "shape": [1, 2],
+                    "stride": [2, 1],
+                },
+            },
+        ),
+        (
+            [{"B01": 21, "B02": 22}],
+            "decade",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length) * -3, 0)",
+            None,
+            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-12'];",
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {
+                        "labels": ["2020"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {
+                    "data": [-63, -66],
+                    "offset": 0,
+                    "shape": [1, 2],
+                    "stride": [2, 1],
+                },
+            },
+        ),
+        (
+            [{"B01": 21, "B02": 22}],
+            "decade-ad",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length) * -3, 0)",
+            None,
+            None,
+            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-12'];",
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {
+                        "labels": ["2021"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {
+                    "data": [-63, -66],
+                    "offset": 0,
+                    "shape": [1, 2],
+                    "stride": [2, 1],
+                },
+            },
+        ),
     ],
 )
 def test_aggregate_temporal_period(
@@ -92,7 +440,7 @@ def test_aggregate_temporal_period(
     additional_js_code_to_run = (
         load_datacube_code()
         + f"let cube = new DataCube({json.dumps(data)}, 'bands', 't', true);"
-        + (additional_code_specific_to_test_case or None)
+        + (additional_code_specific_to_test_case or "")
     )
     process_arguments = f"{{'data': cube, 'period': {json.dumps(period)}, 'reducer': {reducer}, 'dimension': {json.dumps(dimension)}, 'context': {json.dumps(context)}}}"
     output = run_process(
@@ -104,7 +452,6 @@ def test_aggregate_temporal_period(
     assert output == expected_output
 
 
-@pytest.mark.skip("Skippppppppppp")
 @pytest.mark.parametrize(
     "data,period,reducer,dimension,context,additional_code_specific_to_test_case,raises_exception,error_name",
     [
@@ -246,7 +593,7 @@ def test_aggregate_temporal_period_exceptions(
         + f"let cube = new DataCube({json.dumps(data)}, 'bands', 't', true);"
         + (additional_code_specific_to_test_case or "")
     )
-    process_arguments = f"{{'data': cube, 'period': {json.dumps(period)}, 'reducer': {reducer}, 'dimension': {json.dumps(dimension)}, 'context': {json.dumps(context)}}}"
+    process_arguments = f"{{'data': cube, 'period': {json.dumps(period)}, 'reducer': {reducer if type(reducer) is str else json.dumps(reducer)}, 'dimension': {json.dumps(dimension)}, 'context': {json.dumps(context)}}}"
     run_input_validation(
         aggregate_temporal_period_process_code + additional_js_code_to_run,
         "aggregate_temporal_period",
