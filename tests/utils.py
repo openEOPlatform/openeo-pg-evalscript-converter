@@ -1,12 +1,18 @@
 import os
 import json
 import glob
+import uuid
+import platform
 import subprocess
 
 
-def get_process_graph_json(name):
+def get_abs_file_path(rel_file_path):
     script_dir = os.path.dirname(__file__)
-    abs_file_path = os.path.join(script_dir, f"process_graphs/{name}.json")
+    return os.path.join(script_dir, rel_file_path)
+
+
+def get_process_graph_json(name):
+    abs_file_path = get_abs_file_path(f"process_graphs/{name}.json")
     with open(abs_file_path) as f:
         return json.load(f)
 
@@ -33,12 +39,21 @@ def get_evalscript_input_object(evalscript):
 
 
 def run_javascript(javascript_code):
-    return subprocess.check_output(["node", "-e", javascript_code], stderr=subprocess.PIPE)
+    if platform.system() == "Windows":
+        abs_file_path = get_abs_file_path(f"test_code_{uuid.uuid4()}.js")
+        with open(abs_file_path, "w") as f:
+            f.write(javascript_code)
+
+        try:
+            return subprocess.check_output(["node", abs_file_path], stderr=subprocess.PIPE)
+        finally:
+            os.remove(abs_file_path)
+    else:
+        return subprocess.check_output(["node", "-e", javascript_code], stderr=subprocess.PIPE)
 
 
 def load_script(source_file_folder, source_file_name):
-    script_dir = os.path.dirname(__file__)
-    abs_file_path = os.path.join(script_dir, f"{source_file_folder}/{source_file_name}.js")
+    abs_file_path = get_abs_file_path(f"{source_file_folder}/{source_file_name}.js")
     with open(abs_file_path) as f:
         return f.read()
 
@@ -72,9 +87,9 @@ def run_input_validation(code, process, example_input, raises_exception, error_n
         try:
             run_process(code, process, example_input)
             # it should always throw an exception
-            assert False
+            assert False, "Process was expected to raise an error, but did not."
         except subprocess.CalledProcessError as exc:
-            assert expected in str(exc.stderr)
+            assert expected in str(exc.stderr), f"assert {expected} == {str(exc.stderr)}"
 
     else:
         run_process(code, process, example_input)

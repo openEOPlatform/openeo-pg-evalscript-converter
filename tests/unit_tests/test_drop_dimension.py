@@ -27,14 +27,13 @@ def drop_dimension_process_code():
                 "dimensions": [
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": {'data': [1, 2, 3], 'offset': 0, 'shape': [3], 'stride': [1]},
+                "data": {"data": [1, 2, 3], "offset": 0, "shape": [3], "stride": [1]},
             },
         ),
         (
             [{"B01": 1}, {"B01": 2}, {"B01": 3}, {"B01": 4}],
             "bands_name",
-            "cube.addDimension('x', 'x_label', 'spatial');"
-            + "cube.addDimension('y', 'y_label', 'spatial');",
+            "cube.addDimension('x', 'x_label', 'spatial');" + "cube.addDimension('y', 'y_label', 'spatial');",
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -46,7 +45,7 @@ def drop_dimension_process_code():
                     {"labels": ["x_label"], "name": "x", "type": "spatial"},
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                 ],
-                "data": {'data': [1, 2, 3, 4], 'offset': 0, 'shape': [1,1,4], 'stride': [4,4,1]},
+                "data": {"data": [1, 2, 3, 4], "offset": 0, "shape": [1, 1, 4], "stride": [4, 4, 1]},
             },
         ),
         (
@@ -63,7 +62,7 @@ def drop_dimension_process_code():
                     {"labels": [], "name": "temporal_name", "type": "temporal"},
                     {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
                 ],
-                "data": {'data': [1, 2, 3, 4, 5, 6], 'offset': 0, 'shape': [2,3], 'stride': [3,1]},
+                "data": {"data": [1, 2, 3, 4, 5, 6], "offset": 0, "shape": [2, 3], "stride": [3, 1]},
             },
         ),
     ],

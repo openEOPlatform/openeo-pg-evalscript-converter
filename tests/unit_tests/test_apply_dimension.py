@@ -53,7 +53,7 @@ def apply_dimension_process_code():
                 "process": "({data}) => {const sum = data.reduce((a, b) => a + b, 0); return data.map(el => el * sum)}",
                 "dimension": "temporal",
             },
-            [9, 24, 27, 48, 45, 72]
+            [9, 24, 27, 48, 45, 72],
         ),
         (
             {
@@ -89,7 +89,7 @@ def apply_dimension_process_code():
                 "process": "({data}) => {const sum = data.reduce((a, b) => a + b, 0); return data.map(el => el * sum)}",
                 "dimension": "bands",
             },
-            [3, 6, 21, 28, 55, 66]
+            [3, 6, 21, 28, 55, 66],
         ),
     ],
 )
@@ -113,7 +113,7 @@ def test_apply_dimension(apply_dimension_process_code, example_input, expected_r
     [
         (
             {
-                "data": [{ "B01": 1, "B02": 2, "B03": 3}],
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
                 "process": "({data})=>1",
                 "dimension": "bands",
             },
@@ -130,7 +130,7 @@ def test_apply_dimension(apply_dimension_process_code, example_input, expected_r
         ),
         (
             {
-                "data": [{ "B01": 1, "B02": 2, "B03": 3}],
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
                 "dimension": "bands",
             },
             True,
@@ -138,7 +138,7 @@ def test_apply_dimension(apply_dimension_process_code, example_input, expected_r
         ),
         (
             {
-                "data": [{ "B01": 1, "B02": 2, "B03": 3}],
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
                 "process": "({data})=>1",
             },
             True,
@@ -146,7 +146,7 @@ def test_apply_dimension(apply_dimension_process_code, example_input, expected_r
         ),
         (
             {
-                "data": [{ "B01": 1, "B02": 2, "B03": 3}],
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
                 "process": "({data})=>1",
                 "dimension": True,
             },
@@ -155,7 +155,7 @@ def test_apply_dimension(apply_dimension_process_code, example_input, expected_r
         ),
         (
             {
-                "data": [{ "B01": 1, "B02": 2, "B03": 3}],
+                "data": [{"B01": 1, "B02": 2, "B03": 3}],
                 "process": "({data})=>1",
                 "dimension": "bands",
                 "target_dimension": True,
