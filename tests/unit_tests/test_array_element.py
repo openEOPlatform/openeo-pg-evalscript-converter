@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, load_datacube_code, run_process, run_process
+from tests.utils import load_process_code, load_datacube_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -85,10 +85,18 @@ def test_array_element(array_element_process_code, example_input, expected_outpu
     ],
 )
 def test_array_element_exceptions(array_element_process_code, example_input, raises_exception, error_message):
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(array_element_process_code, "array_element", example_input)
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(array_element_process_code, "array_element", example_input)
+    additional_js_code_to_run = (
+        load_datacube_code()
+        + f"const d = {json.dumps(example_input['data']) if 'data' in example_input else 'undefined'};"
+        + f"d.labels = {json.dumps(example_input['labels']) if 'labels' in example_input else 'undefined'};"
+        if "data" in example_input
+        else ""
+    )
+    process_arguments = f"{{...{json.dumps(example_input)}, 'data': {'d' if 'data' in example_input else 'undefined'}}}"
+    run_input_validation(
+        array_element_process_code + additional_js_code_to_run,
+        "array_element",
+        process_arguments,
+        raises_exception,
+        error_message=error_message,
+    )

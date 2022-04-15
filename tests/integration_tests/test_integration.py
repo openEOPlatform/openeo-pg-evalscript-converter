@@ -31,7 +31,7 @@ from tests.utils import (
             [1, 1.5, 0, 2, 0, 2, None, None],
         ),
         ("test_graph_1", [], []),
-        ("test_mean_of_mean", [{"B04": 0, "B08":1}, {"B04":2, "B08":3}, {"B04":3, "B08":5}, {"B04":1, "B08": 4}], 2.375),
+        ("test_mean_of_mean", [{"B04": 0, "B08":1}, {"B04":2, "B08":3}, {"B04":3, "B08":5}, {"B04":1, "B08": 4}], [2.375]),
         (
             "test_count_with_condition",
             [{"B01": 0, "B02": 1}, {"B01": 2, "B02": 3}, {"B01": 4, "B02": 5}, {"B01": None, "B02": None}],
@@ -48,7 +48,11 @@ from tests.utils import (
             [10, 11, 12, 13, 14, 15],
         ),
         ("test_array_filter", [{"B01": 0}, {"B01": 1}, {"B01": 2}, {"B01": 4}, {"B01": 5}], [11]),
-        ("test_apply_dimension_absolute", [{"B01": -0.1, "B02": 0.15}, {"B01": 0, "B02": 2}, {"B01": -1, "B02": -2}], [0.1, 0.15, 0, 2, 1, 2]),
+        (
+            "test_apply_dimension_absolute",
+            [{"B01": -0.1, "B02": 0.15}, {"B01": 0, "B02": 2}, {"B01": -1, "B02": -2}],
+            [0.1, 0.15, 0, 2, 1, 2],
+        ),
     ],
 )
 def test_convertable_process_graphs(pg_name, example_input, expected_output):
@@ -61,7 +65,7 @@ def test_convertable_process_graphs(pg_name, example_input, expected_output):
 
     output = run_evalscript(evalscript, example_input)
     output = json.loads(output)
-    
+
     assert output == expected_output
 
 
@@ -70,29 +74,42 @@ def test_convertable_process_graphs(pg_name, example_input, expected_output):
     [
         (
             "test_filter_temporal",
+            [{"B01": 3, "B02": 3}, {"B01": 5, "B02": 1}],
             [
-                {"B01": 3, "B02": 3},
-                {"B01": 5, "B02": 1}
-            ],
-            [
-                {"date":"2022-03-21T00:00:00.000Z"},
-                {"date":"2022-03-19T00:00:00.000Z"},
+                {"date": "2022-03-21T00:00:00.000Z"},
+                {"date": "2022-03-19T00:00:00.000Z"},
             ],
             [5, 1],
         ),
         (
             "test_filter_temporal",
+            [{"B01": -0.1, "B02": 0.15}, {"B01": 0, "B02": 2}, {"B01": -1, "B02": -2}],
             [
-                {"B01": -0.1, "B02": 0.15},
-                {"B01": 0, "B02": 2},
-                {"B01": -1, "B02": -2}
-            ],
-            [
-                {"date":"2022-03-21T00:00:00.000Z"},
-                {"date":"2022-03-19T00:00:00.000Z"},
-                {"date":"2022-03-16T00:00:00.000Z"},
+                {"date": "2022-03-21T00:00:00.000Z"},
+                {"date": "2022-03-19T00:00:00.000Z"},
+                {"date": "2022-03-16T00:00:00.000Z"},
             ],
             [0, 2, -1, -2],
+        ),
+        (
+            "test_aggregate_temporal",
+            [
+                {"B01": 16, "B02": 6},
+                {"B01": 17, "B02": 5},
+                {"B01": 18, "B02": 4},
+                {"B01": 19, "B02": 3},
+                {"B01": 20, "B02": 2},
+                {"B01": 21, "B02": 1},
+            ],
+            [
+                {"date":"2022-03-16T00:00:00.000Z"},
+                {"date":"2022-03-17T00:00:00.000Z"},
+                {"date":"2022-03-18T00:00:00.000Z"},
+                {"date":"2022-03-19T00:00:00.000Z"},
+                {"date":"2022-03-20T00:00:00.000Z"},
+                {"date":"2022-03-21T00:00:00.000Z"},
+            ],
+            [16.5, 5.5, 19.5, 2.5],
         ),
     ],
 )

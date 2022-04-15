@@ -75,6 +75,7 @@ class Node:
             "array_apply": ArrayApplyNode,
             "array_filter": ArrayFilterNode,
             "apply_dimension": ApplyDimensionNode,
+            "aggregate_temporal": AggregateTemporalNode,
         }
         if class_types_for_process.get(process_id):
             self.__class__ = class_types_for_process[process_id]
@@ -126,12 +127,6 @@ class Node:
 
     def write_process(self):
         process_definition = self.load_process_code()
-
-        #         if process_definition is None:
-        #             return f"""function {self.get_process_function_name()}(arguments) {{
-        #     const {{lmao}} = arguments;
-        #     return lmao + 42;
-        # }}"""
         return self.indent_by_level(process_definition)
 
     def write_call(self):
@@ -283,8 +278,9 @@ function count(arguments) {{
 }}
 """
 
+
 class ArrayApplyNode(Node):
-    def write_process(self):   
+    def write_process(self):
         newline = "\n"
         tab = "\t"
         return f"""
@@ -301,6 +297,7 @@ function array_apply(arguments) {{
 }}
 """
 
+
 class ArrayFilterNode(Node):
     def write_process(self):
         newline = "\n"
@@ -315,5 +312,22 @@ function array_filter(arguments) {{
 
     {self.load_process_code()}
     return array_filter(arguments);
+}}
+"""
+
+class AggregateTemporalNode(Node):
+    def write_process(self):
+        newline = "\n"
+        tab = "\t"
+        return f"""
+function aggregate_temporal(arguments) {{
+    function reducer(arguments) {{
+    {newline.join(node.write_function() for node in self.child_nodes)}
+    {newline.join(node.write_call() for node in self.child_nodes)}
+        return {self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id};
+    }}
+
+    {self.load_process_code()}
+    return aggregate_temporal({{...arguments, reducer: reducer}});
 }}
 """

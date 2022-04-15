@@ -83,10 +83,10 @@ def apply_process_code():
                 "data": {"data": [1, 2, 3, 4, 5, 6, 7, 8, 9], "offset": 0, "shape": [3, 3], "stride": [3, 1]},
             },
         ),
-         (
+        (
             {
                 "data": [
-                    {"B01": 1, "B02": -2, "B03": 3},       
+                    {"B01": 1, "B02": -2, "B03": 3},
                 ],
                 "context": {"pi": 3.14},
                 "name": "test_apply",
@@ -102,7 +102,7 @@ def apply_process_code():
                     {"name": "temporal_name", "labels": [], "type": "temporal"},
                     {"name": "bands_name", "labels": ["B01", "B02", "B03"], "type": "bands"},
                 ],
-                "data": {"data": [3.14, -6.28, 9.42],  "offset": 0, "shape": [1, 3], "stride": [3, 1]},
+                "data": {"data": [3.14, -6.28, 9.42], "offset": 0, "shape": [1, 3], "stride": [3, 1]},
             },
         ),
     ],

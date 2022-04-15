@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from tests.utils import load_process_code, run_process
+from tests.utils import load_process_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -36,7 +36,7 @@ def test_array_labels(array_labels_process_code, example_input, expected_output)
     "example_input,raises_exception,error_message",
     [
         ({"data": [1, 0, 3, 2], "labels": [1, 2, 3, 4]}, False, None),
-        ({"data_fake": [1, 0, 3, 2]}, True, "Mandatory argument `data` is not defined."),
+        ({}, True, "Mandatory argument `data` is not defined."),
         ({"data": "[1,0,3,2]"}, True, "Argument `data` is not an array."),
         ({"data": [1, 0, 3, 2]}, True, "Argument `data` is not a labeled array."),
         ({"data": [1, 0, 3, 2], "labels": "[1,2,3,4]"}, True, "Labels in argument `data` is not an array."),
@@ -44,22 +44,16 @@ def test_array_labels(array_labels_process_code, example_input, expected_output)
 )
 def test_array_labels_exceptions(array_labels_process_code, example_input, raises_exception, error_message):
     additional_js_code_to_run = (
-        f"const d = {json.dumps(example_input['data'] if 'data' in example_input else 'undefined')};"
+        f"const d = {json.dumps(example_input['data']) if 'data' in example_input else 'undefined'};"
         + f"d.labels = {json.dumps(example_input['labels']) if 'labels' in example_input else 'undefined'};"
+        if "data" in example_input
+        else ""
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': d}}"
-    if raises_exception:
-        with pytest.raises(Exception) as exc:
-            run_process(
-                array_labels_process_code + additional_js_code_to_run,
-                "array_labels",
-                process_arguments,
-            )
-        assert error_message in str(exc.value)
-
-    else:
-        run_process(
-            array_labels_process_code + additional_js_code_to_run,
-            "array_labels",
-            process_arguments,
-        )
+    process_arguments = f"{{...{json.dumps(example_input)}, 'data': {'d' if 'data' in example_input else 'undefined'}}}"
+    run_input_validation(
+        array_labels_process_code + additional_js_code_to_run,
+        "array_labels",
+        process_arguments,
+        raises_exception,
+        error_message=error_message,
+    )

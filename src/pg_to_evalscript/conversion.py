@@ -170,7 +170,7 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
                 level=level + 1,
             )
         elif process_id == "count":
-            if "condition" in arguments and arguments["condition"] is not None: 
+            if "condition" in arguments and arguments["condition"] is not None:
                 child_nodes, _, _ = generate_nodes_from_process_graph(
                     arguments["condition"]["process_graph"],
                     bands_dimension_name,
@@ -187,6 +187,13 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
         elif process_id == "array_filter":
             child_nodes, _, _ = generate_nodes_from_process_graph(
                 arguments["condition"]["process_graph"],
+                bands_dimension_name,
+                temporal_dimension_name,
+                level=level + 1,
+            )
+        elif process_id == "aggregate_temporal":
+            child_nodes, _, _ = generate_nodes_from_process_graph(
+                arguments["reducer"]["process_graph"],
                 bands_dimension_name,
                 temporal_dimension_name,
                 level=level + 1,
