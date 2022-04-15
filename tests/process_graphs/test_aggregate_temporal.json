@@ -1,0 +1,36 @@
+{
+  "loadcollection": {
+    "process_id": "load_collection",
+    "arguments": {
+      "spatial_extent": null,
+      "id": "S2L2A",
+      "temporal_extent": null,
+      "bands": ["B01", "B02"]
+    }
+  },
+  "aggregate_temporal1": {
+    "process_id": "aggregate_temporal",
+    "arguments": {
+      "data": {
+        "from_node": "loadcollection"
+      },
+      "intervals": [
+        [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
+        [ "2022-03-18T00:00:00.000Z", "2022-03-22T00:00:00.000Z" ]
+      ],
+      "reducer": {
+        "process_graph": {
+           "2": {
+              "process_id":"mean",
+              "arguments":{
+                 "data":{
+                    "from_parameter":"data"
+                 }
+              },
+              "result":true
+           }
+        }
+     }
+    }
+  }
+}
