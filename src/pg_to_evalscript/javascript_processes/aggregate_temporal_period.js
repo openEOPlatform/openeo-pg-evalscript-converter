@@ -221,7 +221,6 @@ function aggregate_temporal_period(arguments) {
     });
   }
 
-  // add code for aggregating
   const axis = newData.dimensions.findIndex(
     (d) => (d.name = temporalDimensionToAggregate.name)
   );
