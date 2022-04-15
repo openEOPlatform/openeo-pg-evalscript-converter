@@ -76,6 +76,7 @@ class Node:
             "array_filter": ArrayFilterNode,
             "aggregate_temporal_period": AggregateTemporalPeriodNode,
             "apply_dimension": ApplyDimensionNode,
+            "aggregate_temporal": AggregateTemporalNode,
         }
         if class_types_for_process.get(process_id):
             self.__class__ = class_types_for_process[process_id]
@@ -127,12 +128,6 @@ class Node:
 
     def write_process(self):
         process_definition = self.load_process_code()
-
-        #         if process_definition is None:
-        #             return f"""function {self.get_process_function_name()}(arguments) {{
-        #     const {{lmao}} = arguments;
-        #     return lmao + 42;
-        # }}"""
         return self.indent_by_level(process_definition)
 
     def write_call(self):
@@ -336,5 +331,22 @@ function aggregate_temporal_period(arguments) {{
     {self.load_process_code()}
     arguments['reducer'] = reducer;
     return aggregate_temporal_period(arguments)
+}}
+"""
+
+class AggregateTemporalNode(Node):
+    def write_process(self):
+        newline = "\n"
+        tab = "\t"
+        return f"""
+function aggregate_temporal(arguments) {{
+    function reducer(arguments) {{
+    {newline.join(node.write_function() for node in self.child_nodes)}
+    {newline.join(node.write_call() for node in self.child_nodes)}
+        return {self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id};
+    }}
+
+    {self.load_process_code()}
+    return aggregate_temporal({{...arguments, reducer: reducer}});
 }}
 """
