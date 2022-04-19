@@ -143,8 +143,8 @@ const generateDatesInRangeByPeriod = (minDate, maxDate, period) => {
         return newDate.toISOString();
       case "dekad":
         if (newDate.getDate() > 20) {
-          newDate.setMonth(newDate.getMonth() + 1);
           newDate.setDate(1);
+          newDate.setMonth(newDate.getMonth() + 1);
         } else {
           newDate.setDate(newDate.getDate() + 10);
         }
