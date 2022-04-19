@@ -266,8 +266,9 @@ class DataCube {
             formatLabelByPeriod(period, temporalDimensionToAggregate.labels[0])
           );
         }
-      
-        for (let _ of newLabels) {
+
+        const formattedOldLabels = temporalDimensionToAggregate.labels.map(l => formatLabelByPeriod(period, l))
+        for (let newLabel of newLabels) {
           const allCoords = this._iterateCoords(this.data.shape.slice(), [
             axis,
           ]);
@@ -276,12 +277,16 @@ class DataCube {
             const dataToReduce = convert_to_1d_array(
               this.data.pick.apply(this.data, coords)
             );
-      
-            const newVals = reducer({
-              data: dataToReduce,
-              context: context,
-            });
-            newValues.push(newVals);
+
+            if (!formattedOldLabels.includes(newLabel)) {
+                newValues.push(null);
+            } else {
+                const newVals = reducer({
+                    data: dataToReduce,
+                    context: context,
+                });
+                newValues.push(newVals);
+            }
           }
         }
       

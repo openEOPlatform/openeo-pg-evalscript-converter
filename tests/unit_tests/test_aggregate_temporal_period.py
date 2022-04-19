@@ -50,7 +50,7 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["2020-005", "2020-006", "2020-007"], "name": "t", "type": "temporal"},
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
-                "data": {"data": [6, 7, 6, 7, 6, 7], "offset": 0, "shape": [3, 2], "stride": [2, 1]},
+                "data": {"data": [6, 7, None, None, 6, 7], "offset": 0, "shape": [3, 2], "stride": [2, 1]},
             },
         ),
         (
@@ -74,7 +74,7 @@ def aggregate_temporal_period_process_code():
                     },
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
-                "data": {"data": [6, 7, 6, 7, 6, 7, 6, 7, 6, 7], "offset": 0, "shape": [5, 2], "stride": [2, 1]},
+                "data": {"data": [6, 7, None, None, None, None, None, None, 6, 7], "offset": 0, "shape": [5, 2], "stride": [2, 1]},
             },
         ),
         (
@@ -99,7 +99,7 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {
-                    "data": [26, 27, 26, 27, 26, 27, 26, 27, 26, 27, 26, 27, 26, 27],
+                    "data": [26, 27, None, None, None, None, None, None, None, None, None, None, 26, 27],
                     "offset": 0,
                     "shape": [7, 2],
                     "stride": [2, 1],
@@ -128,7 +128,7 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {
-                    "data": [26, 27, 26, 27, 26, 27, 26, 27, 26, 27],
+                    "data": [26, 27, None, None, None, None, None, None, 26, 27],
                     "offset": 0,
                     "shape": [5, 2],
                     "stride": [2, 1],
