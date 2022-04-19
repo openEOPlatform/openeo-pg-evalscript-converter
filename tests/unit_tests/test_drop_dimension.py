@@ -3,7 +3,7 @@ import json
 import pytest
 import subprocess
 
-from tests.utils import load_process_code, load_datacube_code, run_process
+from tests.utils import load_process_code, load_datacube_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -146,19 +146,10 @@ def test_drop_dimension_exceptions(
         + (additional_js_code_specific_to_case or "")
     )
     process_arguments = f"{{'data': cube, 'name': {json.dumps(name)}}}"
-    if raises_exception:
-        try:
-            run_process(
-                drop_dimension_process_code + additional_js_code_to_run,
-                "drop_dimension",
-                process_arguments,
-            )
-        except subprocess.CalledProcessError as exc:
-            assert error_message in str(exc.stderr)
-
-    else:
-        run_process(
-            drop_dimension_process_code + additional_js_code_to_run,
-            "drop_dimension",
-            process_arguments,
-        )
+    run_input_validation(
+        drop_dimension_process_code + additional_js_code_to_run,
+        "drop_dimension",
+        process_arguments,
+        raises_exception,
+        error_message=error_message,
+    )
