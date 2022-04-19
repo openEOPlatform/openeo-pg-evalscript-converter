@@ -16,7 +16,7 @@ def aggregate_temporal_period_process_code():
         (
             [{"B01": 1, "B02": 2}],
             "day",
-            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length) * -1, 0)",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
             "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-05'];",
@@ -30,13 +30,13 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["2020-005"], "name": "t", "type": "temporal"},
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
-                "data": {"data": [-1, -2], "offset": 0, "shape": [1, 2], "stride": [2, 1]},
+                "data": {"data": [1, 2], "offset": 0, "shape": [1, 2], "stride": [2, 1]},
             },
         ),
         (
             [{"B01": 1, "B02": 2}, {"B01": 11, "B02": 12}],
             "day",
-            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length) * -1, 0)",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
             "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-05', '2020-01-07'];",
@@ -50,7 +50,7 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["2020-005", "2020-006", "2020-007"], "name": "t", "type": "temporal"},
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
-                "data": {"data": [-5, -5, -5, -5, -5, -5], "offset": 0, "shape": [3, 2], "stride": [2, 1]},
+                "data": {"data": [6, 7, 6, 7, 6, 7], "offset": 0, "shape": [3, 2], "stride": [2, 1]},
             },
         ),
         (
@@ -283,7 +283,7 @@ def aggregate_temporal_period_process_code():
         (
             [{"B01": 21, "B02": 22}],
             "week",
-            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length) * -3, 0)",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
             "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-17'];",
@@ -302,7 +302,7 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {
-                    "data": [-63, -66],
+                    "data": [21, 22],
                     "offset": 0,
                     "shape": [1, 2],
                     "stride": [2, 1],
@@ -312,7 +312,7 @@ def aggregate_temporal_period_process_code():
         (
             [{"B01": 21, "B02": 22}],
             "dekad",
-            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length) * -3, 0)",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
             "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-17'];",
@@ -331,7 +331,7 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {
-                    "data": [-63, -66],
+                    "data": [21, 22],
                     "offset": 0,
                     "shape": [1, 2],
                     "stride": [2, 1],
@@ -341,7 +341,7 @@ def aggregate_temporal_period_process_code():
         (
             [{"B01": 21, "B02": 22}],
             "month",
-            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length) * -3, 0)",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
             "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-17'];",
@@ -360,7 +360,7 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {
-                    "data": [-63, -66],
+                    "data": [21, 22],
                     "offset": 0,
                     "shape": [1, 2],
                     "stride": [2, 1],
@@ -370,7 +370,7 @@ def aggregate_temporal_period_process_code():
         (
             [{"B01": 21, "B02": 22}],
             "decade",
-            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length) * -3, 0)",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
             "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-12'];",
@@ -389,7 +389,7 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {
-                    "data": [-63, -66],
+                    "data": [21, 22],
                     "offset": 0,
                     "shape": [1, 2],
                     "stride": [2, 1],
@@ -399,7 +399,7 @@ def aggregate_temporal_period_process_code():
         (
             [{"B01": 21, "B02": 22}],
             "decade-ad",
-            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length) * -3, 0)",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
             "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-12'];",
@@ -418,7 +418,7 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {
-                    "data": [-63, -66],
+                    "data": [21, 22],
                     "offset": 0,
                     "shape": [1, 2],
                     "stride": [2, 1],
