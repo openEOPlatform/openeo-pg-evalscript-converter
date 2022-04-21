@@ -269,18 +269,25 @@ class DataCube {
 
         const formattedOldLabels = temporalDimensionToAggregate.labels.map(l => formatLabelByPeriod(period, l))
         for (let newLabel of newLabels) {
-          const allCoords = this._iterateCoords(this.data.shape.slice(), [
-            axis,
-          ]);
-      
-          for (let coords of allCoords) {
-            const dataToReduce = convert_to_1d_array(
-              this.data.pick.apply(this.data, coords)
-            );
+          const allCoords = this._iterateCoords(this.data.shape.slice(), [axis]);
+          const indices = []
+          for (let i = 0; i < formattedOldLabels.length; i++) {
+              if (newLabel === formattedOldLabels[i]) {
+                  indices.push(i)
+                }
+          }
+
+          for (let coord of allCoords) {
+            const entireDataToReduce = convert_to_1d_array(this.data.pick.apply(this.data, coord));
 
             if (!formattedOldLabels.includes(newLabel)) {
                 newValues.push(null);
             } else {
+                const dataToReduce = []
+                for (let index of indices) {
+                    dataToReduce.push(entireDataToReduce[index])
+                }
+
                 const newVals = reducer({
                     data: dataToReduce,
                     context: context,
