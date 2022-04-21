@@ -1,0 +1,34 @@
+{
+  "loadcollection": {
+    "process_id": "load_collection",
+    "arguments": {
+      "spatial_extent": null,
+      "id": "S2L2A",
+      "temporal_extent": null,
+      "bands": ["B01", "B02"]
+    }
+  },
+  "aggregate_tp": {
+    "process_id": "aggregate_temporal_period",
+    "arguments": {
+      "data": {
+        "from_node": "loadcollection"
+      },
+      "period": "week",
+      "reducer": {
+        "process_graph": {
+          "sum": {
+            "process_id": "sum",
+            "arguments": {
+              "data": {
+                "from_parameter": "data"
+              }
+            },
+            "result": true
+          }
+        }
+      }
+    },
+    "result": true
+  }
+}
