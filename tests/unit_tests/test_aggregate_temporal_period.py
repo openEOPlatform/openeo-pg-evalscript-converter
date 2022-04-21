@@ -11,7 +11,7 @@ def aggregate_temporal_period_process_code():
 
 
 @pytest.mark.parametrize(
-    "data,period,reducer,dimension,context,additional_code_specific_to_test_case,expected_output",
+    "data,period,reducer,dimension,context,scenes,expected_output",
     [
         (
             [{"B01": 1, "B02": 2}],
@@ -19,7 +19,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-05'];",
+            [{"date": "2020-01-05"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -39,7 +39,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-05', '2020-01-07'];",
+            [{"date": "2020-01-05"}, {"date": "2020-01-07"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -59,7 +59,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-05T00:00:00.000Z', '2020-01-05T04:00:00.000Z'];",
+            [{"date": "2020-01-05T00:00:00.000Z"}, {"date": "2020-01-05T04:00:00.000Z"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -74,7 +74,12 @@ def aggregate_temporal_period_process_code():
                     },
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
-                "data": {"data": [6, 7, None, None, None, None, None, None, 6, 7], "offset": 0, "shape": [5, 2], "stride": [2, 1]},
+                "data": {
+                    "data": [6, 7, None, None, None, None, None, None, 6, 7],
+                    "offset": 0,
+                    "shape": [5, 2],
+                    "stride": [2, 1],
+                },
             },
         ),
         (
@@ -83,7 +88,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-01', '2020-02-15'];",
+            [{"date": "2020-01-01"}, {"date": "2020-02-15"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -112,7 +117,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-01', '2020-02-15'];",
+            [{"date": "2020-01-01"}, {"date": "2020-02-15"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -141,7 +146,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-01', '2020-02-15'];",
+            [{"date": "2020-01-01"}, {"date": "2020-02-15"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -170,7 +175,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-01', '2020-02-15'];",
+            [{"date": "2020-01-01"}, {"date": "2020-02-15"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -199,7 +204,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-01', '2020-04-15'];",
+            [{"date": "2020-01-01"}, {"date": "2020-04-15"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -228,7 +233,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-01', '2020-02-15'];",
+            [{"date": "2020-01-01"}, {"date": "2020-02-15"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -257,7 +262,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-01', '2020-09-15'];",
+            [{"date": "2020-01-01"}, {"date": "2020-09-15"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -286,7 +291,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-17'];",
+            [{"date": "2020-01-17"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -315,7 +320,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-17'];",
+            [{"date": "2020-01-17"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -344,7 +349,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-17'];",
+            [{"date": "2020-01-17"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -373,7 +378,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-12'];",
+            [{"date": "2020-01-12"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -402,7 +407,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            "cube.getDimensionByName(cube.temporal_dimension_name).labels = ['2020-01-12'];",
+            [{"date": "2020-01-12"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -434,13 +439,11 @@ def test_aggregate_temporal_period(
     reducer,
     dimension,
     context,
-    additional_code_specific_to_test_case,
+    scenes,
     expected_output,
 ):
     additional_js_code_to_run = (
-        load_datacube_code()
-        + f"let cube = new DataCube({json.dumps(data)}, 'bands', 't', true);"
-        + (additional_code_specific_to_test_case or "")
+        load_datacube_code() + f"let cube = new DataCube({json.dumps(data)}, 'bands', 't', true, [], {scenes});"
     )
     process_arguments = f"{{'data': cube, 'period': {json.dumps(period)}, 'reducer': {reducer}, 'dimension': {json.dumps(dimension)}, 'context': {json.dumps(context)}}}"
     output = run_process(
