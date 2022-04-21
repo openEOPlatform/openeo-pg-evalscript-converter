@@ -50,7 +50,7 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["2020-005", "2020-006", "2020-007"], "name": "t", "type": "temporal"},
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
-                "data": {"data": [6, 7, None, None, 6, 7], "offset": 0, "shape": [3, 2], "stride": [2, 1]},
+                "data": {"data": [1, 2, None, None, 11, 12], "offset": 0, "shape": [3, 2], "stride": [2, 1]},
             },
         ),
         (
@@ -75,9 +75,38 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {
-                    "data": [6, 7, None, None, None, None, None, None, 6, 7],
+                    "data": [1, 2, None, None, None, None, None, None, 11, 12],
                     "offset": 0,
                     "shape": [5, 2],
+                    "stride": [2, 1],
+                },
+            },
+        ),
+        (
+            [{"B01": 1, "B02": 2}, {"B01": 11, "B02": 12}, {"B01": 21, "B02": 22}, {"B01": 31, "B02": 32}, {"B01": 41, "B02": 42}, {"B01": 51, "B02": 52}, {"B01": 61, "B02": 62}],
+            "hour",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
+            None,
+            None,
+            [{"date": "2020-01-05T00:00:00.000Z"}, {"date": "2020-01-05T00:10:00.000Z"}, {"date": "2020-01-05T00:20:00.000Z"}, {"date": "2020-01-05T00:30:00.000Z"}, {"date": "2020-01-05T00:40:00.000Z"}, {"date": "2020-01-05T00:50:00.000Z"}, {"date": "2020-01-05T01:00:00.000Z"}],
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {
+                        "labels": ["2020-01-05-00", "2020-01-05-01"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {
+                    "data": [26, 27, 61, 62],
+                    "offset": 0,
+                    "shape": [2, 2],
                     "stride": [2, 1],
                 },
             },
@@ -104,7 +133,7 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {
-                    "data": [26, 27, None, None, None, None, None, None, None, None, None, None, 26, 27],
+                    "data": [21, 22, None, None, None, None, None, None, None, None, None, None, 31, 32],
                     "offset": 0,
                     "shape": [7, 2],
                     "stride": [2, 1],
@@ -133,7 +162,7 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {
-                    "data": [26, 27, None, None, None, None, None, None, 26, 27],
+                    "data": [21, 22, None, None, None, None, None, None, 31, 32],
                     "offset": 0,
                     "shape": [5, 2],
                     "stride": [2, 1],
@@ -162,7 +191,7 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {
-                    "data": [26, 27, 26, 27],
+                    "data": [21, 22, 31, 32],
                     "offset": 0,
                     "shape": [2, 2],
                     "stride": [2, 1],
@@ -220,7 +249,36 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {
-                    "data": [26, 27, 26, 27],
+                    "data": [21, 22, 31, 32],
+                    "offset": 0,
+                    "shape": [2, 2],
+                    "stride": [2, 1],
+                },
+            },
+        ),
+        (
+            [{"B01": 21, "B02": 22}, {"B01": 31, "B02": 32}, {"B01": 33, "B02": 34}],
+            "season",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
+            None,
+            None,
+            [{"date": "2020-01-01"}, {"date": "2020-04-15"}, {"date": "2020-04-29"}],
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {
+                        "labels": ["2020-djf", "2020-mam"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {
+                    "data": [21, 22, 32, 33],
                     "offset": 0,
                     "shape": [2, 2],
                     "stride": [2, 1],
@@ -257,6 +315,35 @@ def aggregate_temporal_period_process_code():
             },
         ),
         (
+            [{"B01": 21, "B02": 22}, {"B01": 31, "B02": 32}, {"B01": 41, "B02": 42}],
+            "tropical-season",
+            "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
+            None,
+            None,
+            [{"date": "2020-01-01"}, {"date": "2020-02-15"}, {"date": "2020-02-27"}],
+            {
+                "BANDS": "bands",
+                "OTHER": "other",
+                "TEMPORAL": "temporal",
+                "bands_dimension_name": "bands",
+                "temporal_dimension_name": "t",
+                "dimensions": [
+                    {
+                        "labels": ["2020-ndjfma"],
+                        "name": "t",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
+                ],
+                "data": {
+                    "data": [31, 32],
+                    "offset": 0,
+                    "shape": [1, 2],
+                    "stride": [2, 1],
+                },
+            },
+        ),
+        (
             [{"B01": 21, "B02": 22}, {"B01": 31, "B02": 32}],
             "tropical-season",
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
@@ -278,7 +365,7 @@ def aggregate_temporal_period_process_code():
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
                 ],
                 "data": {
-                    "data": [26, 27, 26, 27],
+                    "data": [21, 22, 31, 32],
                     "offset": 0,
                     "shape": [2, 2],
                     "stride": [2, 1],
