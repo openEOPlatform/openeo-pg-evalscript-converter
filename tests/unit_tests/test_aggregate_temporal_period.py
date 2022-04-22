@@ -146,7 +146,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            [{"date": "2020-01-01"}, {"date": "2020-02-15"}],
+            [{"date": "2020-01-02"}, {"date": "2020-02-15"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",
@@ -175,7 +175,7 @@ def aggregate_temporal_period_process_code():
             "({data, context}) => data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0)",
             None,
             None,
-            [{"date": "2020-01-01"}, {"date": "2020-02-15"}],
+            [{"date": "2020-01-21"}, {"date": "2020-02-15"}],
             {
                 "BANDS": "bands",
                 "OTHER": "other",

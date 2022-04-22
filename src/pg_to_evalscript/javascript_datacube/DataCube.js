@@ -256,10 +256,20 @@ class DataCube {
           const { minDate, maxDate } = getMinMaxDate(
             temporalDimensionToAggregate.labels
           );
+          const firstDayInYear = new Date(minDate)
+          firstDayInYear.setMonth(0)
+          firstDayInYear.setDate(1)
       
-          const dates = generateDatesInRangeByPeriod(minDate, maxDate, period);
-          for (let d of dates) {
-            newLabels.push(formatLabelByPeriod(period, d));
+          const dates = generateDatesInRangeByPeriod(firstDayInYear.toISOString(), maxDate, period);
+          let shouldAdd = false;
+          for (let i = 0; i < dates.length; i++) {
+              if (formatLabelByPeriod(period, dates[i]) === formatLabelByPeriod(period,minDate)) {
+                shouldAdd = true;
+              }  
+
+              if (shouldAdd) {
+                newLabels.push(formatLabelByPeriod(period, dates[i]));
+              }
           }
         } else {
           newLabels.push(
