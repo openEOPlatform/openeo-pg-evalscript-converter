@@ -10,110 +10,116 @@ def merge_cubes_process_code():
     return load_process_code("merge_cubes")
 
 
-@pytest.mark.skip(
-    "Skipping as DataCube implementation changed and this merge_cubes implementation wasn't complete/correct."
-)
+@pytest.fixture
+def construct_datacube():
+    def wrapped(cube_name, data, data_shape, dimensions):
+        return (
+            f"\nconst {cube_name} = new DataCube(ndarray({json.dumps(data)}, {json.dumps(data_shape)}), 'b', 't', false);"
+            + f"\n{cube_name}.dimensions = {json.dumps(dimensions)};"
+        )
+
+    return wrapped
+
+
 @pytest.mark.parametrize(
-    "example_input,expected_output",
+    "data_cube1,data_shape_cube1,dimensions_cube1,data_cube2,data_shape_cube2,dimensions_cube2,overlap_resolver,data_expected_cube,data_shape_expected_cube,dimensions_expected_cube",
     [
         (
-            {
-                "cube1": {"B01": [1, 2, 3], "B02": [4, 5, 6]},
-                "cube2": {"B03": [11, 12, 13], "B04": [14, 15, 16]},
-            },
-            {
-                "BANDS": "bands",
-                "OTHER": "other",
-                "TEMPORAL": "temporal",
-                "bands_dimension_name": "bands_name",
-                "temporal_dimension_name": "temporal_name",
-                "dimensions": [
-                    {"labels": [], "name": "temporal_name", "type": "temporal"},
-                    {"labels": ["B01", "B02", "B03", "B04"], "name": "bands_name", "type": "bands"},
-                ],
-                "data": [[1, 2, 3], [4, 5, 6], [11, 12, 13], [14, 15, 16]],
-            },
+            [1, 2, 3, 4, 5, 6],
+            [3, 2],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+            [7, 8, 9, 10, 11, 12],
+            [3, 2],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B3", "B4"], "name": "b", "type": "bands"},
+            ],
+            None,
+            [1, 2, 7, 8, 3, 4, 9, 10, 5, 6, 11, 12],
+            [3, 4],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2", "B3", "B4"], "name": "b", "type": "bands"},
+            ],
         ),
         (
-            {
-                "cube1": {"B01": [1, 2, 3], "B02": [4, 5, 6]},
-                "cube2": {"B02": [11, 12, 13], "B03": [14, 15, 16]},
-                "overlap_resolver": "({x,y}) => x + y",
-            },
-            {
-                "BANDS": "bands",
-                "OTHER": "other",
-                "TEMPORAL": "temporal",
-                "bands_dimension_name": "bands_name",
-                "temporal_dimension_name": "temporal_name",
-                "dimensions": [
-                    {"labels": [], "name": "temporal_name", "type": "temporal"},
-                    {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
-                ],
-                "data": [[1, 2, 3], [15, 17, 19], [14, 15, 16]],
-            },
+            [1, 2, 3, 4, 5, 6],
+            [3, 2],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+            [7, 8, 9, 10, 11, 12],
+            [3, 2],
+            [
+                {"labels": ["2022-04-01", "2022-05-01", "2022-06-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+            None,
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+            [6, 2],
+            [
+                {
+                    "labels": ["2022-01-01", "2022-02-01", "2022-03-01", "2022-04-01", "2022-05-01", "2022-06-01"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
         ),
         (
-            {
-                "cube1": {"B01": [1, 2, 3], "B02": [4, 5, 6], "B03": [7, 8, 9]},
-                "cube2": {"B02": [11, 12, 13], "B03": [14, 15, 16], "B04": [42, 41, 40]},
-                "overlap_resolver": "({x,y}) => x + y",
-            },
-            {
-                "BANDS": "bands",
-                "OTHER": "other",
-                "TEMPORAL": "temporal",
-                "bands_dimension_name": "bands_name",
-                "temporal_dimension_name": "temporal_name",
-                "dimensions": [
-                    {"labels": [], "name": "temporal_name", "type": "temporal"},
-                    {"labels": ["B01", "B02", "B03", "B04"], "name": "bands_name", "type": "bands"},
-                ],
-                "data": [[1, 2, 3], [15, 17, 19], [21, 23, 25], [42, 41, 40]],
-            },
-        ),
-        (
-            {
-                "cube1": {"B03": [3]},
-                "cube2": {"B03": [7]},
-                "additional_code_specific_to_test_case": """
-                    cube1.getDimensionByName(cube1.temporal_dimension_name).labels = ['01-01-2022']; 
-                    cube2.getDimensionByName(cube2.temporal_dimension_name).labels = ['01-02-2022'];
-                """,
-            },
-            {
-                "BANDS": "bands",
-                "OTHER": "other",
-                "TEMPORAL": "temporal",
-                "bands_dimension_name": "bands_name",
-                "temporal_dimension_name": "temporal_name",
-                "dimensions": [
-                    {"labels": ["01-01-2022", "01-02-2022"], "name": "temporal_name", "type": "temporal"},
-                    {"labels": ["B03"], "name": "bands_name", "type": "bands"},
-                ],
-                "data": [[3], [7]],
-            },
+            [1, 2, 3, 4, 5, 6],
+            [3, 2],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+            [7, 8, 9, 10, 11, 12],
+            [3, 2],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B2", "B3"], "name": "b", "type": "bands"},
+            ],
+            "({x,y}) => (x+y)",
+            [1, 9, 8, 3, 13, 10, 5, 17, 12],
+            [3, 3],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2", "B3"], "name": "b", "type": "bands"},
+            ],
         ),
     ],
 )
-def test_merge_cubes(merge_cubes_process_code, example_input, expected_output):
-    additional_js_code_to_run = (
-        load_datacube_code()
-        + f"const cube1 = new DataCube({example_input['cube1']}, 'bands_name', 'temporal_name', true);"
-        + f"const cube2 = new DataCube({example_input['cube2']}, 'bands_name', 'temporal_name', true);"
-        + f"const overlap_resolver = eval({example_input['overlap_resolver'] if 'overlap_resolver' in example_input else ''});"
-        + f"{example_input['additional_code_specific_to_test_case'] if 'additional_code_specific_to_test_case' in example_input else ''};"
-    )
-    process_arguments = (
-        f"{{...{json.dumps(example_input)}, 'cube1': cube1, 'cube2': cube2, 'overlap_resolver': overlap_resolver}}"
-    )
+def test_merge_cubes(
+    merge_cubes_process_code,
+    construct_datacube,
+    data_cube1,
+    data_shape_cube1,
+    dimensions_cube1,
+    data_cube2,
+    data_shape_cube2,
+    dimensions_cube2,
+    overlap_resolver,
+    data_expected_cube,
+    data_shape_expected_cube,
+    dimensions_expected_cube,
+):
+    cube_1 = construct_datacube("cube1", data_cube1, data_shape_cube1, dimensions_cube1)
+    cube_2 = construct_datacube("cube2", data_cube2, data_shape_cube2, dimensions_cube2)
+
     output = run_process(
-        merge_cubes_process_code + additional_js_code_to_run,
+        load_datacube_code() + merge_cubes_process_code + cube_1 + cube_2,
         "merge_cubes",
-        process_arguments,
+        f"{{cube1:cube1,cube2:cube2,overlap_resolver:{overlap_resolver if overlap_resolver is not None else 'undefined'}}}",
     )
-    output = json.loads(output)
-    assert output == expected_output
+
+    output = json.loads(output.decode("utf-8"))
+    assert output["data"]["data"] == data_expected_cube
+    assert output["data"]["shape"] == data_shape_expected_cube
+    assert output["dimensions"] == dimensions_expected_cube
 
 
 @pytest.mark.skip(

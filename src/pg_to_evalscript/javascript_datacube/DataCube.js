@@ -119,7 +119,7 @@ class DataCube {
         }
         return indices;
     }
-    
+
     getBand(name) {
         let bandToReturn = null
         for (let band of this.bands_metadata) {
@@ -209,7 +209,7 @@ class DataCube {
             const allCoords = this._iterateCoords(data.shape.slice(), [axis]);
             for (let coord of allCoords) {
                 const entireDataToReduce = convert_to_1d_array(data.pick.apply(data, coord));
-                const dataToReduce = []; 
+                const dataToReduce = [];
                 for (let index of indices) {
                     dataToReduce.push(entireDataToReduce[index]);
                 }
@@ -270,8 +270,8 @@ class DataCube {
     extendFinalDimensionWithData(axis, dataToAdd) {
         const finalShape = this.getDataShape()
         finalShape[axis]++;
-        
-        const finalData = this.insertIntoFinalDimension(dataToAdd, finalShape[axis], finalShape[axis] - 1)     
+
+        const finalData = this.insertIntoFinalDimension(dataToAdd, finalShape[axis], finalShape[axis] - 1)
         this.data = ndarray(finalData, finalShape)
     }
 
@@ -279,13 +279,62 @@ class DataCube {
         const dataArr = this.data.data;
         for (let i = 0; i < dataToAdd.length; i++) {
             dataArr.splice(
-                i * dimensionSize + locationInDimension, 
-                0, 
+                i * dimensionSize + locationInDimension,
+                0,
                 dataToAdd[i]
             );
         }
 
         return dataArr;
+    }
+
+    // axis: integer, dimension axis
+    // dataToAdd: array, values to insert in dimension.
+    // locationInDimension: integer, offset from start of dimension, max length of dimension. Default 0.
+    insertIntoDimension(axis, dataToAdd, locationInDimension = 0) {
+        const newShape = this.getDataShape().slice()
+        newShape[axis] += 1
+
+        let newSize = 1;
+        for (let dimSize of newShape) {
+            newSize *= dimSize
+        }
+
+        const newData = ndarray(new Array(newSize), newShape)
+
+        const minInd = locationInDimension;
+        const maxInd = locationInDimension + 1
+        const allCoords = this._iterateCoords(newShape.slice());
+        let dataToAddInd = 0;
+
+        for (let coord of allCoords) {
+            if (coord[axis] === locationInDimension) {
+                newData.set(...coord, dataToAdd[dataToAddInd])
+                dataToAddInd++
+            } else if (coord[axis] > locationInDimension) {
+                coord[axis]--
+                const value = this.data.get(...coord)
+                coord[axis]++
+                newData.set(...coord, value)
+            } else {
+                const value = this.data.get(...coord)
+                newData.set(...coord, value)
+            }
+        }
+
+        this.data = newData
+    }
+
+    setInDimension(axis, dataToSet, index) {
+        const allCoords = this._iterateCoords(this.data.shape.slice());
+        let dataToSetInd = 0;
+
+        for (let coord of allCoords) {
+            if (coord[axis] === index) {
+                this.data.set(...coord, dataToSet[dataToSetInd])
+                dataToSetInd++
+            }
+        }
     }
 
     clone() {
@@ -365,7 +414,10 @@ class DataCube {
         for (let coord of allCoords) {
             const dataToProcess = convert_to_1d_array(data.pick.apply(data, coord));
             dataToProcess.labels = target_dimension ? targetDimensionLabels : labels;
-            this._setArrayAlongAxis(coord, axis, process({ data: dataToProcess, context }));
+            this._setArrayAlongAxis(coord, axis, process({
+                data: dataToProcess,
+                context
+            }));
         }
     }
 
@@ -441,6 +493,98 @@ class DataCube {
                 coords[d] = Math.floor(i / cumulatives[d]) % shape[d];
             }
             yield coords
+        }
+    }
+
+    merge(cube2, overlap_resolver) {
+        let dimensionWithDifferentLabels;
+        let dimensionWithDifferentLabelsOverlaps = false;
+
+        for (let dimension of this.dimensions) {
+            const dimension2 = cube2.getDimensionByName(dimension.name);
+            const labelsEqual = dimension.labels.length === dimension2.labels.length && dimension.labels.every((l) => dimension2.labels.includes(l))
+
+            if (
+                dimension.name === dimension2.name &&
+                dimension.type === dimension2.type &&
+                labelsEqual
+            ) {
+                continue;
+            }
+
+            if (labelsEqual) {
+                throw new ProcessError("Internal", "Shared dimensions have to have the same name and type in 'merge_cubes'.")
+            }
+
+            if (dimensionWithDifferentLabels) {
+                throw new ProcessError("Internal", "Only one of the dimensions can have different labels in 'merge_cubes'.")
+            }
+
+            dimensionWithDifferentLabels = dimension.name
+
+            if (dimension.labels.some((l) => dimension2.labels.includes(l))) {
+                dimensionWithDifferentLabelsOverlaps = true;
+            }
+        }
+
+        if (!overlap_resolver && dimensionWithDifferentLabelsOverlaps) {
+            throw new ProcessError("OverlapResolverMissing",
+                "Overlapping data cubes, but no overlap resolver has been specified."
+            );
+        }
+
+        for (let i = 0; i < cube2.dimensions.length; i++) {
+            if (!this.getDimensionByName(cube2.dimensions[i].name)) {
+                // Add dimension from cube2 missing from cube1
+                this.dimensions.push(cube2.dimensions[i])
+                this.data.shape.push(cube2.data.shape[i])
+            }
+
+            if (cube2.dimensions[i].name == dimensionWithDifferentLabels) {
+                const axis = this.dimensions.findIndex((e) => e.name === dimensionWithDifferentLabels);
+
+                if (dimensionWithDifferentLabelsOverlaps) {
+                    // Merge differing dimension with overlap
+                    for (let j = 0; j < cube2.dimensions[i].labels.length; j++) {
+                        if (!this.dimensions[axis].labels.includes(cube2.dimensions[i].labels[j])) {
+                            // Label does not overlap
+                            const coord = fill(cube2.data.shape.slice(), null)
+                            coord[i] = j
+                            const dataToInsert = convert_to_1d_array(cube2.data.pick(...coord))
+                            this.insertIntoDimension(axis, dataToInsert, this.data.shape[axis])
+                            this.dimensions[axis].labels.push(cube2.dimensions[i].labels[j])
+                            continue
+                        }
+                        const coord1 = fill(this.data.shape.slice(), null)
+                        const index1 = this.dimensions[axis].labels.indexOf(cube2.dimensions[i].labels[j])
+                        coord1[axis] = index1
+                        const data1 = convert_to_1d_array(this.data.pick(...coord1))
+                        const coord2 = fill(cube2.data.shape.slice(), null)
+                        coord2[i] = j
+                        const data2 = convert_to_1d_array(cube2.data.pick(...coord2))
+
+                        for (let k = 0; k < data1.length; k++) {
+                            data1[k] = overlap_resolver({
+                                x: data1[k],
+                                y: data2[k]
+                            })
+                        }
+                        this.setInDimension(axis, data1, index1)
+
+                    }
+                } else {
+                    const origSize = this.data.shape[axis]
+                    const coord = fill(cube2.getDataShape().slice(), null)
+
+                    for (let j = 0; j < cube2.dimensions[i].labels.length; j++) {
+                        coord[i] = j
+                        const dataToInsert = convert_to_1d_array(cube2.data.pick(...coord))
+                        this.insertIntoDimension(axis, dataToInsert, origSize + j)
+                    }
+
+                    this.dimensions[axis].labels = this.dimensions[axis].labels.concat(cube2.dimensions[i].labels)
+                }
+            }
         }
     }
 }
