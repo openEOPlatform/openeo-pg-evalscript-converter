@@ -137,6 +137,38 @@ def test_convertable_process_graphs(pg_name, example_input, expected_output):
             ],
             [-9, 16],
         ),
+        (
+            "test_atp_month_mean",
+            [
+                {"B01": 1, "B02": 2, "B03": 3},
+                {"B01": 4, "B02": 5, "B03": 6},
+                {"B01": 10, "B02": 11, "B03": 12},
+                {"B01": 14, "B02": 15, "B03": 16},
+            ],
+            [
+                {"date": "2022-02-11T00:00:00.000Z"},
+                {"date": "2022-02-12T00:00:00.000Z"},
+                {"date": "2022-02-13T00:00:00.000Z"},
+                {"date": "2022-04-27T00:00:00.000Z"},
+            ],
+            [5, 6, 7, None, None, None, 14, 15, 16],
+        ),
+        (
+            "test_atp_season_count",
+            [
+                {"B01": 1, "B02": 2, "B03": 3},
+                {"B01": 4, "B02": 5, "B03": 6},
+                {"B01": 10, "B02": 11, "B03": 12},
+                {"B01": 14, "B02": 15, "B03": 16},
+            ],
+            [
+                {"date": "2022-02-11T00:00:00.000Z"},
+                {"date": "2022-02-12T00:00:00.000Z"},
+                {"date": "2022-02-13T00:00:00.000Z"},
+                {"date": "2022-11-27T00:00:00.000Z"},
+            ],
+            [3, 3, 3, None, None, None, None, None, None, 1, 1, 1],
+        ),
     ],
 )
 def test_process_graphs_with_scenes(pg_name, example_input, scenes, expected_output):
