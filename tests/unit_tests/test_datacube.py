@@ -308,3 +308,36 @@ def test_filter(
     output = json.loads(output)
     assert output["data"]["data"] == expected_data
     assert output["data"].get("shape") == expected_shape
+
+
+@pytest.mark.parametrize(
+    "example_data,example_data_shape,axis_to_extend,data_to_add,expected_data,expected_data_shape",
+    [
+        ([1, 2, 3, 4, 5, 6], [2, 3], 1, [-10, -11], [1, 2, 3, -10, 4, 5, 6, -11], [2, 4]),
+        # [[1,2,3], [4,5,6]] -> [[1,2,3,-10], [4,5,6,-11]]
+        ([1, 2, 3, 4, 5, 6], [3, 2], 0, [-10, -11], [1, 2, 3, 4, 5, 6, -10, -11], [4, 2]),
+        # [[1,2], [3,4], [5,6]] -> [[1,2], [3,4], [5,6], [-10,-11]]
+        ([1, 2, 3, 4, 5, 6], [2, 3], 0, [-10, -11, -12], [1, 2, 3, 4, 5, 6, -10, -11, -12], [3, 3]),
+        # [[1,2,3], [4,5,6]] -> [[1,2,3], [4,5,6], [-10,-11,-12]]
+        ([1, 2, 3, 4, 5, 6], [3, 2], 1, [-10, -11, -12], [1, 2, -10, 3, 4, -11, 5, 6, -12], [3, 3]),
+        # [[1,2], [3,4], [5,6]] -> [[1,2,-10], [3,4,-11], [5,6,-12]]
+        ([1,2,3,4,5,6,7,8], [2,2,2], 0, [-1, -2,-3,-4], [1,2,3,4,5,6,7,8,-1,-2,-3,-4], [3,2,2]),
+        # [[[1,2], [3,4]], [[5,6], [7,8]]] -> [[[1,2], [3,4]], [[5,6], [7,8]], [[-1, -2], [-3, -4]]]
+        ([1,2,3,4,5,6,7,8], [2,2,2], 1, [-1, -2,-3,-4], [1,2,3,4,-1,-2,5,6,7,8,-3,-4], [2,3,2]),
+        # [[[1,2], [3,4]], [[5,6], [7,8]]] -> [[[1,2], [3,4], [-1,-2]], [[5,6], [7,8], [-3, -4]]]
+        ([1,2,3,4,5,6,7,8], [2,2,2], 2, [-1,-2,-3,-4], [1,2,-1,3,4,-2,5,6,-3,7,8,-4], [2,2,3]),
+        # [[[1,2], [3,4]], [[5,6], [7,8]]] -> [[[1,2,-1], [3,4,-2]], [[5,6,-3], [7,8,-4]]]
+    ],
+)
+def test_extendFinalDimensionWithData(
+    datacube_code, example_data, example_data_shape, axis_to_extend, data_to_add, expected_data, expected_data_shape
+):
+    testing_code = (
+        datacube_code(f"ndarray({example_data},{example_data_shape})", from_samples=False, json_samples=False)
+        + f"\ndatacube.extendFinalDimensionWithData({axis_to_extend},{data_to_add});"
+        + with_stdout_call("datacube")
+    )
+    output = run_javascript(testing_code)
+    output = json.loads(output)
+    assert output["data"]["data"] == expected_data
+    assert output["data"].get("shape") == expected_data_shape

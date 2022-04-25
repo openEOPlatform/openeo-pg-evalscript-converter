@@ -271,18 +271,22 @@ class DataCube {
         const finalShape = this.getDataShape()
         finalShape[axis]++;
         
-        const finalData = this.insertIntoFinalDimension(dataToAdd, finalShape[axis], finalShape[axis] - 1)     
+        const finalData = this.insertIntoFinalDimension(dataToAdd, finalShape[axis], finalShape[axis] - 1, axis);     
         this.data = ndarray(finalData, finalShape)
     }
 
-    insertIntoFinalDimension(dataToAdd, dimensionSize, locationInDimension) {
+    insertIntoFinalDimension(dataToAdd, dimensionSize, locationInDimension, axis) {
         const dataArr = this.data.data;
         for (let i = 0; i < dataToAdd.length; i++) {
-            dataArr.splice(
-                i * dimensionSize + locationInDimension, 
-                0, 
-                dataToAdd[i]
-            );
+            if (axis === 0) {
+                dataArr.push(dataToAdd[i]);
+            } else {
+                dataArr.splice(
+                    i * dimensionSize + locationInDimension, 
+                    0, 
+                    dataToAdd[i]
+                );
+            }
         }
 
         return dataArr;
