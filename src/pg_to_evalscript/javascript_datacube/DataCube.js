@@ -497,11 +497,23 @@ class DataCube {
     }
 
     merge(cube2, overlap_resolver) {
+        const sharedDimensions = []
+        const cube1SpecificDimensions = []
+        const cube2SpecificDimensions = []
+
         let dimensionWithDifferentLabels;
         let dimensionWithDifferentLabelsOverlaps = false;
 
         for (let dimension of this.dimensions) {
             const dimension2 = cube2.getDimensionByName(dimension.name);
+
+            if (!dimension2) {
+                cube1SpecificDimensions.push(dimension)
+                continue
+            } else {
+                sharedDimensions.push(dimension)
+            }
+
             const labelsEqual = dimension.labels.length === dimension2.labels.length && dimension.labels.every((l) => dimension2.labels.includes(l))
 
             if (
@@ -512,12 +524,19 @@ class DataCube {
                 continue;
             }
 
+
             if (labelsEqual) {
-                throw new ProcessError("Internal", "Shared dimensions have to have the same name and type in 'merge_cubes'.")
+                throw new ProcessError({
+                    name: "Internal",
+                    message: "Shared dimensions have to have the same name and type in 'merge_cubes'."
+                })
             }
 
             if (dimensionWithDifferentLabels) {
-                throw new ProcessError("Internal", "Only one of the dimensions can have different labels in 'merge_cubes'.")
+                throw new ProcessError({
+                    name: "Internal",
+                    message: "Only one of the dimensions can have different labels in 'merge_cubes'."
+                })
             }
 
             dimensionWithDifferentLabels = dimension.name
@@ -527,10 +546,55 @@ class DataCube {
             }
         }
 
-        if (!overlap_resolver && dimensionWithDifferentLabelsOverlaps) {
-            throw new ProcessError("OverlapResolverMissing",
-                "Overlapping data cubes, but no overlap resolver has been specified."
-            );
+        for (let dimension2 of cube2.dimensions) {
+            const dimension = this.getDimensionByName(dimension2.name);
+            if (!dimension) {
+                cube2SpecificDimensions.push(dimension2)
+            }
+        }
+
+        const allDimensionsEqual = cube1SpecificDimensions.length === 0 && cube2SpecificDimensions.length === 0;
+
+        if (!overlap_resolver && ((dimensionWithDifferentLabels && dimensionWithDifferentLabelsOverlaps) || (!dimensionWithDifferentLabels && allDimensionsEqual))) {
+            throw new ProcessError({
+                name: "OverlapResolverMissing",
+                message: "Overlapping data cubes, but no overlap resolver has been specified."
+            });
+        }
+
+        if (allDimensionsEqual && !dimensionWithDifferentLabels) {
+            for (let i = 0; i < this.data.data.length; i++) {
+                this.data.data[i] = overlap_resolver({
+                    x: this.data.data[i],
+                    y: cube2.data.data[i]
+                })
+            }
+            return
+        }
+
+        const isCube2Subcube = !dimensionWithDifferentLabels && cube2SpecificDimensions.length === 0 && cube1SpecificDimensions.length > 0;
+
+        if (isCube2Subcube) {
+            const coord2 = cube2.getDataShape().slice()
+            const indicesOfDimension = []
+
+            for (let dimension2 of cube2.dimensions) {
+                const ind = this.dimensions.findIndex(d => d.name === dimension2.name)
+                indicesOfDimension.push(ind);
+            }
+
+            const allCoords = this._iterateCoords(this.data.shape);
+            for (let coord of allCoords) {
+                const value1 = this.data.get(...coord)
+                for (let i = 0; i < indicesOfDimension.length; i++) {
+                    coord2[i] = coord[indicesOfDimension[i]]
+                }
+                const value2 = cube2.data.get(...coord2)
+                this.data.set(...coord, overlap_resolver({
+                    x: value1,
+                    y: value2
+                }))
+            }
         }
 
         for (let i = 0; i < cube2.dimensions.length; i++) {
@@ -538,6 +602,7 @@ class DataCube {
                 // Add dimension from cube2 missing from cube1
                 this.dimensions.push(cube2.dimensions[i])
                 this.data.shape.push(cube2.data.shape[i])
+                continue
             }
 
             if (cube2.dimensions[i].name == dimensionWithDifferentLabels) {

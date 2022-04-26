@@ -25,6 +25,7 @@ def construct_datacube():
     "data_cube1,data_shape_cube1,dimensions_cube1,data_cube2,data_shape_cube2,dimensions_cube2,overlap_resolver,data_expected_cube,data_shape_expected_cube,dimensions_expected_cube",
     [
         (
+            # Merging datacubes with no overlap (different band labels)
             [1, 2, 3, 4, 5, 6],
             [3, 2],
             [
@@ -46,6 +47,7 @@ def construct_datacube():
             ],
         ),
         (
+            # Merging datacubes with no overlap (different temporal labels)
             [1, 2, 3, 4, 5, 6],
             [3, 2],
             [
@@ -71,6 +73,7 @@ def construct_datacube():
             ],
         ),
         (
+            # Merging datacubes with an overlapping band B2
             [1, 2, 3, 4, 5, 6],
             [3, 2],
             [
@@ -89,6 +92,71 @@ def construct_datacube():
             [
                 {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
                 {"labels": ["B1", "B2", "B3"], "name": "b", "type": "bands"},
+            ],
+        ),
+        (
+            # Merging daacubes with overlapping temporal labels 2022-02-01 and 2022-03-01
+            [1, 2, 3, 4, 5, 6],
+            [3, 2],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+            [7, 8, 9, 10, 11, 12],
+            [3, 2],
+            [
+                {"labels": ["2022-02-01", "2022-03-01", "2022-04-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+            "({x,y}) => (x+y)",
+            [1,2,10,12,14,16,11,12],
+            [4, 2],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01", "2022-04-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+        ),
+        (
+            # Merging fully overlapping datacubes
+            [1, 2, 3, 4, 5, 6],
+            [3, 2],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+            [7, 8, 9, 10, 11, 12],
+            [3, 2],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+            "({x,y}) => (x+y)",
+            [8,10,12,14,16,18],
+            [3, 2],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+        ),
+        (
+            # Merging lower dimension cube into higher dimension cube
+            [1, 2, 3, 4, 5, 6],
+            [3, 2],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+            [7, 8],
+            [2],
+            [
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+            "({x,y}) => (x+y)",
+            [8,10,10,12,12,14],
+            [3, 2],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
             ],
         ),
     ],
@@ -110,11 +178,14 @@ def test_merge_cubes(
     cube_1 = construct_datacube("cube1", data_cube1, data_shape_cube1, dimensions_cube1)
     cube_2 = construct_datacube("cube2", data_cube2, data_shape_cube2, dimensions_cube2)
 
-    output = run_process(
-        load_datacube_code() + merge_cubes_process_code + cube_1 + cube_2,
-        "merge_cubes",
-        f"{{cube1:cube1,cube2:cube2,overlap_resolver:{overlap_resolver if overlap_resolver is not None else 'undefined'}}}",
-    )
+    try:
+        output = run_process(
+            load_datacube_code() + merge_cubes_process_code + cube_1 + cube_2,
+            "merge_cubes",
+            f"{{cube1:cube1,cube2:cube2,overlap_resolver:{overlap_resolver if overlap_resolver is not None else 'undefined'}}}",
+        )
+    except Exception as e:
+        raise Exception("ERROR\n\n" + e.stderr.decode("utf-8"))
 
     output = json.loads(output.decode("utf-8"))
     assert output["data"]["data"] == data_expected_cube
@@ -122,9 +193,6 @@ def test_merge_cubes(
     assert output["dimensions"] == dimensions_expected_cube
 
 
-@pytest.mark.skip(
-    "Skipping as DataCube implementation changed and this merge_cubes implementation wasn't complete/correct."
-)
 @pytest.mark.parametrize(
     "example_input,raises_exception,error_message",
     [
@@ -151,7 +219,7 @@ def test_merge_cubes_exceptions(merge_cubes_process_code, example_input, raises_
         load_datacube_code()
         + f"const cube1 = new DataCube({example_input['cube1']}, 'bands_name', 'temporal_name', true);"
         + f"const cube2 = new DataCube({example_input['cube2']}, 'bands_name', 'temporal_name', true);"
-        + f"const overlap_resolver = eval({example_input['overlap_resolver'] if 'overlap_resolver' in example_input else ''});"
+        + f"const overlap_resolver = {example_input['overlap_resolver'] if 'overlap_resolver' in example_input else 'undefined'};"
     )
     process_arguments = (
         f"{{...{json.dumps(example_input)}, 'cube1': cube1, 'cube2': cube2, 'overlap_resolver': overlap_resolver}}"
