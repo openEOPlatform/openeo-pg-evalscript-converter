@@ -496,6 +496,84 @@ class DataCube {
         }
     }
 
+    _merge_matching_cube(cube2, overlap_resolver) {
+        for (let i = 0; i < this.data.data.length; i++) {
+            this.data.data[i] = overlap_resolver({
+                x: this.data.data[i],
+                y: cube2.data.data[i]
+            })
+        }
+    }
+
+    _merge_subcube(cube2, overlap_resolver) {
+        const coord2 = cube2.getDataShape().slice()
+        const indicesOfDimension = []
+
+        for (let dimension2 of cube2.dimensions) {
+            const ind = this.dimensions.findIndex(d => d.name === dimension2.name)
+            indicesOfDimension.push(ind);
+        }
+
+        const allCoords = this._iterateCoords(this.data.shape);
+        for (let coord of allCoords) {
+            const value1 = this.data.get(...coord)
+            for (let i = 0; i < indicesOfDimension.length; i++) {
+                coord2[i] = coord[indicesOfDimension[i]]
+            }
+            const value2 = cube2.data.get(...coord2)
+            this.data.set(...coord, overlap_resolver({
+                x: value1,
+                y: value2
+            }))
+        }
+    }
+
+    _merge_dimension_with_different_labels(cube2, dimension, dimensionAxis, overlap_resolver, dimensionOverlaps) {
+        const axis = this.dimensions.findIndex((e) => e.name === dimension.name);
+
+        if (dimensionOverlaps) {
+            // Merge differing dimension with overlap
+            for (let j = 0; j < dimension.labels.length; j++) {
+                if (!this.dimensions[axis].labels.includes(dimension.labels[j])) {
+                    // Label does not overlap
+                    const coord = fill(cube2.data.shape.slice(), null)
+                    coord[dimensionAxis] = j
+                    const dataToInsert = flattenToNativeArray(cube2.data.pick(...coord))
+                    this.insertIntoDimension(axis, dataToInsert, this.data.shape[axis])
+                    this.dimensions[axis].labels.push(dimension.labels[j])
+                    continue
+                }
+                const coord1 = fill(this.data.shape.slice(), null)
+                const index1 = this.dimensions[axis].labels.indexOf(dimension.labels[j])
+                coord1[axis] = index1
+                const data1 = flattenToNativeArray(this.data.pick(...coord1))
+                const coord2 = fill(cube2.data.shape.slice(), null)
+                coord2[dimensionAxis] = j
+                const data2 = flattenToNativeArray(cube2.data.pick(...coord2))
+
+                for (let k = 0; k < data1.length; k++) {
+                    data1[k] = overlap_resolver({
+                        x: data1[k],
+                        y: data2[k]
+                    })
+                }
+                this.setInDimension(axis, data1, index1)
+
+            }
+        } else {
+            const origSize = this.data.shape[axis]
+            const coord = fill(cube2.getDataShape().slice(), null)
+
+            for (let j = 0; j < dimension.labels.length; j++) {
+                coord[dimensionAxis] = j
+                const dataToInsert = flattenToNativeArray(cube2.data.pick(...coord))
+                this.insertIntoDimension(axis, dataToInsert, origSize + j)
+            }
+
+            this.dimensions[axis].labels = this.dimensions[axis].labels.concat(dimension.labels)
+        }
+    }
+
     merge(cube2, overlap_resolver) {
         const sharedDimensions = []
         const cube1SpecificDimensions = []
@@ -563,38 +641,13 @@ class DataCube {
         }
 
         if (allDimensionsEqual && !dimensionWithDifferentLabels) {
-            for (let i = 0; i < this.data.data.length; i++) {
-                this.data.data[i] = overlap_resolver({
-                    x: this.data.data[i],
-                    y: cube2.data.data[i]
-                })
-            }
-            return
+            return this._merge_matching_cube(cube2, overlap_resolver)
         }
 
         const isCube2Subcube = !dimensionWithDifferentLabels && cube2SpecificDimensions.length === 0 && cube1SpecificDimensions.length > 0;
 
         if (isCube2Subcube) {
-            const coord2 = cube2.getDataShape().slice()
-            const indicesOfDimension = []
-
-            for (let dimension2 of cube2.dimensions) {
-                const ind = this.dimensions.findIndex(d => d.name === dimension2.name)
-                indicesOfDimension.push(ind);
-            }
-
-            const allCoords = this._iterateCoords(this.data.shape);
-            for (let coord of allCoords) {
-                const value1 = this.data.get(...coord)
-                for (let i = 0; i < indicesOfDimension.length; i++) {
-                    coord2[i] = coord[indicesOfDimension[i]]
-                }
-                const value2 = cube2.data.get(...coord2)
-                this.data.set(...coord, overlap_resolver({
-                    x: value1,
-                    y: value2
-                }))
-            }
+            return this._merge_subcube(cube2, overlap_resolver)
         }
 
         for (let i = 0; i < cube2.dimensions.length; i++) {
@@ -606,49 +659,7 @@ class DataCube {
             }
 
             if (cube2.dimensions[i].name == dimensionWithDifferentLabels) {
-                const axis = this.dimensions.findIndex((e) => e.name === dimensionWithDifferentLabels);
-
-                if (dimensionWithDifferentLabelsOverlaps) {
-                    // Merge differing dimension with overlap
-                    for (let j = 0; j < cube2.dimensions[i].labels.length; j++) {
-                        if (!this.dimensions[axis].labels.includes(cube2.dimensions[i].labels[j])) {
-                            // Label does not overlap
-                            const coord = fill(cube2.data.shape.slice(), null)
-                            coord[i] = j
-                            const dataToInsert = flattenToNativeArray(cube2.data.pick(...coord))
-                            this.insertIntoDimension(axis, dataToInsert, this.data.shape[axis])
-                            this.dimensions[axis].labels.push(cube2.dimensions[i].labels[j])
-                            continue
-                        }
-                        const coord1 = fill(this.data.shape.slice(), null)
-                        const index1 = this.dimensions[axis].labels.indexOf(cube2.dimensions[i].labels[j])
-                        coord1[axis] = index1
-                        const data1 = flattenToNativeArray(this.data.pick(...coord1))
-                        const coord2 = fill(cube2.data.shape.slice(), null)
-                        coord2[i] = j
-                        const data2 = flattenToNativeArray(cube2.data.pick(...coord2))
-
-                        for (let k = 0; k < data1.length; k++) {
-                            data1[k] = overlap_resolver({
-                                x: data1[k],
-                                y: data2[k]
-                            })
-                        }
-                        this.setInDimension(axis, data1, index1)
-
-                    }
-                } else {
-                    const origSize = this.data.shape[axis]
-                    const coord = fill(cube2.getDataShape().slice(), null)
-
-                    for (let j = 0; j < cube2.dimensions[i].labels.length; j++) {
-                        coord[i] = j
-                        const dataToInsert = flattenToNativeArray(cube2.data.pick(...coord))
-                        this.insertIntoDimension(axis, dataToInsert, origSize + j)
-                    }
-
-                    this.dimensions[axis].labels = this.dimensions[axis].labels.concat(cube2.dimensions[i].labels)
-                }
+                this._merge_dimension_with_different_labels(cube2, cube2.dimensions[i], i, overlap_resolver, dimensionWithDifferentLabelsOverlaps)
             }
         }
     }
