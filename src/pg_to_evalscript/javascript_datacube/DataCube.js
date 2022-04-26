@@ -615,7 +615,7 @@ class DataCube {
                             // Label does not overlap
                             const coord = fill(cube2.data.shape.slice(), null)
                             coord[i] = j
-                            const dataToInsert = convert_to_1d_array(cube2.data.pick(...coord))
+                            const dataToInsert = flattenToNativeArray(cube2.data.pick(...coord))
                             this.insertIntoDimension(axis, dataToInsert, this.data.shape[axis])
                             this.dimensions[axis].labels.push(cube2.dimensions[i].labels[j])
                             continue
@@ -623,10 +623,10 @@ class DataCube {
                         const coord1 = fill(this.data.shape.slice(), null)
                         const index1 = this.dimensions[axis].labels.indexOf(cube2.dimensions[i].labels[j])
                         coord1[axis] = index1
-                        const data1 = convert_to_1d_array(this.data.pick(...coord1))
+                        const data1 = flattenToNativeArray(this.data.pick(...coord1))
                         const coord2 = fill(cube2.data.shape.slice(), null)
                         coord2[i] = j
-                        const data2 = convert_to_1d_array(cube2.data.pick(...coord2))
+                        const data2 = flattenToNativeArray(cube2.data.pick(...coord2))
 
                         for (let k = 0; k < data1.length; k++) {
                             data1[k] = overlap_resolver({
@@ -643,7 +643,7 @@ class DataCube {
 
                     for (let j = 0; j < cube2.dimensions[i].labels.length; j++) {
                         coord[i] = j
-                        const dataToInsert = convert_to_1d_array(cube2.data.pick(...coord))
+                        const dataToInsert = flattenToNativeArray(cube2.data.pick(...coord))
                         this.insertIntoDimension(axis, dataToInsert, origSize + j)
                     }
 
