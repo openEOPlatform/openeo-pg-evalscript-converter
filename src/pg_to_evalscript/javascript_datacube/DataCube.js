@@ -269,23 +269,35 @@ class DataCube {
 
     extendFinalDimensionWithData(axis, dataToAdd) {
         const finalShape = this.getDataShape()
+        let loc = 1;
+        let elementsToInsertAtOnce = 1;
+        for (let i = 0; i < finalShape.length; i++) {
+            if (i < axis) {
+                elementsToInsertAtOnce *= finalShape[i];
+                continue
+            }
+            loc *= finalShape[i];
+        }
+        const finalData = this.insertIntoFinalDimension(dataToAdd, loc, dataToAdd.length / elementsToInsertAtOnce, axis);     
         finalShape[axis]++;
-        
-        const finalData = this.insertIntoFinalDimension(dataToAdd, finalShape[axis], finalShape[axis] - 1, axis);     
         this.data = ndarray(finalData, finalShape)
     }
 
-    insertIntoFinalDimension(dataToAdd, dimensionSize, locationInDimension, axis) {
+    insertIntoFinalDimension(dataToAdd, offset, elementsToInsertAtOnce, axis) {
         const dataArr = this.data.data;
-        for (let i = 0; i < dataToAdd.length; i++) {
-            if (axis === 0) {
+        if (axis === 0) {
+            for (let i = 0; i < dataToAdd.length; i++) {
                 dataArr.push(dataToAdd[i]);
-            } else {
-                dataArr.splice(
-                    i * dimensionSize + locationInDimension, 
-                    0, 
-                    dataToAdd[i]
-                );
+            }
+        } else {
+            for (let i = 1; i <= dataToAdd.length / elementsToInsertAtOnce; i++) {
+                for (let j = 0; j < elementsToInsertAtOnce; j++) {
+                    dataArr.splice(
+                        i * offset + (i - 1) * elementsToInsertAtOnce + j, 
+                        0, 
+                        dataToAdd[(i - 1) * elementsToInsertAtOnce + j]
+                    );
+                }
             }
         }
 
