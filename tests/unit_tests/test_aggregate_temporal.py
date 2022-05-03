@@ -120,6 +120,25 @@ def scenes():
                 },
             },
         ),
+        (
+            {
+                "intervals": [
+                    ["2022-03-16", "2022-03-18"],
+                    ["2022-03-16", "2022-03-20"],
+                ],
+                "labels": ["interval1", "interval2"],
+                "reducer": "({data})=>{ return data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0) }",
+            },
+            {
+                "dimensions": [
+                    {"labels": ["interval1", "interval2"], "name": "temporal_name", "type": "temporal"},
+                    {"labels": ["B01", "B02"], "name": "bands_name", "type": "bands"},
+                ],
+                "data": {
+                    "data": [16.5, 5.5, 17.5, 4.5],
+                },
+            },
+        ),
     ],
 )
 def test_aggregate_temporal(aggregate_temporal_process_code, data, scenes, example_input, expected_output):
