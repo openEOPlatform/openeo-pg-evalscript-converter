@@ -42,6 +42,8 @@ def test_common(common_code, example_input, expected_output):
     [
         ("17:35:58Z", dict({"type": "time", "value": "1900-01-01T17:35:58.000Z"})),
         ("12:00:00Z", dict({"type": "time", "value": "1900-01-01T12:00:00.000Z"})),
+        ("23:59:59Z", dict({"type": "time", "value": "1900-01-01T23:59:59.000Z"})),
+        ("24:00:00Z", dict({"type": "time", "value": "1900-01-02T00:00:00.000Z"})),
         ("12:00:00.432Z", dict({"type": "time", "value": "1900-01-01T12:00:00.432Z"})),
         ("12:34:56.123Z", dict({"type": "time", "value": "1900-01-01T12:34:56.123Z"})),
         ("13:00:00+01:00", dict({"type": "time", "value": "1900-01-01T12:00:00.000Z"})),
