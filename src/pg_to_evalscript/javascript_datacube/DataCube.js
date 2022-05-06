@@ -108,7 +108,7 @@ class DataCube {
         const temporalLabels = this.getDimensionByName(temporalDimension).labels;
         const indices = [];
         for (let i = 0; i < temporalLabels.length; i++) {
-            const date = start.type === 'time'
+            const date = start?.type === 'time'
                 ? parse_rfc3339_time(temporalLabels[i])
                 : parse_rfc3339(temporalLabels[i]);
 
@@ -243,7 +243,7 @@ class DataCube {
         const start = parse_rfc3339(extent[0]) || parse_rfc3339_time(extent[0]);
         const end = parse_rfc3339(extent[1]) || parse_rfc3339_time(extent[1]);
 
-        if ((extent[0] !== null && !start) || (extent[1] !== null && !end) || start.type !== end.type) {
+        if ((extent[0] !== null && !start) || (extent[1] !== null && !end)) {
             throw new Error("Invalid temporal extent. Boundary must be ISO date string or null.");
         }
 

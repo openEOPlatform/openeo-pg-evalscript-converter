@@ -236,8 +236,8 @@ def scenes():
         (
             {
                 "extent": [
-                    "2022-03-19T",
-                    "2022-03-25T",
+                    "2022-03-19",
+                    "2022-03-25",
                 ],
             },
             {
@@ -254,7 +254,6 @@ def scenes():
                 },
             },
         ),
-
     ],
 )
 def test_filter_temporal(filter_temporal_process_code, data, scenes, example_input, expected_output):
