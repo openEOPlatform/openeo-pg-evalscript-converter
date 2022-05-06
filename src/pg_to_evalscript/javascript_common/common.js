@@ -188,7 +188,7 @@ const generateDatesInRangeByPeriod = (minDate, maxDate, period) => {
 
 const getMinMaxDate = (labels) => {
   let minDate = parse_rfc3339(labels[0]).value;
-  let maxDate = new Date(minDate).toISOString();
+  let maxDate = minDate;
 
   for (let i = 1; i < labels.length; i++) {
     const currentDate = parse_rfc3339(labels[i]).value;
