@@ -48,8 +48,8 @@ function parse_rfc3339(dt, default_h = 0, default_m = 0, default_s = 0) {
 const formatLabelByPeriod = (period, label) => {
   const dayInYear = (date) => {
     return (
-      (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) -
-        Date.UTC(date.getFullYear(), 0, 0)) /
+      (Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) -
+        Date.UTC(date.getUTCFullYear(), 0, 0)) /
       24 /
       60 /
       60 /
@@ -58,8 +58,8 @@ const formatLabelByPeriod = (period, label) => {
   };
 
   const dekadInYear = (date) => {
-    const monthCount = date.getMonth();
-    const dekadCount = Math.floor((date.getDate() - 1) / 10) + 1;
+    const monthCount = date.getUTCMonth();
+    const dekadCount = Math.floor((date.getUTCDate() - 1) / 10) + 1;
     return monthCount * 3 + (dekadCount > 2 ? 3 : dekadCount);
   };
 
@@ -75,26 +75,26 @@ const formatLabelByPeriod = (period, label) => {
   switch (period) {
     case "hour":
       const hourCount = d.toISOString().split("T")[1].substring(0, 2);
-      const days = d.getDate();
-      const months = d.getMonth() + 1;
-      return `${d.getFullYear()}-${padWithZeros(months, 2)}-${padWithZeros(
+      const days = d.getUTCDate();
+      const months = d.getUTCMonth() + 1;
+      return `${d.getUTCFullYear()}-${padWithZeros(months, 2)}-${padWithZeros(
         days,
         2
       )}-${hourCount}`;
     case "day":
       const dayCount = dayInYear(d);
-      return `${d.getFullYear()}-${padWithZeros(dayCount, 3)}`;
+      return `${d.getUTCFullYear()}-${padWithZeros(dayCount, 3)}`;
     case "week":
       const weekCount = Math.ceil(dayInYear(d) / 7);
-      return `${d.getFullYear()}-${padWithZeros(weekCount, 2)}`;
+      return `${d.getUTCFullYear()}-${padWithZeros(weekCount, 2)}`;
     case "dekad":
       const dekadCount = dekadInYear(d);
-      return `${d.getFullYear()}-${padWithZeros(dekadCount, 2)}`;
+      return `${d.getUTCFullYear()}-${padWithZeros(dekadCount, 2)}`;
     case "month":
-      const monthCount = d.getMonth() + 1;
-      return `${d.getFullYear()}-${padWithZeros(monthCount, 2)}`;
+      const monthCount = d.getUTCMonth() + 1;
+      return `${d.getUTCFullYear()}-${padWithZeros(monthCount, 2)}`;
     case "season":
-      const month = d.getMonth() + 1;
+      const month = d.getUTCMonth() + 1;
       let seasonName = null;
       if (month >= 3 && month <= 5) {
         seasonName = "mam";
@@ -105,21 +105,21 @@ const formatLabelByPeriod = (period, label) => {
       } else {
         seasonName = "djf";
       }
-      return `${d.getFullYear()}-${seasonName}`;
+      return `${d.getUTCFullYear()}-${seasonName}`;
     case "tropical-season":
       let tropicalSeasonName = null;
-      if (d.getMonth() + 1 >= 5 && d.getMonth() + 1 <= 10) {
+      if (d.getUTCMonth() + 1 >= 5 && d.getUTCMonth() + 1 <= 10) {
         tropicalSeasonName = "mjjaso";
       } else {
         tropicalSeasonName = "ndjfma";
       }
-      return `${d.getFullYear()}-${tropicalSeasonName}`;
+      return `${d.getUTCFullYear()}-${tropicalSeasonName}`;
     case "year":
-      return `${d.getFullYear()}`;
+      return `${d.getUTCFullYear()}`;
     case "decade":
-      return `${d.getFullYear().toString().substring(0, 3)}0`;
+      return `${d.getUTCFullYear().toString().substring(0, 3)}0`;
     case "decade-ad":
-      return `${d.getFullYear().toString().substring(0, 3)}1`;
+      return `${d.getUTCFullYear().toString().substring(0, 3)}1`;
     default:
       throw new ProcessError({
         name: "UnknownPeriodValue",
@@ -133,39 +133,39 @@ const generateDatesInRangeByPeriod = (minDate, maxDate, period) => {
     let newDate = new Date(currentDate);
     switch (period) {
       case "hour":
-        newDate.setHours(newDate.getHours() + 1);
+        newDate.setUTCHours(newDate.getUTCHours() + 1);
         return newDate.toISOString();
       case "day":
-        newDate.setDate(newDate.getDate() + 1);
+        newDate.setUTCDate(newDate.getUTCDate() + 1);
         return newDate.toISOString();
       case "week":
-        newDate.setDate(newDate.getDate() + 7);
+        newDate.setUTCDate(newDate.getUTCDate() + 7);
         return newDate.toISOString();
       case "dekad":
-        if (newDate.getDate() > 20) {
-          newDate.setDate(1);
-          newDate.setMonth(newDate.getMonth() + 1);
+        if (newDate.getUTCDate() > 20) {
+          newDate.setUTCDate(1);
+          newDate.setUTCMonth(newDate.getUTCMonth() + 1);
         } else {
-          newDate.setDate(newDate.getDate() + 10);
+          newDate.setUTCDate(newDate.getUTCDate() + 10);
         }
         return newDate.toISOString();
       case "month":
-        newDate.setMonth(newDate.getMonth() + 1);
+        newDate.setUTCMonth(newDate.getUTCMonth() + 1);
         return newDate.toISOString();
       case "season":
-        newDate.setMonth(newDate.getMonth() + 3);
+        newDate.setUTCMonth(newDate.getUTCMonth() + 3);
         return newDate.toISOString();
       case "tropical-season":
-        newDate.setMonth(newDate.getMonth() + 6);
+        newDate.setUTCMonth(newDate.getUTCMonth() + 6);
         return newDate.toISOString();
       case "year":
-        newDate.setFullYear(newDate.getFullYear() + 1);
+        newDate.setUTCFullYear(newDate.getUTCFullYear() + 1);
         return newDate.toISOString();
       case "decade":
-        newDate.setFullYear(newDate.getFullYear() + 10);
+        newDate.setUTCFullYear(newDate.getUTCFullYear() + 10);
         return newDate.toISOString();
       case "decade-ad":
-        newDate.setFullYear(newDate.getFullYear() + 10);
+        newDate.setUTCFullYear(newDate.getUTCFullYear() + 10);
         return newDate.toISOString();
       default:
         throw new ProcessError({
