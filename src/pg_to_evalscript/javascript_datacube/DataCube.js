@@ -263,7 +263,7 @@ class DataCube {
           const dates = generateDatesInRangeByPeriod(firstDayInYear.toISOString(), maxDate, period);
           let shouldAdd = false;
           for (let i = 0; i < dates.length; i++) {
-              if (formatLabelByPeriod(period, dates[i]) === formatLabelByPeriod(period,minDate)) {
+              if (!shouldAdd && formatLabelByPeriod(period, dates[i]) === formatLabelByPeriod(period,minDate)) {
                 shouldAdd = true;
               }  
 
