@@ -41,7 +41,7 @@ replacement_val_str = "qwe"
 
 result_3bands_3dates = [1, None, 3, None, 12, None, 21, None, 23]
 result_mask_no_temporal = [1, None, 3, 11, None, 13, 21, None, 23]
-result_mask_no_bands = [None, 2, 3, None, 12, 13, None, 22, 23]
+result_mask_no_bands = [1, 2, 3, None, None, None, 21, 22, 23]
 
 
 def resultWithReplacement(dataArray, val=None):
@@ -176,6 +176,8 @@ result_added_dim = {
         ),
         # (  # test mask parameter missing dimensions: mask parameter with no bands dimension
         #     # doesn't work properly: same result as for "mask parameter with no temporal dimension"
+        #     # values for all bands for first and third date should ne unchanged
+        #     # values for all bands for second date should be None / null
         #     {
         #         "data": data_3bands_3dates,
         #         "mask": [{"B01": el["B01"]} for el in mask_3bands_3dates_num],
