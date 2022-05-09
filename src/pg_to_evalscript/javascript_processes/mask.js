@@ -23,18 +23,17 @@ function mask(arguments) {
     allowedTypes: ["number", "boolean", "string"],
   });
 
-  // The data cubes have to be compatible so that each dimension in the mask 
-  // must also be available in the raster data cube with the same
-  // name, type, reference system, resolution and labels.
+  // The data and mask cubes have to be compatible, meaning each dimension in the mask must also be
+  // available in the data cube with the same name, type, reference system, resolution and labels.
 
   // check that each dimension, present in mask
-  // - is present in data
+  // - is also present in data
   // - has the same:
-  //    - name, (taken care of by searching for dimension by name)
-  //    - type,
-  //    - reference system, (not sure how to check that)
-  //    - resolution, (not sure how to check that)
+  //    - name (taken care of by searching for dimension by name)
+  //    - type
   //    - labels
+  //    - reference system (no check yet)
+  //    - resolution (no check yet)
 
   for (let maskDim of mask.dimensions) {
     const dataDim = data.getDimensionByName(maskDim.name);
@@ -55,14 +54,11 @@ function mask(arguments) {
   let newData = data.clone();
   let newDataFlat = newData.flattenToArray();
 
-  // broadcast the mask parameter's ndarray to match the data parameter's ndarray
   const maskBroadcasted = broadcastNdarray(mask.data, newData.data.shape);
   const maskBroadcastedFlat = flattenToNativeArray(maskBroadcasted);
 
   const replacement_val = replacement === undefined ? null : replacement;
 
-  // replace pixel in data if the corresponding pixel in mask is
-  // non-zero (for numbers) or true (for boolean values)
   for (let i = 0; i < newDataFlat.length; i++) {
     const maskElNumber = (typeof maskBroadcastedFlat[i] === 'number' && maskBroadcastedFlat[i] !== 0);
     const maskElBool = (typeof maskBroadcastedFlat[i] === 'boolean' && maskBroadcastedFlat[i] === true);
