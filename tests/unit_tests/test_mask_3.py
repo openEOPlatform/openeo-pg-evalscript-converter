@@ -245,3 +245,128 @@ def test_mask(
     output = json.loads(output)
 
     assert output == expected_output
+
+
+@pytest.mark.parametrize(
+    "example_input, additional_js_code_specific_to_case, raises_exception, error_message",
+    [
+        (  # no exception
+            {
+                "data": data_3bands_3dates,
+                "mask": mask_3bands_3dates_num,
+                "scenes_data": scenes_3dates,
+                "scenes_mask": scenes_3dates,
+            },
+            None,
+            False,
+            None,
+        ),
+        (  # exception: replacement = array
+            {
+                "data": data_3bands_3dates,
+                "mask": mask_3bands_3dates_num,
+                "scenes_data": scenes_3dates,
+                "scenes_mask": scenes_3dates,
+                "replacement": [1, 2, 3],
+            },
+            None,
+            True,
+            "WRONG_TYPE: Value for replacement is not a number or a boolean or a string.",
+        ),
+        (  # exception: data doesn't have all dimensions that are in mask
+            {
+                "data": data_3bands_3dates,
+                "mask": mask_3bands_3dates_num,
+                "scenes_data": scenes_3dates,
+                "scenes_mask": scenes_3dates,
+                "replacement": None,
+            },
+            "dataCube.removeDimension('temporal_name');",
+            True,
+            "Error: Dimension `temporal_name` from argument `mask` not in argument `data`.",
+        ),
+        (  # exception: dimension is of different types in data and mask
+            {
+                "data": data_3bands_3dates,
+                "mask": mask_3bands_3dates_num,
+                "scenes_data": scenes_3dates,
+                "scenes_mask": scenes_3dates,
+                "replacement": None,
+            },
+            "dataCube.addDimension('test_name', 'test_label', 'other');"
+            + "maskCube.addDimension('test_name', 'test_label', 'spatial');",
+            True,
+            "Error: Type of the dimension `test_name` from argument `mask` is not the same as in argument `data`.",
+        ),
+        (  # exception: dimension has different labels in data and mask
+            {
+                "data": data_3bands_3dates,
+                "mask": mask_3bands_3dates_num,
+                "scenes_data": scenes_3dates,
+                "scenes_mask": scenes_3dates,
+                "replacement": None,
+            },
+            "dataCube.addDimension('test_name', 'label_1', 'other');"
+            + "maskCube.addDimension('test_name', 'label_2', 'other');",
+            True,
+            "Error: Labels for dimension `test_name` from argument `mask` are not the same as in argument `data`.",
+        ),
+    ],
+)
+def test_mask_exceptions(
+    mask_process_code,
+    example_input,
+    additional_js_code_specific_to_case,
+    raises_exception,
+    error_message,
+):
+
+    data_parameter = json.dumps(example_input["data"])
+    mask_parameter = json.dumps(example_input["mask"])
+    scenes_data = json.dumps(example_input["scenes_data"])
+    scenes_mask = json.dumps(example_input["scenes_mask"])
+    replacement_parameter = (
+        json.dumps(example_input["replacement"])
+        if "replacement" in example_input
+        else None
+    )
+
+    vars_definitions = (
+        f"const dataCube = new DataCube({data_parameter}, 'bands_name', 'temporal_name', true, [], {scenes_data});"
+        + f"let maskCube = new DataCube({mask_parameter}, 'bands_name', 'temporal_name', true, [], {scenes_mask});"
+    )
+
+    if replacement_parameter:
+        vars_definitions = (
+            vars_definitions + f"const replacement = {replacement_parameter};"
+        )
+
+    additional_js_code_to_run = (
+        load_datacube_code()
+        + vars_definitions
+        + (additional_js_code_specific_to_case or "")
+    )
+
+    arguments = f"'data': dataCube, 'mask': maskCube, 'scenes': {scenes_data}"
+
+    if "replacement" in example_input:
+        arguments = arguments + f", 'replacement': {replacement_parameter}"
+
+    process_arguments = f"{{" + arguments + f"}}"
+
+    if raises_exception:
+        try:
+            run_process(
+                mask_process_code + additional_js_code_to_run,
+                "mask",
+                process_arguments,
+            )
+        except subprocess.CalledProcessError as exc:
+            assert error_message in str(exc.stderr)
+
+    else:
+        run_process(
+            mask_process_code + additional_js_code_to_run,
+            "mask",
+            process_arguments,
+        )
