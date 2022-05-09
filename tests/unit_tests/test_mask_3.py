@@ -237,43 +237,11 @@ def test_mask(
 
     process_arguments = f"{{" + arguments + f"}}"
 
-    print("input")
-    print(example_input)
-    print("\n")
+    output = run_process(
+        mask_process_code + additional_js_code_to_run,
+        "mask",
+        process_arguments,
+    )
+    output = json.loads(output)
 
-    print("vars def")
-    print(vars_definitions)
-    print("\n")
-
-    print("custom js")
-    print(additional_js_code_specific_to_case)
-    print("\n")
-
-    print("arguments")
-    print(process_arguments)
-    print("\n")
-
-    print("expected")
-    print(expected_output)
-    print("\n")
-
-    try:
-        output = run_process(
-            mask_process_code + additional_js_code_to_run,
-            "mask",
-            process_arguments,
-        )
-        output = json.loads(output)
-
-        print("actual")
-        print(output)
-        print("\n")
-
-        assert output == expected_output
-
-    except subprocess.CalledProcessError as exc:
-        print("error:")
-        print(exc.stderr)
-        print("\n")
-
-        assert exc.stderr == "OK"
+    assert output == expected_output
