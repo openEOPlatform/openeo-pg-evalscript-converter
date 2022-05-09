@@ -23,18 +23,6 @@ function mask(arguments) {
     allowedTypes: ["number", "boolean", "string"],
   });
 
-  // The data and mask cubes have to be compatible, meaning each dimension in the mask must also be
-  // available in the data cube with the same name, type, reference system, resolution and labels.
-
-  // check that each dimension, present in mask
-  // - is also present in data
-  // - has the same:
-  //    - name (taken care of by searching for dimension by name)
-  //    - type
-  //    - labels
-  //    - reference system (no check yet)
-  //    - resolution (no check yet)
-
   for (let maskDim of mask.dimensions) {
     const dataDim = data.getDimensionByName(maskDim.name);
 
