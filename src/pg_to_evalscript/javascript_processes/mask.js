@@ -53,16 +53,22 @@ function mask(arguments) {
   }
 
   let newData = data.clone();
-  let flatData = newData.flattenToArray();
-  let flatMask = mask.flattenToArray();
+  let newDataFlat = newData.flattenToArray();
+
+  // broadcast the mask parameter's ndarray to match the data parameter's ndarray
+  const maskBroadcasted = broadcastNdarray(mask.data, newData.data.shape);
+  const maskBroadcastedFlat = flattenToNativeArray(maskBroadcasted);
+
   const replacement_val = replacement === undefined ? null : replacement;
 
   // replace pixel in data if the corresponding pixel in mask is
   // non-zero (for numbers) or true (for boolean values)
-  for (let i = 0; i < flatData.length; i++) {
-    const shouldBeReplaced = (typeof flatMask[i] === 'number' && flatMask[i] !== 0) || (typeof flatMask[i] === 'boolean' && flatMask[i] === true);
+  for (let i = 0; i < newDataFlat.length; i++) {
+    const maskElNumber = (typeof maskBroadcastedFlat[i] === 'number' && maskBroadcastedFlat[i] !== 0);
+    const maskElBool = (typeof maskBroadcastedFlat[i] === 'boolean' && maskBroadcastedFlat[i] === true);
+    const shouldBeReplaced = maskElNumber || maskElBool;
     if (shouldBeReplaced) {
-      flatData[i] = replacement_val;
+      newDataFlat[i] = replacement_val;
     }
   }
 
