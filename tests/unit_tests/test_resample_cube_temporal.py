@@ -17,18 +17,18 @@ data_3dates = [
     {"B01": 21, "B02": 22, "B03": 23},  # date 3
 ]
 
-target_3Dates = [
+target_3dates = [
     {"B01": 1, "B02": 2, "B03": 3},  # date 1
     {"B01": 11, "B02": 12, "B03": 13},  # date 2
     {"B01": 21, "B02": 22, "B03": 23},  # date 3
 ]
 
-target_2Dates = [
+target_2dates = [
     {"B01": 1, "B02": 2, "B03": 3},  # date 1
     {"B01": 11, "B02": 12, "B03": 13},  # date 2
 ]
 
-target_4Dates = [
+target_4dates = [
     {"B01": 1, "B02": 2, "B03": 3},  # date 1
     {"B01": 11, "B02": 12, "B03": 13},  # date 2
     {"B01": 21, "B02": 22, "B03": 23},  # date 3
@@ -104,7 +104,7 @@ def resultWithTemporal(dataObject, temporalLabels):
         (
             {
                 "data": data_3dates,
-                "target": target_3Dates,
+                "target": target_3dates,
                 "scenes_data": data_scenes_3dates,
                 "scenes_target": data_scenes_3dates
                 # "dimension": None,
@@ -171,7 +171,7 @@ def test_resample_cube_temporal(
     process_arguments = f"{{" + arguments + f"}}"
 
     print("EXPECTED OUTPUT:")
-    print(expected_output)
+    print(json.dumps(expected_output))
 
     try:
         output = run_process(
