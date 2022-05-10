@@ -74,6 +74,7 @@ class Node:
             "count": CountNode,
             "array_apply": ArrayApplyNode,
             "array_filter": ArrayFilterNode,
+            "aggregate_temporal_period": AggregateTemporalPeriodNode,
             "apply_dimension": ApplyDimensionNode,
             "aggregate_temporal": AggregateTemporalNode,
         }
@@ -334,6 +335,25 @@ function array_filter(arguments) {{
 
     {self.load_process_code()}
     return array_filter(arguments);
+}}
+"""
+
+
+class AggregateTemporalPeriodNode(Node):
+    def write_process(self):
+        newline = "\n"
+        tab = "\t"
+        return f"""
+function aggregate_temporal_period(arguments) {{
+    function reducer(arguments) {{
+    {newline.join(node.write_function() for node in self.child_nodes)}
+    {newline.join(node.write_call() for node in self.child_nodes)}
+        return {self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id};
+    }}
+
+    {self.load_process_code()}
+    arguments['reducer'] = reducer;
+    return aggregate_temporal_period(arguments)
 }}
 """
 
