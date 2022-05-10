@@ -206,6 +206,29 @@ def construct_datacube():
             ],
         ),
         (
+            # Merging lower dimension cube into higher dimension cube other way around
+            [9, 10, 11, 12],
+            [2, 2],
+            [{"labels": [0, 1], "name": "x", "type": "spatial"}, {"labels": [0, 1], "name": "y", "type": "spatial"}],
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            [2, 2, 2, 1],
+            [
+                {"labels": [0, 1], "name": "x", "type": "spatial"},
+                {"labels": [0, 1], "name": "y", "type": "spatial"},
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+            "({x,y}) => (x+y)",
+            [10, 11, 13, 14, 16, 17, 19, 20],
+            [2, 2, 2, 1],
+            [
+                {"labels": [0, 1], "name": "x", "type": "spatial"},
+                {"labels": [0, 1], "name": "y", "type": "spatial"},
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+        ),
+        (
             # Merging cubes with overlapping dimension y
             [1, 2, 3, 4, 5, 6, 7, 8],
             [2, 2, 2, 1],

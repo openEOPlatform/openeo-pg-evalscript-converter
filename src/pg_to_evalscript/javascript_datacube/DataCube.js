@@ -685,7 +685,6 @@ class DataCube {
     }
 
     merge(cube2, overlap_resolver) {
-        const sharedDimensions = []
         const cube1SpecificDimensions = []
         const cube2SpecificDimensions = []
 
@@ -698,9 +697,7 @@ class DataCube {
             if (!dimension2) {
                 cube1SpecificDimensions.push(dimension)
                 continue
-            } else {
-                sharedDimensions.push(dimension)
-            }
+            } 
 
             const labelsEqual = dimension.labels.length === dimension2.labels.length && dimension.labels.every((l) => dimension2.labels.includes(l))
 
@@ -761,6 +758,15 @@ class DataCube {
 
         if (isCube2Subcube) {
             return this._merge_subcube(cube2, overlap_resolver)
+        }
+
+        const isCube1Subcube = !dimensionWithDifferentLabels && cube1SpecificDimensions.length === 0 && cube2SpecificDimensions.length > 0;
+
+        if (isCube1Subcube) {
+            cube2._merge_subcube(this, overlap_resolver)
+            this.data = cube2.data;
+            this.dimensions = cube2.dimensions
+            return
         }
 
         for (let i = 0; i < cube2.dimensions.length; i++) {
