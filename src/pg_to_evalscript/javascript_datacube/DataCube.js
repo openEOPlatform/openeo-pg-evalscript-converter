@@ -228,6 +228,91 @@ class DataCube {
         dimension.labels = labels && labels.length > 0 ? labels : computedLabels;
     }
 
+    aggregateTemporalPeriod(period, reducer, dimension, context) {
+        const temporalDimensions = this.getTemporalDimensions();
+        if (!dimension && temporalDimensions.length > 1) {
+          throw new ProcessError({
+            name: "TooManyDimensions",
+            message:
+              "The data cube contains multiple temporal dimensions. The parameter `dimension` must be specified.",
+          });
+        }
+      
+        const temporalDimensionToAggregate = dimension ? this.getDimensionByName(dimension) : temporalDimensions[0];
+        if (!temporalDimensionToAggregate) {
+          throw new ProcessError({
+            name: "DimensionNotAvailable",
+            message: "A dimension with the specified name does not exist.",
+          });
+        }
+      
+        const axis = this.dimensions.findIndex(
+          (d) => (d.name = temporalDimensionToAggregate.name)
+        );
+        const newLabels = [];
+        const newValues = [];
+      
+        if (temporalDimensionToAggregate.labels.length > 1) {
+          const { minDate, maxDate } = getMinMaxDate(
+            temporalDimensionToAggregate.labels
+          );
+          const firstDayInYear = new Date(minDate)
+          firstDayInYear.setMonth(0)
+          firstDayInYear.setDate(1)
+      
+          const dates = generateDatesInRangeByPeriod(firstDayInYear.toISOString(), maxDate, period);
+          let shouldAdd = false;
+          for (let i = 0; i < dates.length; i++) {
+              if (!shouldAdd && formatLabelByPeriod(period, dates[i]) === formatLabelByPeriod(period,minDate)) {
+                shouldAdd = true;
+              }  
+
+              if (shouldAdd) {
+                newLabels.push(formatLabelByPeriod(period, dates[i]));
+              }
+          }
+        } else {
+          newLabels.push(
+            formatLabelByPeriod(period, temporalDimensionToAggregate.labels[0])
+          );
+        }
+
+        const formattedOldLabels = temporalDimensionToAggregate.labels.map(l => formatLabelByPeriod(period, l))
+        for (let newLabel of newLabels) {
+          const allCoords = this._iterateCoords(this.data.shape.slice(), [axis]);
+          const indices = []
+          for (let i = 0; i < formattedOldLabels.length; i++) {
+              if (newLabel === formattedOldLabels[i]) {
+                  indices.push(i)
+                }
+          }
+
+          for (let coord of allCoords) {
+            const entireDataToReduce = convert_to_1d_array(this.data.pick.apply(this.data, coord));
+
+            if (!formattedOldLabels.includes(newLabel)) {
+                newValues.push(null);
+            } else {
+                const dataToReduce = []
+                for (let index of indices) {
+                    dataToReduce.push(entireDataToReduce[index])
+                }
+
+                const newVals = reducer({
+                    data: dataToReduce,
+                    context: context,
+                });
+                newValues.push(newVals);
+            }
+          }
+        }
+      
+        const newShape = this.getDataShape().slice();
+        newShape[axis] = newLabels.length;
+        this.data = ndarray(newValues, newShape);
+        this.setDimensionLabels(temporalDimensionToAggregate.name, newLabels);
+    }
+
     parseTemporalExtent(extent) {
         if (extent.length !== 2) {
             throw new Error("Invalid temporal extent. Temporal extent must be an array of exactly two elements.");
