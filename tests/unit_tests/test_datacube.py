@@ -322,12 +322,12 @@ def test_filter(
         ([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2], 2, [-1, -2, -3, -4], [1, 2, -1, 3, 4, -2, 5, 6, -3, 7, 8, -4], [2, 2, 3]),
     ],
 )
-def test_extendFinalDimensionWithData(
+def test_extendDimensionWithData(
     datacube_code, example_data, example_data_shape, axis_to_extend, data_to_add, expected_data, expected_data_shape
 ):
     testing_code = (
         datacube_code(f"ndarray({example_data},{example_data_shape})", from_samples=False, json_samples=False)
-        + f"\ndatacube.extendFinalDimensionWithData({axis_to_extend},{data_to_add});"
+        + f"\ndatacube.extendDimensionWithData({axis_to_extend},{data_to_add});"
         + with_stdout_call("datacube")
     )
     output = run_javascript(testing_code)

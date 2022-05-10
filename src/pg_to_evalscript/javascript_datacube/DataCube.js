@@ -267,23 +267,19 @@ class DataCube {
         })
     }
 
-    extendFinalDimensionWithData(axis, dataToAdd) {
+    extendDimensionWithData(axis, dataToAdd) {
         const finalShape = this.getDataShape()
-        let loc = 1;
+        let locationToInsert = 1;
         let elementsToInsertAtOnce = 1;
         for (let i = 0; i < finalShape.length; i++) {
             if (i < axis) {
                 elementsToInsertAtOnce *= finalShape[i];
                 continue
             }
-            loc *= finalShape[i];
+            locationToInsert *= finalShape[i];
         }
-        const finalData = this.insertIntoFinalDimension(dataToAdd, loc, dataToAdd.length / elementsToInsertAtOnce, axis);     
-        finalShape[axis]++;
-        this.data = ndarray(finalData, finalShape)
-    }
 
-    insertIntoFinalDimension(dataToAdd, offset, elementsToInsertAtOnce, axis) {
+        elementsToInsertAtOnce = dataToAdd.length / elementsToInsertAtOnce;
         const dataArr = this.data.data;
         if (axis === 0) {
             for (let i = 0; i < dataToAdd.length; i++) {
@@ -293,7 +289,7 @@ class DataCube {
             for (let i = 1; i <= dataToAdd.length / elementsToInsertAtOnce; i++) {
                 for (let j = 0; j < elementsToInsertAtOnce; j++) {
                     dataArr.splice(
-                        i * offset + (i - 1) * elementsToInsertAtOnce + j, 
+                        i * locationToInsert + (i - 1) * elementsToInsertAtOnce + j, 
                         0, 
                         dataToAdd[(i - 1) * elementsToInsertAtOnce + j]
                     );
@@ -301,7 +297,8 @@ class DataCube {
             }
         }
 
-        return dataArr;
+        finalShape[axis]++;
+        this.data = ndarray(dataArr, finalShape)
     }
 
     clone() {
