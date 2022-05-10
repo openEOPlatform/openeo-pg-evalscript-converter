@@ -605,6 +605,16 @@ class DataCube {
         }
     }
 
+    // Returns new DataCube with added dimensions `cubes` with labels `cube1` and `cube2`
+    _join_cubes_in_big_cube(cube2) {
+        const newShape = cube2.getDataShape()
+        newShape.unshift(2)
+        this.addDimension("cubes", "cube1", this.OTHER) 
+        this.getDimensionByName("cubes").labels.push("cube2")
+        this.data = ndarray(this.data.data.concat(cube2.data.data), newShape)
+        return this
+    }
+
     _merge_subcube(cube2, overlap_resolver) {
         const coord2 = cube2.getDataShape().slice()
         const indicesOfDimension = []
@@ -733,15 +743,18 @@ class DataCube {
 
         const allDimensionsEqual = cube1SpecificDimensions.length === 0 && cube2SpecificDimensions.length === 0;
 
-        if (!overlap_resolver && ((dimensionWithDifferentLabels && dimensionWithDifferentLabelsOverlaps) || (!dimensionWithDifferentLabels && allDimensionsEqual))) {
+        if (!overlap_resolver && ((dimensionWithDifferentLabels && dimensionWithDifferentLabelsOverlaps))) {
             throw new ProcessError({
                 name: "OverlapResolverMissing",
                 message: "Overlapping data cubes, but no overlap resolver has been specified."
             });
         }
 
-        if (allDimensionsEqual && !dimensionWithDifferentLabels) {
+        if (allDimensionsEqual && !dimensionWithDifferentLabels && overlap_resolver) {
             return this._merge_matching_cube(cube2, overlap_resolver)
+        }
+        if (allDimensionsEqual && !dimensionWithDifferentLabels && !overlap_resolver) {
+            return this._join_cubes_in_big_cube(cube2)
         }
 
         const isCube2Subcube = !dimensionWithDifferentLabels && cube2SpecificDimensions.length === 0 && cube1SpecificDimensions.length > 0;

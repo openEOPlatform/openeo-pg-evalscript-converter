@@ -139,6 +139,29 @@ def construct_datacube():
             ],
         ),
         (
+            # Merging fully overlapping datacubes without overlap_resolver
+            [1, 2, 3, 4, 5, 6],
+            [3, 2],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+            [7, 8, 9, 10, 11, 12],
+            [3, 2],
+            [
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+            None,
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+            [2, 3, 2],
+            [
+                {"labels": ["cube1", "cube2"], "name": "cubes", "type": "other"},
+                {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
+            ],
+        ),
+        (
             # Merging lower dimension cube into higher dimension cube
             [1, 2, 3, 4, 5, 6],
             [3, 2],
@@ -209,7 +232,7 @@ def construct_datacube():
                 {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
                 {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
             ],
-        ),
+        )
     ],
 )
 def test_merge_cubes(
@@ -250,10 +273,10 @@ def test_merge_cubes(
             [
                 {"labels": ["B1"], "name": "b", "type": "bands"},
             ],
+            [2,3],
             [2],
-            [1],
             [
-                {"labels": ["B1"], "name": "b", "type": "bands"},
+                {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
             ],
             None,
             "Overlapping data cubes, but no overlap resolver has been specified.",
