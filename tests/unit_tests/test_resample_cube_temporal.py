@@ -62,15 +62,15 @@ result_3dates = {
 
 result_2dates = {
     "data": [1, 2, 3, 11, 12, 13],
-    "shape": [3, 3],  # FIX (2,3) or (2,4)
-    "stride": [3, 1],  # FIX (2,1) or (1,2)
+    "shape": [2, 3],
+    "stride": [3, 1],
     "offset": 0,
 }
 
 result_4dates = {
     "data": [1, 2, 3, 11, 12, 13, 21, 22, 23, 31, 32, 33],
-    "shape": [3, 3],  # FIX (4,3) or (3,4)
-    "stride": [3, 1],  # FIX (4,1) or (1,4)
+    "shape": [4, 3],
+    "stride": [3, 1],
     "offset": 0,
 }
 
