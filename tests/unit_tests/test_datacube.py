@@ -334,3 +334,58 @@ def test_extendDimensionWithData(
     output = json.loads(output)
     assert output["data"]["data"] == expected_data
     assert output["data"].get("shape") == expected_data_shape
+
+
+@pytest.mark.parametrize(
+    "example_data,example_data_shape,axis,data_to_add,location_in_dimension,expected_data,expected_shape",
+    [
+        ([1, 2, 3, 4], [2, 2], 0, [5, 6], 0, [5, 6, 1, 2, 3, 4], [3, 2]),
+        ([1, 2, 3, 4], [2, 2], 0, [5, 6], 1, [1, 2, 5, 6, 3, 4], [3, 2]),
+        ([1, 2, 3, 4], [2, 2], 0, [5, 6], 2, [1, 2, 3, 4, 5, 6], [3, 2]),
+        ([1, 2, 3, 4], [2, 2], 1, [5, 6], 0, [5, 1, 2, 6, 3, 4], [2, 3]),
+        ([1, 2, 3, 4], [2, 2], 1, [5, 6], 1, [1, 5, 2, 3, 6, 4], [2, 3]),
+        ([1, 2, 3, 4], [2, 2], 1, [5, 6], 2, [1, 2, 5, 3, 4, 6], [2, 3]),
+    ],
+)
+def test_insert_into_dimension(
+    datacube_code,
+    example_data,
+    example_data_shape,
+    axis,
+    data_to_add,
+    location_in_dimension,
+    expected_data,
+    expected_shape,
+):
+    testing_code = (
+        datacube_code(f"ndarray({example_data},{example_data_shape})", from_samples=False, json_samples=False)
+        + f"\ndatacube.insertIntoDimension({axis},{json.dumps(data_to_add)},{location_in_dimension});"
+        + with_stdout_call("datacube")
+    )
+    output = run_javascript(testing_code)
+    output = json.loads(output)
+    assert output["data"]["data"] == expected_data
+    assert output["data"].get("shape") == expected_shape
+
+
+@pytest.mark.parametrize(
+    "example_data,example_data_shape,axis,data_to_set,index,expected_data",
+    [
+        ([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2], 0, [9, 99, 999, 9999], 0, [9, 99, 999, 9999, 5, 6, 7, 8]),
+        ([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2], 0, [9, 99, 999, 9999], 1, [1, 2, 3, 4, 9, 99, 999, 9999]),
+        ([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2], 1, [9, 99, 999, 9999], 0, [9, 99, 3, 4, 999, 9999, 7, 8]),
+        ([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2], 1, [9, 99, 999, 9999], 1, [1, 2, 9, 99, 5, 6, 999, 9999]),
+        ([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2], 2, [9, 99, 999, 9999], 0, [9, 2, 99, 4, 999, 6, 9999, 8]),
+        ([1, 2, 3, 4, 5, 6, 7, 8], [2, 2, 2], 2, [9, 99, 999, 9999], 1, [1, 9, 3, 99, 5, 999, 7, 9999]),
+    ],
+)
+def test_set_in_dimension(datacube_code, example_data, example_data_shape, axis, data_to_set, index, expected_data):
+    testing_code = (
+        datacube_code(f"ndarray({example_data},{example_data_shape})", from_samples=False, json_samples=False)
+        + f"\ndatacube.setInDimension({axis},{json.dumps(data_to_set)},{index});"
+        + with_stdout_call("datacube")
+    )
+    output = run_javascript(testing_code)
+    output = json.loads(output)
+    assert output["data"]["data"] == expected_data
+    assert output["data"].get("shape") == example_data_shape
