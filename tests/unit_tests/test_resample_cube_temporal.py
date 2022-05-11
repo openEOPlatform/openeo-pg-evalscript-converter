@@ -112,7 +112,31 @@ def resultWithTemporal(dataObject, temporalLabels):
             },
             None,
             resultWithTemporal(result_3dates, data_scenes_3dates),
-        )
+        ),
+        # (
+        #     {
+        #         "data": data_3dates,
+        #         "target": target_2dates,
+        #         "scenes_data": data_scenes_3dates,
+        #         "scenes_target": scenes_2dates
+        #         # "dimension": None,
+        #         # "valid_within": None,
+        #     },
+        #     None,
+        #     resultWithTemporal(result_2dates, scenes_2dates),
+        # ),
+        # (
+        #     {
+        #         "data": data_3dates,
+        #         "target": target_4dates,
+        #         "scenes_data": data_scenes_3dates,
+        #         "scenes_target": scenes_4dates
+        #         # "dimension": None,
+        #         # "valid_within": None,
+        #     },
+        #     None,
+        #     resultWithTemporal(result_4dates, scenes_4dates),
+        # ),
     ],
 )
 def test_resample_cube_temporal(
