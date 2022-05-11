@@ -684,6 +684,30 @@ class DataCube {
         }
     }
 
+    _checkLabelsEqual(labels1, labels2) {
+        if (labels1.length !== labels2.length) {
+            return false
+        }
+        const duplicatedLabelsError = new ProcessError({
+            name: "Internal",
+            message: "Dimension labels must be unique!"
+        })
+        const set1 = new Set(labels1)
+        if (set1.size !== labels1.length) {
+            throw duplicatedLabelsError
+        }
+        const set2 = new Set(labels2)
+        if (set2.size !== labels2.length) {
+            throw duplicatedLabelsError
+        }
+        for (let label of labels1) {
+            if (!labels2.includes(label)) {
+                return false
+            }
+        }
+        return true
+    }
+
     merge(cube2, overlap_resolver) {
         const cube1SpecificDimensions = []
         const cube2SpecificDimensions = []
@@ -699,7 +723,7 @@ class DataCube {
                 continue
             } 
 
-            const labelsEqual = dimension.labels.length === dimension2.labels.length && dimension.labels.every((l) => dimension2.labels.includes(l))
+            const labelsEqual = this._checkLabelsEqual(dimension.labels, dimension2.labels)
 
             if (
                 dimension.name === dimension2.name &&
