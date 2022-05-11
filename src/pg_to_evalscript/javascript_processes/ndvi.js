@@ -87,7 +87,7 @@ function ndvi(arguments) {
     }
 
     bandsDim.labels.push(target_band);
-    clonedData.extendFinalDimensionWithData(axis, ndvis);
+    clonedData.extendDimensionWithData(axis, ndvis);
     return clonedData;
   }
 

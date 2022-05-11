@@ -85,6 +85,166 @@ function parse_rfc3339_time(t) {
   return null;
 }
 
+const formatLabelByPeriod = (period, label) => {
+  const dayInYear = (date) => {
+    return (
+      (Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) -
+        Date.UTC(date.getUTCFullYear(), 0, 0)) /
+      24 /
+      60 /
+      60 /
+      1000
+    );
+  };
+
+  const dekadInYear = (date) => {
+    const monthCount = date.getUTCMonth();
+    const dekadCount = Math.floor((date.getUTCDate() - 1) / 10) + 1;
+    return monthCount * 3 + (dekadCount > 2 ? 3 : dekadCount);
+  };
+
+  const padWithZeros = (num, size) => {
+    num = num.toString();
+    while (num.length < size) {
+      num = "0" + num;
+    }
+    return num;
+  };
+
+  const d = new Date(label);
+  switch (period) {
+    case "hour":
+      const hourCount = d.toISOString().split("T")[1].substring(0, 2);
+      const days = d.getUTCDate();
+      const months = d.getUTCMonth() + 1;
+      return `${d.getUTCFullYear()}-${padWithZeros(months, 2)}-${padWithZeros(
+        days,
+        2
+      )}-${hourCount}`;
+    case "day":
+      const dayCount = dayInYear(d);
+      return `${d.getUTCFullYear()}-${padWithZeros(dayCount, 3)}`;
+    case "week":
+      const weekCount = Math.ceil(dayInYear(d) / 7);
+      return `${d.getUTCFullYear()}-${padWithZeros(weekCount, 2)}`;
+    case "dekad":
+      const dekadCount = dekadInYear(d);
+      return `${d.getUTCFullYear()}-${padWithZeros(dekadCount, 2)}`;
+    case "month":
+      const monthCount = d.getUTCMonth() + 1;
+      return `${d.getUTCFullYear()}-${padWithZeros(monthCount, 2)}`;
+    case "season":
+      const month = d.getUTCMonth() + 1;
+      let seasonName = null;
+      if (month >= 3 && month <= 5) {
+        seasonName = "mam";
+      } else if (month >= 6 && month <= 8) {
+        seasonName = "jja";
+      } else if (month >= 9 && month <= 11) {
+        seasonName = "son";
+      } else {
+        seasonName = "djf";
+      }
+      return `${d.getUTCFullYear()}-${seasonName}`;
+    case "tropical-season":
+      let tropicalSeasonName = null;
+      if (d.getUTCMonth() + 1 >= 5 && d.getUTCMonth() + 1 <= 10) {
+        tropicalSeasonName = "mjjaso";
+      } else {
+        tropicalSeasonName = "ndjfma";
+      }
+      return `${d.getUTCFullYear()}-${tropicalSeasonName}`;
+    case "year":
+      return `${d.getUTCFullYear()}`;
+    case "decade":
+      return `${d.getUTCFullYear().toString().substring(0, 3)}0`;
+    case "decade-ad":
+      return `${d.getUTCFullYear().toString().substring(0, 3)}1`;
+    default:
+      throw new ProcessError({
+        name: "UnknownPeriodValue",
+        message: `Value '${period}' is not an allowed value for period.`,
+      });
+  }
+};
+
+const generateDatesInRangeByPeriod = (minDate, maxDate, period) => {
+  const addPeriodToDate = (currentDate, period) => {
+    let newDate = new Date(currentDate);
+    switch (period) {
+      case "hour":
+        newDate.setUTCHours(newDate.getUTCHours() + 1);
+        return newDate.toISOString();
+      case "day":
+        newDate.setUTCDate(newDate.getUTCDate() + 1);
+        return newDate.toISOString();
+      case "week":
+        newDate.setUTCDate(newDate.getUTCDate() + 7);
+        return newDate.toISOString();
+      case "dekad":
+        if (newDate.getUTCDate() > 20) {
+          newDate.setUTCDate(1);
+          newDate.setUTCMonth(newDate.getUTCMonth() + 1);
+        } else {
+          newDate.setUTCDate(newDate.getUTCDate() + 10);
+        }
+        return newDate.toISOString();
+      case "month":
+        newDate.setUTCMonth(newDate.getUTCMonth() + 1);
+        return newDate.toISOString();
+      case "season":
+        newDate.setUTCMonth(newDate.getUTCMonth() + 3);
+        return newDate.toISOString();
+      case "tropical-season":
+        newDate.setUTCMonth(newDate.getUTCMonth() + 6);
+        return newDate.toISOString();
+      case "year":
+        newDate.setUTCFullYear(newDate.getUTCFullYear() + 1);
+        return newDate.toISOString();
+      case "decade":
+        newDate.setUTCFullYear(newDate.getUTCFullYear() + 10);
+        return newDate.toISOString();
+      case "decade-ad":
+        newDate.setUTCFullYear(newDate.getUTCFullYear() + 10);
+        return newDate.toISOString();
+      default:
+        throw new ProcessError({
+          name: "UnknownPeriodValue",
+          message: `Value '${period}' is not an allowed value for period.`,
+        });
+    }
+  };
+
+  const dates = [];
+  let currentDate = minDate;
+
+  while (currentDate <= maxDate) {
+    dates.push(currentDate);
+    currentDate = addPeriodToDate(currentDate, period);
+  }
+
+  return dates;
+};
+
+const getMinMaxDate = (labels) => {
+  let minDate = parse_rfc3339(labels[0]).value;
+  let maxDate = minDate;
+
+  for (let i = 1; i < labels.length; i++) {
+    const currentDate = parse_rfc3339(labels[i]).value;
+
+    if (currentDate < minDate) {
+      minDate = currentDate;
+    }
+
+    if (currentDate > maxDate) {
+      maxDate = currentDate;
+    }
+  }
+
+  return { minDate, maxDate };
+};
+
 class ProcessError extends Error {
   constructor({ name, message }) {
     super(message);
