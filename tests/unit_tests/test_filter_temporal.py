@@ -232,6 +232,28 @@ def scenes():
                 },
             },
         ),
+        # temporal extent in date format
+        (
+            {
+                "extent": [
+                    "2022-03-19",
+                    "2022-03-25",
+                ],
+            },
+            {
+                "dimensions": [
+                    {
+                        "labels": ["2022-03-21T00:00:00.000Z", "2022-03-19T00:00:00.000Z"],
+                        "name": "temporal_name",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02", "B03"], "name": "bands_name", "type": "bands"},
+                ],
+                "data": {
+                    "data": [1, 2, 3, 11, 12, 13],
+                },
+            },
+        ),
     ],
 )
 def test_filter_temporal(filter_temporal_process_code, data, scenes, example_input, expected_output):
