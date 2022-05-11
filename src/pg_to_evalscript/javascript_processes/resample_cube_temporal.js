@@ -80,6 +80,13 @@ function resample_cube_temporal(arguments) {
   // }
 
   // update the ndarray data for the returned DataCube
+  // we can't just clone target data (ndarray) because the dimensions might not be in the same order!
+  // resampledData.data = target.data.slice();
+  
+  // find the nearest dates and change the vals in returned DataCube
+
+  // valid_within param: 
+  // getFilteredTemporalIndices(..., [date in data] - valid_within, [date in data] + valid_within)
 
 
   // throw new Error(
