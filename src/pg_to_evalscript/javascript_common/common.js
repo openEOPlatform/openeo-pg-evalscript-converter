@@ -28,34 +28,12 @@ function parse_rfc3339_time(t) {
   try {
     const g = t.match(regexTime);
     if (g) {
-      let date = Date.UTC(
-        0, // year
-        0, // month
-        1, // day
-        parseInt(g[2]), // hour
-        parseInt(g[3]), // minute
-        parseInt(g[4]), // second
-        parseFloat(g[5]) * 1000 || 0 // milisecond
-      );
-
-      // for time strings either time zone or Z should be provided
-      if (g[2] !== undefined && g[6] === undefined) {
-        return null;
-      }
-
-      // check if timezone is provided
-      if (g[6] !== undefined && g[6] !== "Z") {
-        // offset in minutes
-        const offset =
-          (parseInt(g[9] || 0) * 60 + parseInt(g[10] || 0)) *
-          (g[8] === "+" ? -1 : 1);
-        // add offset in miliseconds
-        date = date + offset * 60 * 1000;
-      }
+      const split = t.split(new RegExp('[Tt]'));
+      const time = split.length === 1 ? split[0] : split[1];
 
       return {
         type: "time",
-        value: new Date(date).toISOString(),
+        value: new Date('1900-01-01T' + time).toISOString(),
       };
     }
   } catch (err) {}
