@@ -236,19 +236,14 @@ def test_mask(
 
     process_arguments = f"{{" + arguments + f"}}"
 
-    try:
-        output = run_process(
-            mask_process_code + additional_js_code_to_run,
-            "mask",
-            process_arguments,
-        )
-        output = json.loads(output)
+    output = run_process(
+        mask_process_code + additional_js_code_to_run,
+        "mask",
+        process_arguments,
+    )
+    output = json.loads(output)
 
-        assert output == expected_output
-    except subprocess.CalledProcessError as exc:
-        print("ERROR:")
-        print(exc.stderr)
-        assert "OK" in str(exc.stderr)
+    assert output == expected_output
 
 
 @pytest.mark.parametrize(
