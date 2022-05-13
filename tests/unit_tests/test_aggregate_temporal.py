@@ -25,12 +25,12 @@ def data():
 @pytest.fixture
 def scenes():
     return [
-        {"date": "2022-03-16T00:00:00.000Z"},
-        {"date": "2022-03-17T00:00:00.000Z"},
-        {"date": "2022-03-18T00:00:00.000Z"},
-        {"date": "2022-03-19T00:00:00.000Z"},
-        {"date": "2022-03-20T00:00:00.000Z"},
-        {"date": "2022-03-21T00:00:00.000Z"},
+        {"date": "2022-03-16T03:00:00.000Z"},
+        {"date": "2022-03-17T03:00:00.000Z"},
+        {"date": "2022-03-18T03:30:00.000Z"},
+        {"date": "2022-03-19T04:00:00.000Z"},
+        {"date": "2022-03-20T04:30:00.000Z"},
+        {"date": "2022-03-21T04:00:00.000Z"},
     ]
 
 
@@ -117,6 +117,63 @@ def scenes():
                 ],
                 "data": {
                     "data": [16.5, 5.5, 17.5, 4.5],
+                },
+            },
+        ),
+        (
+            {
+                "intervals": [
+                    ["2022-03-16", "2022-03-18"],
+                    ["2022-03-16", "2022-03-20"],
+                ],
+                "labels": ["interval1", "interval2"],
+                "reducer": "({data})=>{ return data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0) }",
+            },
+            {
+                "dimensions": [
+                    {"labels": ["interval1", "interval2"], "name": "temporal_name", "type": "temporal"},
+                    {"labels": ["B01", "B02"], "name": "bands_name", "type": "bands"},
+                ],
+                "data": {
+                    "data": [16.5, 5.5, 17.5, 4.5],
+                },
+            },
+        ),
+        (
+            {
+                "intervals": [
+                    ["03:00:00Z", "04:00:00Z"],
+                    ["04:00:00Z", "04:30:00Z"],
+                    ["04:30:00Z", "05:00:00Z"],
+                ],
+                "labels": ["interval1", "interval2", "interval3"],
+                "reducer": "({data})=>{ return data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0) }",
+            },
+            {
+                "dimensions": [
+                    {"labels": ["interval1", "interval2", "interval3"], "name": "temporal_name", "type": "temporal"},
+                    {"labels": ["B01", "B02"], "name": "bands_name", "type": "bands"},
+                ],
+                "data": {
+                    "data": [17, 5, 20, 2, 20, 2],
+                },
+            },
+        ),
+        (
+            {
+                "intervals": [
+                    ["03:00:00Z", "04:00:00Z"],
+                    ["04:00:00Z", "05:30:00Z"],
+                ],
+                "reducer": "({data})=>{ return data.reduce((acc, val, i, arr) => Math.round(acc + val / arr.length), 0) }",
+            },
+            {
+                "dimensions": [
+                    {"labels": ["03:00:00Z", "04:00:00Z"], "name": "temporal_name", "type": "temporal"},
+                    {"labels": ["B01", "B02"], "name": "bands_name", "type": "bands"},
+                ],
+                "data": {
+                    "data": [17, 5, 20, 2],
                 },
             },
         ),
