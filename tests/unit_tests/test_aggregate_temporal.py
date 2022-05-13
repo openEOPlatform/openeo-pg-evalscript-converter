@@ -9,6 +9,7 @@ from tests.utils import load_process_code, load_datacube_code, run_process, run_
 def aggregate_temporal_process_code():
     return load_process_code("aggregate_temporal")
 
+
 @pytest.fixture
 def data():
     return [
@@ -20,15 +21,16 @@ def data():
         {"B01": 21, "B02": 1},
     ]
 
+
 @pytest.fixture
 def scenes():
     return [
-        {"date":"2022-03-16T00:00:00.000Z"},
-        {"date":"2022-03-17T00:00:00.000Z"},
-        {"date":"2022-03-18T00:00:00.000Z"},
-        {"date":"2022-03-19T00:00:00.000Z"},
-        {"date":"2022-03-20T00:00:00.000Z"},
-        {"date":"2022-03-21T00:00:00.000Z"},
+        {"date": "2022-03-16T03:00:00.000Z"},
+        {"date": "2022-03-17T03:00:00.000Z"},
+        {"date": "2022-03-18T03:30:00.000Z"},
+        {"date": "2022-03-19T04:00:00.000Z"},
+        {"date": "2022-03-20T04:30:00.000Z"},
+        {"date": "2022-03-21T04:00:00.000Z"},
     ]
 
 
@@ -38,94 +40,160 @@ def scenes():
         (
             {
                 "intervals": [
-                    [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
-                    [ "2022-03-18T00:00:00.000Z", "2022-03-22T00:00:00.000Z" ],
+                    ["2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z"],
+                    ["2022-03-18T00:00:00.000Z", "2022-03-22T00:00:00.000Z"],
                 ],
                 "reducer": "({data})=>{ return data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0) }",
             },
             {
-                'dimensions': [
-                    {'labels': ['2022-03-16T00:00:00.000Z', '2022-03-18T00:00:00.000Z'], 'name': 'temporal_name', 'type': 'temporal'},
-                    {'labels': ['B01', 'B02'], 'name': 'bands_name', 'type': 'bands'}
+                "dimensions": [
+                    {
+                        "labels": ["2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z"],
+                        "name": "temporal_name",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands_name", "type": "bands"},
                 ],
-                'data': {
-                    'data': [16.5, 5.5, 19.5, 2.5],
-                }
+                "data": {
+                    "data": [16.5, 5.5, 19.5, 2.5],
+                },
             },
         ),
         (
             {
                 "intervals": [
-                    [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
-                    [ "2022-03-18T00:00:00.000Z", "2022-03-22T00:00:00.000Z" ],
+                    ["2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z"],
+                    ["2022-03-18T00:00:00.000Z", "2022-03-22T00:00:00.000Z"],
                 ],
-                "labels": [ "interval1", "interval2" ],
+                "labels": ["interval1", "interval2"],
                 "reducer": "({data})=>{ return data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0) }",
                 "dimension": "temporal_name",
             },
             {
-                'dimensions': [
-                    {'labels': ['interval1', 'interval2'], 'name': 'temporal_name', 'type': 'temporal'},
-                    {'labels': ['B01', 'B02'], 'name': 'bands_name', 'type': 'bands'}
+                "dimensions": [
+                    {"labels": ["interval1", "interval2"], "name": "temporal_name", "type": "temporal"},
+                    {"labels": ["B01", "B02"], "name": "bands_name", "type": "bands"},
                 ],
-                'data': {
-                    'data': [16.5, 5.5, 19.5, 2.5],
-                }
+                "data": {
+                    "data": [16.5, 5.5, 19.5, 2.5],
+                },
             },
         ),
         (
             {
                 "intervals": [
-                    [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
-                    [ "2022-03-17T00:00:00.000Z", "2022-03-20T00:00:00.000Z" ],
+                    ["2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z"],
+                    ["2022-03-17T00:00:00.000Z", "2022-03-20T00:00:00.000Z"],
                 ],
                 "reducer": "({data})=>{ return data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0) }",
             },
             {
-                'dimensions': [
-                    {'labels': ['2022-03-16T00:00:00.000Z', '2022-03-17T00:00:00.000Z'], 'name': 'temporal_name', 'type': 'temporal'},
-                    {'labels': ['B01', 'B02'], 'name': 'bands_name', 'type': 'bands'}
+                "dimensions": [
+                    {
+                        "labels": ["2022-03-16T00:00:00.000Z", "2022-03-17T00:00:00.000Z"],
+                        "name": "temporal_name",
+                        "type": "temporal",
+                    },
+                    {"labels": ["B01", "B02"], "name": "bands_name", "type": "bands"},
                 ],
-                'data': {
-                    'data': [16.5, 5.5, 18, 4],
-                }
+                "data": {
+                    "data": [16.5, 5.5, 18, 4],
+                },
             },
         ),
         (
             {
                 "intervals": [
-                    [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
-                    [ "2022-03-16T00:00:00.000Z", "2022-03-20T00:00:00.000Z" ],
+                    ["2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z"],
+                    ["2022-03-16T00:00:00.000Z", "2022-03-20T00:00:00.000Z"],
                 ],
-                "labels": [ "interval1", "interval2" ],
+                "labels": ["interval1", "interval2"],
                 "reducer": "({data})=>{ return data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0) }",
             },
             {
-                'dimensions': [
-                    {'labels': [ "interval1", "interval2" ], 'name': 'temporal_name', 'type': 'temporal'},
-                    {'labels': ['B01', 'B02'], 'name': 'bands_name', 'type': 'bands'}
+                "dimensions": [
+                    {"labels": ["interval1", "interval2"], "name": "temporal_name", "type": "temporal"},
+                    {"labels": ["B01", "B02"], "name": "bands_name", "type": "bands"},
                 ],
-                'data': {
-                    'data': [16.5, 5.5, 17.5, 4.5],
-                }
+                "data": {
+                    "data": [16.5, 5.5, 17.5, 4.5],
+                },
+            },
+        ),
+        (
+            {
+                "intervals": [
+                    ["2022-03-16", "2022-03-18"],
+                    ["2022-03-16", "2022-03-20"],
+                ],
+                "labels": ["interval1", "interval2"],
+                "reducer": "({data})=>{ return data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0) }",
+            },
+            {
+                "dimensions": [
+                    {"labels": ["interval1", "interval2"], "name": "temporal_name", "type": "temporal"},
+                    {"labels": ["B01", "B02"], "name": "bands_name", "type": "bands"},
+                ],
+                "data": {
+                    "data": [16.5, 5.5, 17.5, 4.5],
+                },
+            },
+        ),
+        (
+            {
+                "intervals": [
+                    ["03:00:00Z", "04:00:00Z"],
+                    ["04:00:00Z", "04:30:00Z"],
+                    ["04:30:00Z", "05:00:00Z"],
+                ],
+                "labels": ["interval1", "interval2", "interval3"],
+                "reducer": "({data})=>{ return data.reduce((acc, val, i, arr) => (acc + val / arr.length), 0) }",
+            },
+            {
+                "dimensions": [
+                    {"labels": ["interval1", "interval2", "interval3"], "name": "temporal_name", "type": "temporal"},
+                    {"labels": ["B01", "B02"], "name": "bands_name", "type": "bands"},
+                ],
+                "data": {
+                    "data": [17, 5, 20, 2, 20, 2],
+                },
+            },
+        ),
+        (
+            {
+                "intervals": [
+                    ["03:00:00Z", "04:00:00Z"],
+                    ["04:00:00Z", "05:30:00Z"],
+                ],
+                "reducer": "({data})=>{ return data.reduce((acc, val, i, arr) => Math.round(acc + val / arr.length), 0) }",
+            },
+            {
+                "dimensions": [
+                    {"labels": ["03:00:00Z", "04:00:00Z"], "name": "temporal_name", "type": "temporal"},
+                    {"labels": ["B01", "B02"], "name": "bands_name", "type": "bands"},
+                ],
+                "data": {
+                    "data": [17, 5, 20, 2],
+                },
             },
         ),
     ],
 )
 def test_aggregate_temporal(aggregate_temporal_process_code, data, scenes, example_input, expected_output):
     additional_js_code_to_run = (
-        load_datacube_code()
-        + f"const cube = new DataCube({data}, 'bands_name', 'temporal_name', true, [], {scenes});"
+        load_datacube_code() + f"const cube = new DataCube({data}, 'bands_name', 'temporal_name', true, [], {scenes});"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'scenes': {scenes}, 'reducer': {example_input['reducer']}}}"
+    process_arguments = (
+        f"{{...{json.dumps(example_input)}, 'data': cube, 'scenes': {scenes}, 'reducer': {example_input['reducer']}}}"
+    )
     output = run_process(
         aggregate_temporal_process_code + additional_js_code_to_run,
         "aggregate_temporal",
         process_arguments,
     )
     output = json.loads(output)
-    assert output['dimensions'] == expected_output['dimensions']
-    assert output['data']['data'] == expected_output['data']['data']
+    assert output["dimensions"] == expected_output["dimensions"]
+    assert output["data"]["data"] == expected_output["data"]["data"]
 
 
 @pytest.mark.parametrize(
@@ -134,7 +202,7 @@ def test_aggregate_temporal(aggregate_temporal_process_code, data, scenes, examp
         (
             {
                 "intervals": [
-                    [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
+                    ["2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z"],
                 ],
                 "reducer": "({data}) => data.length",
             },
@@ -159,7 +227,7 @@ def test_aggregate_temporal(aggregate_temporal_process_code, data, scenes, examp
         (
             {
                 "intervals": [
-                    [ "INVALID_INTERVAL" ],
+                    ["INVALID_INTERVAL"],
                 ],
                 "reducer": "({data}) => data.length",
             },
@@ -169,10 +237,10 @@ def test_aggregate_temporal(aggregate_temporal_process_code, data, scenes, examp
         (
             {
                 "intervals": [
-                    [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
+                    ["2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z"],
                 ],
                 "reducer": "({data}) => data.length",
-                "labels": [ "interval1", "interval2" ],
+                "labels": ["interval1", "interval2"],
             },
             True,
             "Number of labels must match number of intervals",
@@ -180,8 +248,8 @@ def test_aggregate_temporal(aggregate_temporal_process_code, data, scenes, examp
         (
             {
                 "intervals": [
-                    [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
-                    [ "2022-03-16T00:00:00.000Z", "2022-03-20T00:00:00.000Z" ],
+                    ["2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z"],
+                    ["2022-03-16T00:00:00.000Z", "2022-03-20T00:00:00.000Z"],
                 ],
                 "reducer": "({data}) => data.length",
             },
@@ -191,7 +259,7 @@ def test_aggregate_temporal(aggregate_temporal_process_code, data, scenes, examp
         (
             {
                 "intervals": [
-                    [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
+                    ["2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z"],
                 ],
                 "reducer": "({data}) => data.length",
                 "dimension": "NON_EXISTENT_DIMENSION",
@@ -202,7 +270,7 @@ def test_aggregate_temporal(aggregate_temporal_process_code, data, scenes, examp
         (
             {
                 "intervals": [
-                    [ "2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z" ],
+                    ["2022-03-16T00:00:00.000Z", "2022-03-18T00:00:00.000Z"],
                 ],
                 "reducer": "({data}) => data.length",
                 "dimension": "bands_name",
@@ -212,12 +280,15 @@ def test_aggregate_temporal(aggregate_temporal_process_code, data, scenes, examp
         ),
     ],
 )
-def test_aggregate_temporal_exceptions(aggregate_temporal_process_code, data, scenes, example_input, raises_exception, error_message):
+def test_aggregate_temporal_exceptions(
+    aggregate_temporal_process_code, data, scenes, example_input, raises_exception, error_message
+):
     additional_js_code_to_run = (
-        load_datacube_code()
-        + f"const cube = new DataCube({data}, 'bands_name', 'temporal_name', true, [], {scenes});"
+        load_datacube_code() + f"const cube = new DataCube({data}, 'bands_name', 'temporal_name', true, [], {scenes});"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'scenes': {scenes}, 'reducer': {example_input['reducer']}}}"
+    process_arguments = (
+        f"{{...{json.dumps(example_input)}, 'data': cube, 'scenes': {scenes}, 'reducer': {example_input['reducer']}}}"
+    )
 
     run_input_validation(
         aggregate_temporal_process_code + additional_js_code_to_run,

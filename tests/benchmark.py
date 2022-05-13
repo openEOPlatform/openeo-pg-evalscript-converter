@@ -40,7 +40,7 @@ if __name__ == "__main__":
         "test_count_without_condition",
     ]
     dim = 1000
-    size = dim ** 2
+    size = dim**2
     print(f"\n{size} iterations per test ({dim}x{dim})\n")
     for process_graph in process_graphs:
         run_benchmark(process_graph, size)
