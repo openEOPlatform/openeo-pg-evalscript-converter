@@ -1,19 +1,16 @@
-function parse_rfc3339(dt, default_h = 0, default_m = 0, default_s = 0) {
+function parse_rfc3339(dateTime, default_h = 0, default_m = 0, default_s = 0) {
   const regexDateTime =
-    "^([0-9]{4})-([0-9]{2})-([0-9]{2})([Tt]([0-9]{2}):([0-9]{2}):([0-9]{2})(\\.[0-9]+)?)?(([Zz]|([+-])([0-9]{2}):([0-9]{2})))?";
+    "^([0-9]{4})-([0-9]{2})-([0-9]{2})([Tt]([0-9]{2}):([0-9]{2}):([0-9]{2})(\.[0-9]+)?)([Zz]|([+-])([0-9]{2}):([0-9]{2}))";
   const regexDate = "^([0-9]{4})-([0-9]{2})-([0-9]{2})$";
 
   try {
-    const g = dt.match(regexDateTime);
-    if (g) {
-      // for date-time strings either time zone or Z should be provided
-      if (g[5] !== undefined && g[9] === undefined) {
-        return null;
-      }
+    const matchDateTime = dateTime.match(regexDateTime);
+    const matchDate = dateTime.match(regexDate);
 
+    if (matchDateTime || matchDate) {
       return {
-        type: dt.match(regexDate) ? "date" : "date-time",
-        value: new Date(dt).toISOString(),
+        type: matchDate ? "date" : "date-time",
+        value: new Date(dateTime).toISOString(),
       };
     }
   } catch (err) {}
@@ -21,17 +18,16 @@ function parse_rfc3339(dt, default_h = 0, default_m = 0, default_s = 0) {
   return null;
 }
 
-function parse_rfc3339_time(t) {
-  const regexTime = "(([0-9]{2}):([0-9]{2}):([0-9]{2})(\\.[0-9]+)?)?(([Zz]|([+-])([0-9]{2}):([0-9]{2})))";
-  try {
-    const g = t.match(regexTime);
-    if (g) {
-      const split = t.split(new RegExp('[Tt]'));
-      const time = split.length === 1 ? split[0] : split[1];
+function parse_rfc3339_time(dateTime) {
+  const regexTime = "(([0-9]{2}):([0-9]{2}):([0-9]{2})(\.[0-9]+)?)([Zz]|([+-])([0-9]{2}):([0-9]{2}))";
 
+  try {
+    const matchTime = dateTime.match(regexTime);
+
+    if (matchTime) {
       return {
         type: "time",
-        value: new Date('1900-01-01T' + time).toISOString(),
+        value: new Date('1900-01-01T' + matchTime[0]).toISOString(),
       };
     }
   } catch (err) {}
