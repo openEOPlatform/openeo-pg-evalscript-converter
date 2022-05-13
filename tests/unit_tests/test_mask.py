@@ -174,19 +174,16 @@ result_added_dim = {
             "maskCube.removeDimension('temporal_name');",
             resultWithReplacement(result_mask_no_temporal),
         ),
-        # (  # test mask parameter missing dimensions: mask parameter with no bands dimension
-        #     # doesn't work properly: same result as for "mask parameter with no temporal dimension"
-        #     # values for all bands for first and third date should ne unchanged
-        #     # values for all bands for second date should be None / null
-        #     {
-        #         "data": data_3bands_3dates,
-        #         "mask": [{"B01": el["B01"]} for el in mask_3bands_3dates_num],
-        #         "scenes_data": scenes_3dates,
-        #         "scenes_mask": scenes_3dates,
-        #     },
-        #     "maskCube.removeDimension('bands_name');",
-        #     resultWithReplacement(result_mask_no_bands),
-        # ),
+        (  # test mask parameter missing dimensions: mask parameter with no bands dimension
+            {
+                "data": data_3bands_3dates,
+                "mask": [{"B01": el["B01"]} for el in mask_3bands_3dates_num],
+                "scenes_data": scenes_3dates,
+                "scenes_mask": scenes_3dates,
+            },
+            "maskCube.removeDimension('bands_name');",
+            resultWithReplacement(result_mask_no_bands),
+        ),
         (  # test mask parameter missing dimensions: data parameter with additional dimension
             {
                 "data": data_3bands_3dates,
