@@ -195,6 +195,28 @@ class AddDimensionNode(Node):
 
 
 class MergeCubesNode(Node):
+    def write_process(self):
+        newline = "\n"
+        tab = "\t"
+        overlap_resolver_code = (
+            f"""
+function overlap_resolver(arguments) {{
+    {newline.join(node.write_function() for node in self.child_nodes)}
+    {newline.join(node.write_call() for node in self.child_nodes)}
+        return {self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id};
+}}
+"""
+            if len(self.child_nodes) > 0
+            else "const overlap_resolver=undefined;"
+        )
+        return f"""
+function merge_cubes(arguments) {{
+    {overlap_resolver_code}
+    {self.load_process_code()}
+    return merge_cubes({{...arguments, overlap_resolver: overlap_resolver }});
+}}
+"""
+
     def get_dimensions_change(self, dimensions_of_inputs):
         """
         merge_cubes process expects datacubes to have different labels in a single dimension.
@@ -316,6 +338,7 @@ function array_filter(arguments) {{
 }}
 """
 
+
 class AggregateTemporalPeriodNode(Node):
     def write_process(self):
         newline = "\n"
@@ -333,6 +356,7 @@ function aggregate_temporal_period(arguments) {{
     return aggregate_temporal_period(arguments)
 }}
 """
+
 
 class AggregateTemporalNode(Node):
     def write_process(self):
