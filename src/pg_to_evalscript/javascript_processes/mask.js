@@ -39,7 +39,7 @@ function mask(arguments) {
     }
   }
 
-  // add missing dimensions at the start of mask's dimensions
+  // add missing dimensions (as labelless dimensions of length 1) at the start of mask's dimensions
   let maskWithMissingDims = mask.clone();
   for (let dataDim of data.dimensions) {
     if (!maskWithMissingDims.getDimensionByName(dataDim.name)) {
@@ -64,6 +64,7 @@ function mask(arguments) {
   let newData = data.clone();
   let newDataFlat = newData.flattenToArray();
 
+  // broadcast the mask's ndarray to the size of data's ndarray
   const maskBroadcasted = broadcastNdarray(maskWithMissingDims.data, newData.data.shape);
   const maskBroadcastedFlat = flattenToNativeArray(maskBroadcasted);
 
