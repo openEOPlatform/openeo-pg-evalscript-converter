@@ -11,11 +11,9 @@ function parse_rfc3339(dt, default_h = 0, default_m = 0, default_s = 0) {
         return null;
       }
 
-      const date = new Date(dt);
-
       return {
         type: dt.match(regexDate) ? "date" : "date-time",
-        value: new Date(date).toISOString(),
+        value: new Date(dt).toISOString(),
       };
     }
   } catch (err) {}
