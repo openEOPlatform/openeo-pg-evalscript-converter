@@ -194,17 +194,21 @@ result_added_dim = {
             "dataCube.addDimension('test_name', 'test_label', 'other');",
             result_added_dim,
         ),
-
         (  # test different order of dimensions in data and mask
+            # same result as for missing bands
             {
                 "data": data_3bands_3dates,
-                "mask": [ mask_3bands_3dates_num[0], mask_3bands_3dates_num[0], mask_3bands_3dates_num[0] ],
+                "mask": [
+                    mask_3bands_3dates_num[0],
+                    mask_3bands_3dates_num[0],
+                    mask_3bands_3dates_num[0],
+                ],
                 "scenes_data": scenes_3dates,
                 "scenes_mask": scenes_3dates,
             },
-            "maskCube.dimensions = [maskCube.dimensions[1], maskCube.dimensions[0]];" +
-            "maskCube.data = maskCube.data.transpose(1,0);",
-            resultWithReplacement(result_mask_no_bands), # same result as for missing bands
+            "maskCube.dimensions = [maskCube.dimensions[1], maskCube.dimensions[0]];"
+            + "maskCube.data = maskCube.data.transpose(1,0);",
+            resultWithReplacement(result_mask_no_bands),
         ),
     ],
 )
