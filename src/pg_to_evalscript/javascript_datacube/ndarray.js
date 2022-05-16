@@ -414,9 +414,18 @@ function isNotSubarray(ndarray, shape) {
 function flattenToNativeArray(ndarray) {
     const shape = ndarray.shape
 
-    if (isNotSubarray(ndarray, shape)) {
-        return ndarray.data
-    }
+    // This is not correct, because it doesn't use ndarray's shape and stride
+    // which are important when the ndarray is transposed.
+    // Also, when it goes into the if, it returns the same array
+    // as it got in the argument.
+    // But when it doesn't go into the if, it returns a new array.
+    // This makes it ambigous if the changes are made to the returned array,
+    // because sometimes the changes would be done in the original ndarray
+    // and sometimes not.
+
+    // if (isNotSubarray(ndarray, shape)) {
+    //     return ndarray.data
+    // }
 
     const cumulatives = fill(shape.slice(), 0);
     const coord = shape.slice();
