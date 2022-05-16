@@ -78,6 +78,7 @@ function mask(arguments) {
       newDataFlat[i] = replacement_val;
     }
   }
-
+  
+  newData.data.data = newDataFlat;
   return newData;
 }
