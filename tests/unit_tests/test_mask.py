@@ -245,7 +245,7 @@ def test_mask(
         + (additional_js_code_specific_to_case or "")
     )
 
-    arguments = f"'data': dataCube, 'mask': maskCube, 'scenes': {scenes_data}"
+    arguments = f"'data': dataCube, 'mask': maskCube"
 
     if "replacement" in example_input:
         arguments = arguments + f", 'replacement': {replacement_parameter}"
