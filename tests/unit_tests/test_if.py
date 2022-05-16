@@ -15,11 +15,11 @@ def if_process_code():
     [
         ({"value": True, "accept": "A", "reject": "B"}, "A"),
         ({"value": False, "accept": "A", "reject": "B"}, "B"),
-        ({"value": 3**2 == 9, "accept": "equals", "reject": [1, 2, 3]}, "equals"),
+        ({"value": 3 ** 2 == 9, "accept": "equals", "reject": [1, 2, 3]}, "equals"),
         ({"value": None, "accept": "ABC", "reject": [1, 2, 3]}, [1, 2, 3]),
         ({"value": None, "accept": 1}, None),
         ({"value": False, "accept": 123}, None),
-        ({"value": True, "accept": 4**2}, 16),
+        ({"value": True, "accept": 4 ** 2}, 16),
     ],
 )
 def test_if(if_process_code, example_input, expected_output):
