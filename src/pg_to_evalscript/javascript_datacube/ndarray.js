@@ -411,8 +411,13 @@ function isNotSubarray(ndarray, shape) {
     return length === ndarray.data.length
 }
 
-function flattenToNativeArray(ndarray) {
+function flattenToNativeArray(ndarray, useAllNdarrayProperties = false) {
     const shape = ndarray.shape
+
+    if (!useAllNdarrayProperties && isNotSubarray(ndarray, shape)) {
+      return ndarray.data.slice();
+    }
+  
     const cumulatives = fill(shape.slice(), 0);
     const coord = shape.slice();
     const arr = []

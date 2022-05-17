@@ -66,7 +66,7 @@ function mask(arguments) {
 
   // broadcast the mask's ndarray to the size of data's ndarray
   const maskBroadcasted = broadcastNdarray(maskWithMissingDims.data, newData.data.shape);
-  const maskBroadcastedFlat = flattenToNativeArray(maskBroadcasted);
+  const maskBroadcastedFlat = flattenToNativeArray(maskBroadcasted, true);
 
   const replacement_val = replacement === undefined ? null : replacement;
 
