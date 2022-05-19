@@ -3,7 +3,7 @@ import json
 import pytest
 import subprocess
 
-from tests.utils import load_process_code, load_datacube_code, run_process
+from tests.utils import load_process_code, load_datacube_code, run_process, run_input_validation
 
 
 @pytest.fixture
@@ -11,377 +11,288 @@ def mask_process_code():
     return load_process_code("mask")
 
 
-data_3bands_3dates = [
-    {"B01": 1, "B02": 2, "B03": 3},  # date 1
-    {"B01": 11, "B02": 12, "B03": 13},  # date 2
-    {"B01": 21, "B02": 22, "B03": 23},  # date 3
-]
+@pytest.fixture
+def construct_datacube():
+    def wrapped(cube_name, data, data_shape, dimensions):
+        return (
+            f"\nconst {cube_name} = new DataCube(ndarray({json.dumps(data)}, {json.dumps(data_shape)}), 'b', 't', false);"
+            + f"\n{cube_name}.dimensions = {json.dumps(dimensions)};"
+        )
 
-mask_3bands_3dates_num = [
-    {"B01": 0, "B02": 2, "B03": 0},  # date 1
-    {"B01": 11, "B02": 0, "B03": 13},  # date 2
-    {"B01": 0, "B02": 22, "B03": 0},  # date 3
-]
-
-mask_3bands_3dates_bool = [
-    {"B01": False, "B02": True, "B03": False},  # date 1
-    {"B01": True, "B02": False, "B03": True},  # date 2
-    {"B01": False, "B02": True, "B03": False},  # date 3
-]
-
-scenes_3dates = [
-    {"date": "2022-03-21T00:00:00.000Z"},  # date 1
-    {"date": "2022-03-19T00:00:00.000Z"},  # date 2
-    {"date": "2022-03-16T00:00:00.000Z"},  # date 3
-]
-
-replacement_val_num = 42
-replacement_val_bool = True
-replacement_val_str = "qwe"
-
-result_3bands_3dates = [1, None, 3, None, 12, None, 21, None, 23]
-result_mask_no_temporal = [1, None, 3, 11, None, 13, 21, None, 23]
-result_mask_no_bands = [1, 2, 3, None, None, None, 21, 22, 23]
+    return wrapped
 
 
-def resultWithReplacement(dataArray, val=None):
-    return {
-        "TEMPORAL": "temporal",
-        "BANDS": "bands",
-        "OTHER": "other",
-        "bands_dimension_name": "bands_name",
-        "temporal_dimension_name": "temporal_name",
-        "dimensions": [
-            {
-                "name": "temporal_name",
-                "labels": [
-                    "2022-03-21T00:00:00.000Z",
-                    "2022-03-19T00:00:00.000Z",
-                    "2022-03-16T00:00:00.000Z",
-                ],
-                "type": "temporal",
-            },
-            {
-                "name": "bands_name",
-                "labels": ["B01", "B02", "B03"],
-                "type": "bands",
-            },
-        ],
-        "data": {
-            "data": [val if el == None else el for el in dataArray],
-            "shape": [3, 3],
-            "stride": [3, 1],
-            "offset": 0,
-        },
-    }
-
-
-result_added_dim = {
-    "TEMPORAL": "temporal",
-    "BANDS": "bands",
-    "OTHER": "other",
-    "bands_dimension_name": "bands_name",
-    "temporal_dimension_name": "temporal_name",
-    "dimensions": [
-        {"name": "test_name", "labels": ["test_label"], "type": "other"},
-        {
-            "name": "temporal_name",
-            "labels": [
-                "2022-03-21T00:00:00.000Z",
-                "2022-03-19T00:00:00.000Z",
-                "2022-03-16T00:00:00.000Z",
-            ],
-            "type": "temporal",
-        },
-        {
-            "name": "bands_name",
-            "labels": ["B01", "B02", "B03"],
-            "type": "bands",
-        },
-    ],
-    "data": {
-        "data": result_3bands_3dates,
-        "shape": [1, 3, 3],
-        "stride": [9, 3, 1],
-        "offset": 0,
-    },
-}
-
-
+scenes_3dates = ["2022-03-21", "2022-03-19", "2022-03-16"]
 @pytest.mark.parametrize(
-    "example_input, additional_js_code_specific_to_case, expected_output",
+    "data_array, data_shape, data_dimensions, mask_array, mask_shape, mask_dimensions, replacement, expected_array",
     [
         (  # test different mask values: mask with number values
-            {
-                "data": data_3bands_3dates,
-                "mask": mask_3bands_3dates_num,
-                "scenes_data": scenes_3dates,
-                "scenes_mask": scenes_3dates,
-            },
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [0, 2, 0, 11, 0, 13, 0, 22, 0],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
             None,
-            resultWithReplacement(result_3bands_3dates),
+            [1, None, 3, None, 12, None, 21, None, 23],
         ),
         (  # test different mask values: mask with boolean values
-            {
-                "data": data_3bands_3dates,
-                "mask": mask_3bands_3dates_bool,
-                "scenes_data": scenes_3dates,
-                "scenes_mask": scenes_3dates,
-            },
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [False, True, False, True, False, True, False, True, False],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
             None,
-            resultWithReplacement(result_3bands_3dates),
+            [1, None, 3, None, 12, None, 21, None, 23],
         ),
         (  # test different replacement values: replacement = number
-            {
-                "data": data_3bands_3dates,
-                "mask": mask_3bands_3dates_num,
-                "scenes_data": scenes_3dates,
-                "scenes_mask": scenes_3dates,
-                "replacement": replacement_val_num,
-            },
-            None,
-            resultWithReplacement(result_3bands_3dates, replacement_val_num),
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [0, 2, 0, 11, 0, 13, 0, 22, 0],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            42,
+            [1, 42, 3, 42, 12, 42, 21, 42, 23],
         ),
         (  # test different replacement values: replacement = boolean
-            {
-                "data": data_3bands_3dates,
-                "mask": mask_3bands_3dates_num,
-                "scenes_data": scenes_3dates,
-                "scenes_mask": scenes_3dates,
-                "replacement": replacement_val_bool,
-            },
-            None,
-            resultWithReplacement(result_3bands_3dates, replacement_val_bool),
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [0, 2, 0, 11, 0, 13, 0, 22, 0],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            True,
+            [1, True, 3, True, 12, True, 21, True, 23],
         ),
         (  # test different replacement values: replacement = string
-            {
-                "data": data_3bands_3dates,
-                "mask": mask_3bands_3dates_num,
-                "scenes_data": scenes_3dates,
-                "scenes_mask": scenes_3dates,
-                "replacement": replacement_val_str,
-            },
-            None,
-            resultWithReplacement(result_3bands_3dates, replacement_val_str),
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [0, 2, 0, 11, 0, 13, 0, 22, 0],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            "qwe",
+            [1, "qwe", 3, "qwe", 12, "qwe", 21, "qwe", 23],
         ),
         (  # test mask parameter missing dimensions: mask parameter with no temporal dimension
-            {
-                "data": data_3bands_3dates,
-                "mask": [mask_3bands_3dates_num[0]],
-                "scenes_data": scenes_3dates,
-                "scenes_mask": None,
-            },
-            "maskCube.removeDimension('temporal_name');",
-            resultWithReplacement(result_mask_no_temporal),
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [0, 2, 0],
+            [3],
+            [{"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"}],
+            None,
+            [1, None, 3, 11, None, 13, 21, None, 23],
         ),
         (  # test mask parameter missing dimensions: mask parameter with no bands dimension
-            {
-                "data": data_3bands_3dates,
-                "mask": [{"B01": el["B01"]} for el in mask_3bands_3dates_num],
-                "scenes_data": scenes_3dates,
-                "scenes_mask": scenes_3dates,
-            },
-            "maskCube.removeDimension('bands_name');",
-            resultWithReplacement(result_mask_no_bands),
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [0, 11, 0],
+            [3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"}
+            ],
+            None,
+            [1, 2, 3, None, None, None, 21, 22, 23],
         ),
         (  # test mask parameter missing dimensions: data parameter with additional dimension
-            {
-                "data": data_3bands_3dates,
-                "mask": mask_3bands_3dates_num,
-                "scenes_data": scenes_3dates,
-                "scenes_mask": scenes_3dates,
-            },
-            "dataCube.addDimension('test_name', 'test_label', 'other');",
-            result_added_dim,
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [1, 3, 3],
+            [
+                {"labels": [], "name": "test_name", "type": "other"},
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [0, 2, 0, 11, 0, 13, 0, 22, 0],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            None,
+            [1, None, 3, None, 12, None, 21, None, 23],
         ),
         (  # test different order of dimensions in data and mask
-            # same result as for missing bands
-            {
-                "data": data_3bands_3dates,
-                "mask": [
-                    mask_3bands_3dates_num[0],
-                    mask_3bands_3dates_num[0],
-                    mask_3bands_3dates_num[0],
-                ],
-                "scenes_data": scenes_3dates,
-                "scenes_mask": scenes_3dates,
-            },
-            "maskCube.dimensions = [maskCube.dimensions[1], maskCube.dimensions[0]];"
-            + "maskCube.data = maskCube.data.transpose(1,0);",
-            resultWithReplacement(result_mask_no_bands),
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [0, 2, 0, 0, 12, 0, 0, 22, 0],
+            [3, 3],
+            [
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+            ],
+            None,
+            [1, 2, 3, None, None, None, 21, 22, 23],
         ),
     ],
 )
 def test_mask(
     mask_process_code,
-    example_input,
-    additional_js_code_specific_to_case,
-    expected_output,
+    construct_datacube,
+    data_array,
+    data_shape,
+    data_dimensions,
+    mask_array,
+    mask_shape,
+    mask_dimensions,
+    replacement,
+    expected_array,
 ):
 
-    data_parameter = json.dumps(example_input["data"])
-    mask_parameter = json.dumps(example_input["mask"])
-    scenes_data = json.dumps(example_input["scenes_data"])
-    scenes_mask = json.dumps(example_input["scenes_mask"])
-    replacement_parameter = (
-        json.dumps(example_input["replacement"])
-        if "replacement" in example_input
-        else None
-    )
+    data_cube = construct_datacube("dataCube", data_array, data_shape, data_dimensions)
+    mask_cube = construct_datacube("maskCube", mask_array, mask_shape, mask_dimensions)
 
-    vars_definitions = (
-        f"const dataCube = new DataCube({data_parameter}, 'bands_name', 'temporal_name', true, [], {scenes_data});"
-        + f"let maskCube = new DataCube({mask_parameter}, 'bands_name', 'temporal_name', true, [], {scenes_mask});"
-    )
-
-    if replacement_parameter:
-        vars_definitions = (
-            vars_definitions + f"const replacement = {replacement_parameter};"
-        )
-
-    additional_js_code_to_run = (
-        load_datacube_code()
-        + vars_definitions
-        + (additional_js_code_specific_to_case or "")
-    )
-
+    additional_js_code_to_run = load_datacube_code() + data_cube + mask_cube
     arguments = f"'data': dataCube, 'mask': maskCube"
 
-    if "replacement" in example_input:
-        arguments = arguments + f", 'replacement': {replacement_parameter}"
+    if replacement:
+        additional_js_code_to_run = (
+            additional_js_code_to_run
+            + f"const replacement = {json.dumps(replacement)};"
+        )
+        arguments = arguments + f", 'replacement': {json.dumps(replacement)}"
 
     process_arguments = f"{{" + arguments + f"}}"
 
     output = run_process(
-        mask_process_code + additional_js_code_to_run,
+        additional_js_code_to_run + mask_process_code,
         "mask",
         process_arguments,
     )
-    output = json.loads(output)
+    output = json.loads(output.decode("utf-8"))
 
-    assert output == expected_output
+    assert output["data"]["data"] == expected_array
 
 
 @pytest.mark.parametrize(
-    "example_input, additional_js_code_specific_to_case, raises_exception, error_message",
+    "data_array, data_shape, data_dimensions, mask_array, mask_shape, mask_dimensions, replacement, error_message",
     [
-        (  # no exception
-            {
-                "data": data_3bands_3dates,
-                "mask": mask_3bands_3dates_num,
-                "scenes_data": scenes_3dates,
-                "scenes_mask": scenes_3dates,
-            },
-            None,
-            False,
-            None,
-        ),
-        (  # exception: replacement = array
-            {
-                "data": data_3bands_3dates,
-                "mask": mask_3bands_3dates_num,
-                "scenes_data": scenes_3dates,
-                "scenes_mask": scenes_3dates,
-                "replacement": [1, 2, 3],
-            },
-            None,
-            True,
+        (  # exception: wrong type of replacement
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [0, 2, 0, 11, 0, 13, 0, 22, 0],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [123, 123],
             "WRONG_TYPE: Value for replacement is not a number or a boolean or a string.",
         ),
         (  # exception: data doesn't have all dimensions that are in mask
-            {
-                "data": data_3bands_3dates,
-                "mask": mask_3bands_3dates_num,
-                "scenes_data": scenes_3dates,
-                "scenes_mask": scenes_3dates,
-                "replacement": None,
-            },
-            "dataCube.removeDimension('temporal_name');",
-            True,
-            "Error: Dimension `temporal_name` from argument `mask` not in argument `data`.",
+            [1, 2, 3],
+            [3],
+            [{"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"}],
+            [0, 2, 0, 11, 0, 13, 0, 22, 0],
+            [3, 3],
+            [
+                {"labels": ["2022-03-21", "2022-03-19", "2022-03-16"],"name": "t","type": "temporal"},
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            None,
+            "Error: Dimension `t` from argument `mask` not in argument `data`.",
         ),
-        (  # exception: dimension is of different types in data and mask
-            {
-                "data": data_3bands_3dates,
-                "mask": mask_3bands_3dates_num,
-                "scenes_data": scenes_3dates,
-                "scenes_mask": scenes_3dates,
-                "replacement": None,
-            },
-            "dataCube.addDimension('test_name', 'test_label', 'other');"
-            + "maskCube.addDimension('test_name', 'test_label', 'spatial');",
-            True,
-            "Error: Type of the dimension `test_name` from argument `mask` is not the same as in argument `data`.",
+        (  # exception: different types of dimension in data and mask
+            [1, 2, 3],
+            [3],
+            [{"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"}],
+            [0, 2, 0],
+            [3],
+            [{"labels": ["B01", "B02", "B03"], "name": "b", "type": "other"}],
+            None,
+            "Error: Type of the dimension `b` from argument `mask` is not the same as in argument `data`.",
         ),
         (  # exception: dimension has different labels in data and mask
-            {
-                "data": data_3bands_3dates,
-                "mask": mask_3bands_3dates_num,
-                "scenes_data": scenes_3dates,
-                "scenes_mask": scenes_3dates,
-                "replacement": None,
-            },
-            "dataCube.addDimension('test_name', 'label_1', 'other');"
-            + "maskCube.addDimension('test_name', 'label_2', 'other');",
-            True,
-            "Error: Labels for dimension `test_name` from argument `mask` are not the same as in argument `data`.",
+            [1, 2, 3],
+            [3],
+            [{"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"}],
+            [0, 2, 0],
+            [3],
+            [{"labels": ["B04", "B05", "B06"], "name": "b", "type": "bands"}],
+            None,
+            "Error: Labels for dimension `b` from argument `mask` are not the same as in argument `data`.",
         ),
     ],
 )
 def test_mask_exceptions(
     mask_process_code,
-    example_input,
-    additional_js_code_specific_to_case,
-    raises_exception,
+    construct_datacube,
+    data_array,
+    data_shape,
+    data_dimensions,
+    mask_array,
+    mask_shape,
+    mask_dimensions,
+    replacement,
     error_message,
 ):
+    data_cube = construct_datacube("dataCube", data_array, data_shape, data_dimensions)
+    mask_cube = construct_datacube("maskCube", mask_array, mask_shape, mask_dimensions)
 
-    data_parameter = json.dumps(example_input["data"])
-    mask_parameter = json.dumps(example_input["mask"])
-    scenes_data = json.dumps(example_input["scenes_data"])
-    scenes_mask = json.dumps(example_input["scenes_mask"])
-    replacement_parameter = (
-        json.dumps(example_input["replacement"])
-        if "replacement" in example_input
-        else None
-    )
-
-    vars_definitions = (
-        f"const dataCube = new DataCube({data_parameter}, 'bands_name', 'temporal_name', true, [], {scenes_data});"
-        + f"let maskCube = new DataCube({mask_parameter}, 'bands_name', 'temporal_name', true, [], {scenes_mask});"
-    )
-
-    if replacement_parameter:
-        vars_definitions = (
-            vars_definitions + f"const replacement = {replacement_parameter};"
-        )
-
-    additional_js_code_to_run = (
-        load_datacube_code()
-        + vars_definitions
-        + (additional_js_code_specific_to_case or "")
-    )
+    additional_js_code_to_run = load_datacube_code() + data_cube + mask_cube
 
     arguments = f"'data': dataCube, 'mask': maskCube"
 
-    if "replacement" in example_input:
-        arguments = arguments + f", 'replacement': {replacement_parameter}"
+    if replacement:
+        additional_js_code_to_run = (
+            additional_js_code_to_run
+            + f"const replacement = {json.dumps(replacement)};"
+        )
+        arguments = arguments + f", 'replacement': {json.dumps(replacement)}"
 
     process_arguments = f"{{" + arguments + f"}}"
 
-    if raises_exception:
-        try:
-            run_process(
-                mask_process_code + additional_js_code_to_run,
-                "mask",
-                process_arguments,
-            )
-        except subprocess.CalledProcessError as exc:
-            assert error_message in str(exc.stderr)
-
-    else:
-        run_process(
-            mask_process_code + additional_js_code_to_run,
-            "mask",
-            process_arguments,
-        )
+    run_input_validation(
+        additional_js_code_to_run + mask_process_code,
+        "mask",
+        process_arguments,
+        True,
+        error_message=error_message,
+    )
