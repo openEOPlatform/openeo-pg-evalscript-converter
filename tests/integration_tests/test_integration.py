@@ -228,3 +228,36 @@ def test_set_input_bands(new_bands):
 
     input_object = get_evalscript_input_object(evalscript.write())
     assert input_object["input"] == new_bands
+
+
+@pytest.mark.parametrize(
+    "process_graph,example_input,expected_output",
+    [
+        (
+            "user_defined_process_fahrenheit",
+            [{"B01": -40, "B02": -4}, {"B01": 32, "B02": 50}, {"B01": 68, "B02": 86}, {"B01": 104, "B02": 212}],
+            [-40, -20, 0, 10, 20, 30, 40, 100],
+        )
+    ],
+)
+def test_user_defined_processes(process_graph, example_input, expected_output):
+    user_defined_processes = {
+        "fahrenheit_to_celsius": {
+            "subtract1": {"process_id": "subtract", "arguments": {"x": {"from_parameter": "f"}, "y": 32}},
+            "divide1": {
+                "process_id": "divide",
+                "arguments": {"x": {"from_node": "subtract1"}, "y": 1.8},
+                "result": True,
+            },
+        }
+    }
+    process_graph = get_process_graph_json(process_graph)
+    result = convert_from_process_graph(
+        process_graph, user_defined_processes=user_defined_processes, encode_result=False
+    )
+    evalscript = result[0]["evalscript"].write()
+
+    output = run_evalscript(evalscript, example_input)
+    output = json.loads(output)
+
+    assert output == expected_output

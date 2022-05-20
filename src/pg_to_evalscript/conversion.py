@@ -18,6 +18,7 @@ def validate_nodes(
     dependents,
     temporal_dimension_name,
     bands_dimension_name,
+    user_defined_processes,
 ):
     valid_subgraphs = []
     all_nodes_valid = True
@@ -34,7 +35,16 @@ def validate_nodes(
             valid = False
 
         try:
-            node = Node(node_id, process_id, arguments, [], dependency_graph[node_id], dependents[node_id], 0)
+            node = Node(
+                node_id,
+                process_id,
+                arguments,
+                [],
+                dependency_graph[node_id],
+                dependents[node_id],
+                0,
+                user_defined_processes=user_defined_processes,
+            )
         except ProcessDefinitionMissing as e:
             valid = False
 
@@ -48,7 +58,9 @@ def validate_nodes(
     return all_nodes_valid, valid_subgraphs
 
 
-def check_validity_and_subgraphs(process_graph, temporal_dimension_name, bands_dimension_name):
+def check_validity_and_subgraphs(
+    process_graph, temporal_dimension_name, bands_dimension_name, user_defined_processes={}
+):
     dependency_graph = get_dependencies(process_graph)
     dependents = get_dependents(dependency_graph)
     execution_order = get_execution_order(dependency_graph, dependents)
@@ -59,11 +71,13 @@ def check_validity_and_subgraphs(process_graph, temporal_dimension_name, bands_d
         dependents,
         temporal_dimension_name,
         bands_dimension_name,
+        user_defined_processes,
     )
 
 
 def convert_from_process_graph(
     process_graph,
+    user_defined_processes={},
     n_output_bands=1,
     sample_type="FLOAT32",
     units=None,
@@ -73,11 +87,15 @@ def convert_from_process_graph(
     bands_metadata=[],
 ):
     all_nodes_valid, subgraphs = check_validity_and_subgraphs(
-        process_graph, temporal_dimension_name, bands_dimension_name
+        process_graph, temporal_dimension_name, bands_dimension_name, user_defined_processes=user_defined_processes
     )
     if all_nodes_valid:
         nodes, input_bands, initial_data_name = generate_nodes_from_process_graph(
-            process_graph, bands_dimension_name, temporal_dimension_name, level=1
+            process_graph,
+            bands_dimension_name,
+            temporal_dimension_name,
+            user_defined_processes=user_defined_processes,
+            level=1,
         )
         evalscript = Evalscript(
             input_bands,
@@ -104,6 +122,7 @@ def convert_from_process_graph(
                 subgraph["graph"],
                 bands_dimension_name,
                 temporal_dimension_name,
+                user_defined_processes=user_defined_processes,
                 level=1,
             )
             evalscript = Evalscript(
@@ -127,7 +146,9 @@ def convert_from_process_graph(
         return evalscripts
 
 
-def generate_nodes_from_process_graph(process_graph, bands_dimension_name, temporal_dimension_name, level=1):
+def generate_nodes_from_process_graph(
+    process_graph, bands_dimension_name, temporal_dimension_name, user_defined_processes={}, level=1
+):
     dependency_graph = get_dependencies(process_graph)
     dependents = get_dependents(dependency_graph)
     execution_order = get_execution_order(dependency_graph, dependents)
@@ -138,6 +159,7 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
         dependents,
         temporal_dimension_name,
         bands_dimension_name,
+        user_defined_processes,
     )
 
     nodes = []
@@ -160,6 +182,7 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
                 arguments["reducer"]["process_graph"],
                 bands_dimension_name,
                 temporal_dimension_name,
+                user_defined_processes=user_defined_processes,
                 level=level + 1,
             )
         elif process_id == "apply" or process_id == "apply_dimension":
@@ -167,6 +190,7 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
                 arguments["process"]["process_graph"],
                 bands_dimension_name,
                 temporal_dimension_name,
+                user_defined_processes=user_defined_processes,
                 level=level + 1,
             )
         elif process_id == "count":
@@ -175,6 +199,7 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
                     arguments["condition"]["process_graph"],
                     bands_dimension_name,
                     temporal_dimension_name,
+                    user_defined_processes=user_defined_processes,
                     level=level + 1,
                 )
         elif process_id == "array_apply":
@@ -182,6 +207,7 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
                 arguments["process"]["process_graph"],
                 bands_dimension_name,
                 temporal_dimension_name,
+                user_defined_processes=user_defined_processes,
                 level=level + 1,
             )
         elif process_id == "array_filter":
@@ -189,6 +215,7 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
                 arguments["condition"]["process_graph"],
                 bands_dimension_name,
                 temporal_dimension_name,
+                user_defined_processes=user_defined_processes,
                 level=level + 1,
             )
         elif process_id == "aggregate_temporal_period":
@@ -196,6 +223,7 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
                 arguments["reducer"]["process_graph"],
                 bands_dimension_name,
                 temporal_dimension_name,
+                user_defined_processes=user_defined_processes,
                 level=level + 1,
             )
         elif process_id == "aggregate_temporal":
@@ -203,6 +231,15 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
                 arguments["reducer"]["process_graph"],
                 bands_dimension_name,
                 temporal_dimension_name,
+                user_defined_processes=user_defined_processes,
+                level=level + 1,
+            )
+        elif process_id in user_defined_processes:
+            child_nodes, _, _ = generate_nodes_from_process_graph(
+                user_defined_processes[process_id],
+                bands_dimension_name,
+                temporal_dimension_name,
+                user_defined_processes=user_defined_processes,
                 level=level + 1,
             )
         node = Node(
@@ -213,6 +250,7 @@ def generate_nodes_from_process_graph(process_graph, bands_dimension_name, tempo
             dependency_graph[node_id],
             dependents[node_id],
             level,
+            user_defined_processes=user_defined_processes,
         )
         nodes.append(node)
     return nodes, input_bands, initial_data_name
