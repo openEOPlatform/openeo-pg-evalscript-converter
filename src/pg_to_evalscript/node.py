@@ -87,8 +87,6 @@ class Node:
                 self.__class__ = class_types_for_process[process_id]
 
     def is_process_defined(self, process_id):
-        if process_id in self.user_defined_processes:
-            return True
         try:
             return (
                 pkgutil.get_data("pg_to_evalscript", f"{self.process_definitions_directory}/{process_id}.js")
