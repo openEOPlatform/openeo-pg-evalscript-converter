@@ -14,19 +14,20 @@
          ]
       }
    },
-   "apply":{
-      "process_id":"apply",
+   "convertnodataindex":{
+      "process_id":"reduce_dimension",
       "arguments":{
          "data":{
             "from_node":"loadco1"
          },
-         "process":{
+         "dimension": "t",
+         "reducer":{
             "process_graph":{
                "converttocelsius": {
-                  "process_id":"fahrenheit_to_celsius",
+                  "process_id":"find_nodata_convert_to_celsius",
                   "arguments":{
-                     "f":{
-                        "from_parameter":"x"
+                     "x":{
+                        "from_parameter":"data"
                      }
                   },
                   "result":true
@@ -40,7 +41,7 @@
       "process_id":"save_result",
       "arguments":{
          "data":{
-            "from_node":"apply"
+            "from_node":"convertnodataindex"
          },
          "format":"jpeg"
       },
