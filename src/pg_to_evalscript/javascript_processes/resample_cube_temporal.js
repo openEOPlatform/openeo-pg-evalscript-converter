@@ -144,6 +144,10 @@ function resample_cube_temporal(arguments) {
 
     // create a new ndarray with correct shape so that the stride is correct too
     resampledData.data = ndarray(flattenToNativeArray(resampledData.data, true), resampledData.data.shape);
+
+    // update the data for the next pair of temporal dimensions
+    dataClone = resampledData.clone();
+
   }
 
   return resampledData;
