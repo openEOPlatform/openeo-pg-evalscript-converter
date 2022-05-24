@@ -411,13 +411,13 @@ function isNotSubarray(ndarray, shape) {
     return length === ndarray.data.length
 }
 
-function flattenToNativeArray(ndarray) {
+function flattenToNativeArray(ndarray, useAllNdarrayProperties = false) {
     const shape = ndarray.shape
 
-    if (isNotSubarray(ndarray, shape)) {
-        return ndarray.data
+    if (!useAllNdarrayProperties && isNotSubarray(ndarray, shape)) {
+      return ndarray.data.slice();
     }
-
+  
     const cumulatives = fill(shape.slice(), 0);
     const coord = shape.slice();
     const arr = []
@@ -434,4 +434,66 @@ function flattenToNativeArray(ndarray) {
         arr.push(ndarray.get.apply(ndarray, coord))
     }
     return arr
+}
+
+/**
+* @license Apache-2.0
+*
+* Copyright (c) 2021 The Stdlib Authors.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+function broadcastNdarray(inputArray, targetShape) {
+  
+  const targetNumOfDimensions = targetShape.length;
+  const inputArrayNumOfDimensions = inputArray.shape.length;
+
+  if (targetNumOfDimensions < inputArrayNumOfDimensions) {
+    throw new Error('invalid argument. Cannot broadcast an array to a shape having fewer dimensions. Arrays can only be broadcasted to shapes having the same or more dimensions.');
+  }
+
+  // Initialize a strides array...
+  let generatedStrides = [];
+  for (let i = 0; i < targetNumOfDimensions; i++) {
+    generatedStrides.push(0);
+  }
+
+  // Determine the output array strides...
+  const inputArrayStride = inputArray.stride;
+  for (let i = targetNumOfDimensions - 1; i >= 0; i--) {
+    const dimIndexInShape = inputArrayNumOfDimensions - targetNumOfDimensions + i;
+    const inputArrayDim = inputArray.shape[dimIndexInShape];
+    const currentDim = targetShape[i];
+
+    if (dimIndexInShape < 0) {
+      // Prepended singleton dimension; stride is zero...
+      continue;
+    }
+    
+    if (currentDim !== 0 && currentDim < inputArrayDim) {
+      throw new Error(format('invalid argument. Input array cannot be broadcast to the specified shape, as the specified shape has a dimension whose size is less than the size of the corresponding dimension in the input array. Array shape: (%s). Desired shape: (%s). Dimension: %u.', inputArray.shape.slice().join(', '), targetShape.slice().join(', '), i));
+    }
+    if (inputArrayDim === currentDim) {
+      generatedStrides[i] = inputArrayStride[dimIndexInShape];
+    } else if (inputArrayDim === 1) {
+      // In order to broadcast dimensions, we set the stride for that dimension to zero...
+      generatedStrides[i] = 0;
+    } else {
+      // At this point, we know that `dim > d` and that `d` does not equal `1` (e.g., `dim=3` and `d=2`); in which case, the shapes are considered incompatible (even for desired shapes which are multiples of array dimensions, as might be desired when "tiling" an array; e.g., `dim=4` and `d=2`)...
+      throw new Error(format('invalid argument. Input array and the specified shape are broadcast incompatible. Array shape: (%s). Desired shape: (%s). Dimension: %u.', inputArray.shape.slice().join(', '), targetShape.slice().join(', '), i));
+    }
+  }
+  const newArr = ndarray(inputArray.data, targetShape.slice(), generatedStrides, inputArray.offset);
+  return newArr;
 }
