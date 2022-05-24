@@ -38,17 +38,17 @@ function resample_cube_temporal(arguments) {
   let temporalDimensionsPairs = [];
   if (dimension) {
     const dataDim = dataClone.getDimensionByName(dimension);
-    const dataDimIndex = dataClone.dimensions.findIndex(d => d.name === targetDim.name);
+    const dataDimIndex = dataClone.dimensions.findIndex(d => d.name === dimension);
 
     const targetDim = target.getDimensionByName(dimension);
-    const targetDimIndex = target.dimensions.findIndex(d => d.name === targetDim.name);
+    const targetDimIndex = target.dimensions.findIndex(d => d.name === dimension);
 
     // provided dimension not present in one or both datacubes
     if (!dataDim || !targetDim) {
       throw new Error("DimensionNotAvailable");
     }
 
-    if (dataDim.type !== dataClone.TEMPORAL || targetDim !== target.TEMPORAL) {
+    if (dataDim.type !== dataClone.TEMPORAL || targetDim.type !== target.TEMPORAL) {
       throw new Error("DimensionMismatch");
     }
 
