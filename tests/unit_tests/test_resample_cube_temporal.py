@@ -11,200 +11,402 @@ def resample_cube_temporal_process_code():
     return load_process_code("resample_cube_temporal")
 
 
-data_3dates = [
-    {"B01": 1, "B02": 2, "B03": 3},  # date 1
-    {"B01": 11, "B02": 12, "B03": 13},  # date 2
-    {"B01": 21, "B02": 22, "B03": 23},  # date 3
-]
+@pytest.fixture
+def construct_datacube():
+    def wrapped(cube_name, data, data_shape, dimensions):
+        return (
+            f"\nconst {cube_name} = new DataCube(ndarray({json.dumps(data)}, {json.dumps(data_shape)}), 'b', 't', false);"
+            + f"\n{cube_name}.dimensions = {json.dumps(dimensions)};"
+        )
 
-target_3dates = [
-    {"B01": 1, "B02": 2, "B03": 3},  # date 1
-    {"B01": 11, "B02": 12, "B03": 13},  # date 2
-    {"B01": 21, "B02": 22, "B03": 23},  # date 3
-]
-
-target_2dates = [
-    {"B01": 1, "B02": 2, "B03": 3},  # date 1
-    {"B01": 11, "B02": 12, "B03": 13},  # date 2
-]
-
-target_4dates = [
-    {"B01": 1, "B02": 2, "B03": 3},  # date 1
-    {"B01": 11, "B02": 12, "B03": 13},  # date 2
-    {"B01": 21, "B02": 22, "B03": 23},  # date 3
-    {"B01": 31, "B02": 32, "B03": 33},  # date 4
-]
-
-data_scenes_3dates = [
-    {"date": "2022-03-21T00:00:00.000Z"},  # date 1
-    {"date": "2022-03-19T00:00:00.000Z"},  # date 2
-    {"date": "2022-03-16T00:00:00.000Z"},  # date 3
-]
-
-scenes_2dates = [
-    {"date": "2022-03-20T00:00:00.000Z"},  # date 1
-    {"date": "2022-03-18T00:00:00.000Z"},  # date 2
-]
-
-scenes_4dates = [
-    {"date": "2022-03-21T00:00:00.000Z"},  # date 1
-    {"date": "2022-03-20T00:00:00.000Z"},  # date 2
-    {"date": "2022-03-18T00:00:00.000Z"},  # date 3
-    {"date": "2022-03-17T00:00:00.000Z"},  # date 4
-]
-
-result_3dates = {
-    "data": [1, 2, 3, 11, 12, 13, 21, 22, 23],
-    "shape": [3, 3],
-    "stride": [3, 1],
-    "offset": 0,
-}
-
-result_2dates = {
-    "data": [1, 2, 3, 11, 12, 13],
-    "shape": [2, 3],
-    "stride": [3, 1],
-    "offset": 0,
-}
-
-result_4dates = {
-    "data": [1, 2, 3, 11, 12, 13, 21, 22, 23, 31, 32, 33],
-    "shape": [4, 3],
-    "stride": [3, 1],
-    "offset": 0,
-}
-
-
-def resultWithTemporal(dataObject, temporalLabels):
-    return {
-        "TEMPORAL": "temporal",
-        "BANDS": "bands",
-        "OTHER": "other",
-        "bands_dimension_name": "bands_name",
-        "temporal_dimension_name": "temporal_name",
-        "dimensions": [
-            {
-                "name": "temporal_name",
-                "labels": [el["date"] for el in temporalLabels],
-                "type": "temporal",
-            },
-            {
-                "name": "bands_name",
-                "labels": ["B01", "B02", "B03"],
-                "type": "bands",
-            },
-        ],
-        "data": dataObject,
-    }
+    return wrapped
 
 
 @pytest.mark.parametrize(
-    "example_input, additional_js_code_specific_to_case, expected_output",
+    # "example_input, additional_js_code_specific_to_case, expected_output",
+    "data_array, data_shape, data_dimensions, target_array, target_shape, target_dimensions, dimension, valid_within, expected_array, expected_shape, expected_dimensions",
     [
-        (
-            {
-                "data": data_3dates,
-                "target": target_3dates,
-                "scenes_data": data_scenes_3dates,
-                "scenes_target": data_scenes_3dates
-                # "dimension": None,
-                # "valid_within": None,
-            },
+        # bands:  B1, B2, B3
+        # date 1:  1,  2,  3,
+        # date 2: 11, 12, 13,
+        # date 3: 21, 22, 23
+        (  # same dates
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
             None,
-            resultWithTemporal(result_3dates, data_scenes_3dates),
+            None,
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
         ),
-        # (
-        #     {
-        #         "data": data_3dates,
-        #         "target": target_2dates,
-        #         "scenes_data": data_scenes_3dates,
-        #         "scenes_target": scenes_2dates
-        #         # "dimension": None,
-        #         # "valid_within": None,
-        #     },
-        #     None,
-        #     resultWithTemporal(result_2dates, scenes_2dates),
-        # ),
-        # (
-        #     {
-        #         "data": data_3dates,
-        #         "target": target_4dates,
-        #         "scenes_data": data_scenes_3dates,
-        #         "scenes_target": scenes_4dates
-        #         # "dimension": None,
-        #         # "valid_within": None,
-        #     },
-        #     None,
-        #     resultWithTemporal(result_4dates, scenes_4dates),
-        # ),
+        (  # same size of temporal dimension, but different dates
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-22", "2022-03-17", "2022-03-15"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            None,
+            None,
+            [1, 2, 3, 21, 22, 23, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-16", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+        ),
+        (  # resample to less dates - downsample
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [1, 2, 3, 11, 12, 13],
+            [2, 3],
+            [
+                {
+                    "labels": ["2022-03-20", "2022-03-17"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            None,
+            None,
+            [11, 12, 13, 21, 22, 23],
+            [2, 3],
+            [
+                {
+                    "labels": [
+                        "2022-03-19",
+                        "2022-03-16",
+                    ],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+        ),
+        (  # resample to more dates - upsample
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [1, 2, 3, 11, 12, 13, 21, 22, 23, 31, 32, 33],
+            [4, 3],
+            [
+                {
+                    "labels": ["2022-03-22", "2022-03-20", "2022-03-18", "2022-03-15"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            None,
+            None,
+            [1, 2, 3, 11, 12, 13, 11, 12, 13, 21, 22, 23],
+            [4, 3],
+            [
+                {
+                    "labels": [
+                        "2022-03-21",
+                        "2022-03-19",
+                        "2022-03-19",
+                        "2022-03-16",
+                    ],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+        ),
+        (  # dimensions in data same as before, target has them switched
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+            None,
+            None,
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+        ),
+        # data has temporal dimension in a different location
+        # bands: B1, B2, B3
+        # date 1: 1, 11, 21
+        # date 2: 2, 12, 22
+        # date 3: 3, 13, 23
+        (  # same dates; data has switched dimensions
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            None,
+            None,
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+        ),
+        (  # same size of temporal dimension, but different dates; data has switched dimensions
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-22", "2022-03-17", "2022-03-15"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            None,
+            None,
+            [1, 3, 3, 11, 13, 13, 21, 23, 23],
+            [3, 3],
+            [
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-03-21", "2022-03-16", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+        ),
+        (  # resample to less dates - downsample; data has switched dimensions
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+            [1, 2, 3, 11, 12, 13],
+            [2, 3],
+            [
+                {
+                    "labels": ["2022-03-20", "2022-03-17"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            None,
+            None,
+            [2, 3, 12, 13, 22, 23],
+            [3, 2],
+            [
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+        ),
+        # dela ok @ 2022-05-24T13:49
+        (  # resample to more dates - upsample; data has switched dimensions
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+            [1, 2, 3, 11, 12, 13, 21, 22, 23, 31, 32, 33],
+            [4, 3],
+            [
+                {
+                    "labels": ["2022-03-22", "2022-03-20", "2022-03-18", "2022-03-15"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            None,
+            None,
+            [1, 2, 2, 3, 11, 12, 12, 13, 21, 22, 22, 23],
+            [3, 4],
+            [
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+                {
+                    "labels": [
+                        "2022-03-21",
+                        "2022-03-19",
+                        "2022-03-19",
+                        "2022-03-16",
+                    ],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+        ),
     ],
 )
 def test_resample_cube_temporal(
     resample_cube_temporal_process_code,
-    example_input,
-    additional_js_code_specific_to_case,
-    expected_output,
+    construct_datacube,
+    data_array,
+    data_shape,
+    data_dimensions,
+    target_array,
+    target_shape,
+    target_dimensions,
+    dimension,
+    valid_within,
+    expected_array,
+    expected_shape,
+    expected_dimensions,
 ):
 
-    data_parameter = json.dumps(example_input["data"])
-    target_parameter = json.dumps(example_input["target"])
-    scenes_data = json.dumps(example_input["scenes_data"])
-    scenes_target = json.dumps(example_input["scenes_target"])
-
-    dimension_parameter = (
-        json.dumps(example_input["dimension"]) if "dimension" in example_input else None
+    data_cube = construct_datacube("dataCube", data_array, data_shape, data_dimensions)
+    target_cube = construct_datacube(
+        "targetCube", target_array, target_shape, target_dimensions
     )
 
-    valid_within_parameter = (
-        json.dumps(example_input["valid_within"])
-        if "valid_within" in example_input
-        else None
-    )
+    additional_js_code_to_run = load_datacube_code() + data_cube + target_cube
+    arguments = f"'data': dataCube, 'target': targetCube"
 
-    vars_definitions = (
-        f"const dataCube = new DataCube({data_parameter}, 'bands_name', 'temporal_name', true, [], {scenes_data});"
-        + f"let targetCube = new DataCube({target_parameter}, 'bands_name', 'temporal_name', true, [], {scenes_target});"
-    )
-
-    if dimension_parameter:
-        vars_definitions = (
-            vars_definitions + f"const dimension = {dimension_parameter};"
+    if dimension:
+        additional_js_code_to_run = (
+            additional_js_code_to_run + f"const dimension = {json.dumps(dimension)};"
         )
+        arguments = arguments + f", 'dimension': {json.dumps(dimension)}"
 
-    if valid_within_parameter:
-        vars_definitions = (
-            vars_definitions + f"const valid_within = {valid_within_parameter};"
+    if valid_within:
+        additional_js_code_to_run = (
+            additional_js_code_to_run
+            + f"const valid_within = {json.dumps(valid_within)};"
         )
-
-    additional_js_code_to_run = (
-        load_datacube_code()
-        + vars_definitions
-        + (additional_js_code_specific_to_case or "")
-    )
-
-    arguments = (
-        f"'data': dataCube, 'target': targetCube"  # , 'scenes': {dimension_parameter}
-    )
-
-    if "dimension" in example_input:
-        arguments = arguments + f", 'dimension': {dimension_parameter}"
-
-    if "valid_within" in example_input:
-        arguments = arguments + f", 'valid_within': {valid_within_parameter}"
+        arguments = arguments + f", 'valid_within': {json.dumps(valid_within)}"
 
     process_arguments = f"{{" + arguments + f"}}"
 
-    print("EXPECTED OUTPUT:")
-    print(json.dumps(expected_output))
-
     try:
         output = run_process(
-            resample_cube_temporal_process_code + additional_js_code_to_run,
+            additional_js_code_to_run + resample_cube_temporal_process_code,
             "resample_cube_temporal",
             process_arguments,
         )
-        output = json.loads(output)
-        assert output == expected_output
+        output = json.loads(output.decode("utf-8"))
+
+        assert output["data"]["data"] == expected_array
+        assert output["data"]["shape"] == expected_shape
+        assert output["dimensions"] == expected_dimensions
 
     except subprocess.CalledProcessError as exc:
         print("ERROR")
