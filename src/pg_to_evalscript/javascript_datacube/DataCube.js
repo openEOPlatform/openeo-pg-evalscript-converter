@@ -108,7 +108,7 @@ class DataCube {
         const temporalLabels = this.getDimensionByName(temporalDimension).labels;
         const indices = [];
         for (let i = 0; i < temporalLabels.length; i++) {
-            const date = start?.type === 'time'
+            const date = start && start.type === 'time'
                 ? parse_rfc3339_time(temporalLabels[i])
                 : parse_rfc3339(temporalLabels[i]);
 
