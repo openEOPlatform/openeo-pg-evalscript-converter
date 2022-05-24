@@ -315,7 +315,6 @@ def construct_datacube():
                 },
             ],
         ),
-        # dela ok @ 2022-05-24T13:49
         (  # resample to more dates - upsample; data has switched dimensions
             [1, 2, 3, 11, 12, 13, 21, 22, 23],
             [3, 3],
@@ -353,6 +352,196 @@ def construct_datacube():
                     "name": "t",
                     "type": "temporal",
                 },
+            ],
+        ),
+
+        (  # same size of temporal dimension, but different dates; dimension is set
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-22", "2022-03-17", "2022-03-15"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            "t",
+            None,
+            [1, 2, 3, 21, 22, 23, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-16", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+        ),
+
+        (  # 2 temporal dimensions; dimension is set to t
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            [2, 2, 2],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-10"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-01-01", "2022-02-01"],
+                    "name": "additional_t",
+                    "type": "temporal",
+                },
+            ],
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            [2, 2, 2],
+            [
+                {
+                    "labels": ["2022-03-22", "2022-03-17"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-01-01", "2022-02-01"],
+                    "name": "additional_t",
+                    "type": "temporal",
+                },
+            ],
+            "t",
+            None,
+            [1, 2, 3, 4, 1, 2, 3, 4],
+            [2, 2, 2],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-21"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-01-01", "2022-02-01"],
+                    "name": "additional_t",
+                    "type": "temporal",
+                },
+            ],
+        ),
+
+        (  # 2 temporal dimensions; dimension is set to additiona_t
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            [2, 2, 2],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-10"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-01-01", "2022-02-01"],
+                    "name": "additional_t",
+                    "type": "temporal",
+                },
+            ],
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            [2, 2, 2],
+            [
+                {
+                    "labels": ["2022-03-15", "2022-03-10"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-01-25", "2022-02-01"],
+                    "name": "additional_t",
+                    "type": "temporal",
+                },
+            ],
+            "additional_t",
+            None,
+            [2,2,6,6,4,4,8,8],
+            [2, 2, 2],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-10"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-02-01", "2022-02-01"],
+                    "name": "additional_t",
+                    "type": "temporal",
+                },
+            ],
+        ),
+
+
+        # add tests where valid_within is set
+
+
+
+        (  # 2 temporal dimensions; resample both
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            [2, 2, 2],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-10"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {
+                    "labels": ["2022-01-01", "2022-02-01"],
+                    "name": "additional_t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+            ],
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            [2, 2, 2],
+            [
+                {
+                    "labels": ["2022-03-22", "2022-03-17"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {
+                    "labels": ["2022-01-25", "2022-02-01"],
+                    "name": "additional_t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+            ],
+            None,
+            None,
+            [3, 4, 3, 4, 3, 4, 3, 4],
+            [2, 2, 2],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-21"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {
+                    "labels": ["2022-02-01", "2022-02-01"],
+                    "name": "additional_t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
             ],
         ),
     ],
