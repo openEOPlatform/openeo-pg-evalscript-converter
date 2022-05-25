@@ -139,7 +139,7 @@ function resample_cube_temporal(arguments) {
       resampledData.data = resampledData.data.transpose(...swappedDims);
 
       // add the label
-      resampledData.dimensions[dataDimIndex].labels[targetLabelIndex] = dataDim.labels[nearestDataLabelIndex];
+      resampledData.dimensions[dataDimIndex].labels[targetLabelIndex] = targetDim.labels[targetLabelIndex];
     }
 
     // create a new ndarray with correct shape so that the stride is correct too

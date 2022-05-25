@@ -91,7 +91,7 @@ def construct_datacube():
             [3, 3],
             [
                 {
-                    "labels": ["2022-03-21", "2022-03-16", "2022-03-16"],
+                    "labels": ["2022-03-22", "2022-03-17", "2022-03-15"],
                     "name": "t",
                     "type": "temporal",
                 },
@@ -125,10 +125,7 @@ def construct_datacube():
             [2, 3],
             [
                 {
-                    "labels": [
-                        "2022-03-19",
-                        "2022-03-16",
-                    ],
+                    "labels": ["2022-03-20", "2022-03-17"],
                     "name": "t",
                     "type": "temporal",
                 },
@@ -162,19 +159,14 @@ def construct_datacube():
             [4, 3],
             [
                 {
-                    "labels": [
-                        "2022-03-21",
-                        "2022-03-19",
-                        "2022-03-19",
-                        "2022-03-16",
-                    ],
+                    "labels": ["2022-03-22", "2022-03-20", "2022-03-18", "2022-03-15"],
                     "name": "t",
                     "type": "temporal",
                 },
                 {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
             ],
         ),
-        (  # dimensions in data same as before, target has them switched
+        (  # target has different order of dimension
             [1, 2, 3, 11, 12, 13, 21, 22, 23],
             [3, 3],
             [
@@ -213,7 +205,7 @@ def construct_datacube():
         # date 1: 1, 11, 21
         # date 2: 2, 12, 22
         # date 3: 3, 13, 23
-        (  # same dates; data has switched dimensions
+        (  # same dates; data has different order of dimensions
             [1, 2, 3, 11, 12, 13, 21, 22, 23],
             [3, 3],
             [
@@ -247,7 +239,7 @@ def construct_datacube():
                 },
             ],
         ),
-        (  # same size of temporal dimension, but different dates; data has switched dimensions
+        (  # same size of temporal dimension, but different dates; data has different order of dimensions
             [1, 2, 3, 11, 12, 13, 21, 22, 23],
             [3, 3],
             [
@@ -275,13 +267,13 @@ def construct_datacube():
             [
                 {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
                 {
-                    "labels": ["2022-03-21", "2022-03-16", "2022-03-16"],
+                    "labels": ["2022-03-22", "2022-03-17", "2022-03-15"],
                     "name": "t",
                     "type": "temporal",
                 },
             ],
         ),
-        (  # resample to less dates - downsample; data has switched dimensions
+        (  # resample to less dates - downsample; data has different order of dimensions
             [1, 2, 3, 11, 12, 13, 21, 22, 23],
             [3, 3],
             [
@@ -309,13 +301,13 @@ def construct_datacube():
             [
                 {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
                 {
-                    "labels": ["2022-03-19", "2022-03-16"],
+                    "labels": ["2022-03-20", "2022-03-17"],
                     "name": "t",
                     "type": "temporal",
                 },
             ],
         ),
-        (  # resample to more dates - upsample; data has switched dimensions
+        (  # resample to more dates - upsample; data has different order of dimensions
             [1, 2, 3, 11, 12, 13, 21, 22, 23],
             [3, 3],
             [
@@ -343,12 +335,7 @@ def construct_datacube():
             [
                 {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
                 {
-                    "labels": [
-                        "2022-03-21",
-                        "2022-03-19",
-                        "2022-03-19",
-                        "2022-03-16",
-                    ],
+                    "labels": ["2022-03-22", "2022-03-20", "2022-03-18", "2022-03-15"],
                     "name": "t",
                     "type": "temporal",
                 },
@@ -382,7 +369,7 @@ def construct_datacube():
             [3, 3],
             [
                 {
-                    "labels": ["2022-03-21", "2022-03-16", "2022-03-16"],
+                    "labels": ["2022-03-22", "2022-03-17", "2022-03-15"],
                     "name": "t",
                     "type": "temporal",
                 },
@@ -427,7 +414,7 @@ def construct_datacube():
             [2, 2, 2],
             [
                 {
-                    "labels": ["2022-03-21", "2022-03-21"],
+                    "labels": ["2022-03-22", "2022-03-17"],
                     "name": "t",
                     "type": "temporal",
                 },
@@ -440,7 +427,7 @@ def construct_datacube():
             ],
         ),
 
-        (  # 2 temporal dimensions; dimension is set to additiona_t
+        (  # 2 temporal dimensions; dimension is set to additional_t
             [1, 2, 3, 4, 5, 6, 7, 8],
             [2, 2, 2],
             [
@@ -483,7 +470,7 @@ def construct_datacube():
                 },
                 {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
                 {
-                    "labels": ["2022-02-01", "2022-02-01"],
+                    "labels": ["2022-01-25", "2022-02-01"],
                     "name": "additional_t",
                     "type": "temporal",
                 },
@@ -532,12 +519,12 @@ def construct_datacube():
             [2, 2, 2],
             [
                 {
-                    "labels": ["2022-03-21", "2022-03-21"],
+                    "labels": ["2022-03-22", "2022-03-17"],
                     "name": "t",
                     "type": "temporal",
                 },
                 {
-                    "labels": ["2022-02-01", "2022-02-01"],
+                    "labels": ["2022-01-25", "2022-02-01"],
                     "name": "additional_t",
                     "type": "temporal",
                 },
