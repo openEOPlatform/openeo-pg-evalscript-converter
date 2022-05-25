@@ -18,7 +18,7 @@ function parse_rfc3339(dateTime, default_h = 0, default_m = 0, default_s = 0) {
   return null;
 }
 
-function parse_rfc3339_time(dateTime) {
+function extract_milliseconds_of_day(dateTime) {
   const regexTime = "(([0-9]{2}):([0-9]{2}):([0-9]{2})(\.[0-9]+)?)([Zz]|([+-])([0-9]{2}):([0-9]{2}))";
 
   try {
@@ -26,8 +26,8 @@ function parse_rfc3339_time(dateTime) {
 
     if (matchTime) {
       return {
-        type: "time",
-        value: new Date('1900-01-01T' + matchTime[0]).toISOString(),
+        type: "milliseconds-of-day",
+        value: new Date('1970-01-01T' + matchTime[0]).getTime(),
       };
     }
   } catch (err) {}

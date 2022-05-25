@@ -41,20 +41,20 @@ def test_common(common_code, example_input, expected_output):
 @pytest.mark.parametrize(
     "example_input,expected_output",
     [
-        ("17:35:58Z", dict({"type": "time", "value": "1900-01-01T17:35:58.000Z"})),
-        ("12:00:00Z", dict({"type": "time", "value": "1900-01-01T12:00:00.000Z"})),
-        ("23:59:59Z", dict({"type": "time", "value": "1900-01-01T23:59:59.000Z"})),
-        ("24:00:00Z", dict({"type": "time", "value": "1900-01-02T00:00:00.000Z"})),
-        ("12:00:00.432Z", dict({"type": "time", "value": "1900-01-01T12:00:00.432Z"})),
-        ("12:34:56.123Z", dict({"type": "time", "value": "1900-01-01T12:34:56.123Z"})),
-        ("13:00:00+01:00", dict({"type": "time", "value": "1900-01-01T12:00:00.000Z"})),
-        ("11:00:00-01:30", dict({"type": "time", "value": "1900-01-01T12:30:00.000Z"})),
-        ("00:00:00+01:00", dict({"type": "time", "value": "1899-12-31T23:00:00.000Z"})),
-        ("2018-01-01T12:00:00Z", dict({"type": "time", "value": "1900-01-01T12:00:00.000Z"})),
-        ("2018-01-01T12:34:56.123Z", dict({"type": "time", "value": "1900-01-01T12:34:56.123Z"})),
-        ("2018-01-01T13:00:00+01:00", dict({"type": "time", "value": "1900-01-01T12:00:00.000Z"})),
-        ("2018-01-01T11:00:00-01:30", dict({"type": "time", "value": "1900-01-01T12:30:00.000Z"})),
-        ("2018-01-01T00:00:00+01:00", dict({"type": "time", "value": "1899-12-31T23:00:00.000Z"})),
+        ("17:35:58Z", dict({"type": "milliseconds-of-day", "value": 63358000})),
+        ("12:00:00Z", dict({"type": "milliseconds-of-day", "value": 43200000})),
+        ("23:59:59Z", dict({"type": "milliseconds-of-day", "value": 86399000})),
+        ("24:00:00Z", dict({"type": "milliseconds-of-day", "value": 86400000})),
+        ("12:00:00.432Z", dict({"type": "milliseconds-of-day", "value": 43200432})),
+        ("12:34:56.123Z", dict({"type": "milliseconds-of-day", "value": 45296123})),
+        ("13:00:00+01:00", dict({"type": "milliseconds-of-day", "value": 43200000})),
+        ("11:00:00-01:30", dict({"type": "milliseconds-of-day", "value": 45000000})),
+        ("00:00:00+01:00", dict({"type": "milliseconds-of-day", "value": -3600000})),
+        ("2018-01-01T12:00:00Z", dict({"type": "milliseconds-of-day", "value": 43200000})),
+        ("2018-01-01T12:34:56.123Z", dict({"type": "milliseconds-of-day", "value": 45296123})),
+        ("2018-01-01T13:00:00+01:00", dict({"type": "milliseconds-of-day", "value": 43200000})),
+        ("2018-01-01T11:00:00-01:30", dict({"type": "milliseconds-of-day", "value": 45000000})),
+        ("2018-01-01T00:00:00+01:00", dict({"type": "milliseconds-of-day", "value": -3600000})),
         ("2018-01-01", None),
         (None, None),
         (1, None),
@@ -66,7 +66,7 @@ def test_common(common_code, example_input, expected_output):
     ],
 )
 def test_common_time(common_code, example_input, expected_output):
-    function_name = "parse_rfc3339_time"
+    function_name = "extract_milliseconds_of_day"
     output = run_javascript(
         common_code + f"process.stdout.write(JSON.stringify({function_name}({json.dumps(example_input)})))"
     )
