@@ -478,7 +478,7 @@ def construct_datacube():
         # date 1: 1, 11,
         # date 2: 2, 12,
         # date 3: 3, 13,
-        (  # valid_within: nearest date has invalid values, but there are valid values within timespan [target label] +/- valid_within
+        (  # valid_within: nearest date has invalid values, but there are valid values within timespan [targetLabel +/- valid_within]
             [None, None, 3, 11, None, None],
             [2, 3],
             [
@@ -512,7 +512,7 @@ def construct_datacube():
                 },
             ],
         ),
-        (  # valid_within: no VALID values in the timespan [target label] +/- valid_within
+        (  # valid_within: no VALID values in the timespan [targetLabel +/- valid_within]
             [None, None, 3, 11, None, None],
             [2, 3],
             [
@@ -550,7 +550,7 @@ def construct_datacube():
         # bands:  B1, B2
         # date 1: 1, 11,
         # date 2: 2, 12,
-        (  # valid_within: no VALID or INVALID values in the timespan [target label] +/- valid_within
+        (  # valid_within: no VALID or INVALID values in the timespan [targetLabel +/- valid_within]
             [1, 2, 11, 12],
             [2, 2],
             [

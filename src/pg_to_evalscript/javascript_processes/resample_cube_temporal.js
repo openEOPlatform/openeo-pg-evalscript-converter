@@ -136,24 +136,13 @@ function resample_cube_temporal(arguments) {
 
       let dataToAdd = flatPickedNdarray;
 
-
       if(valid_within !== undefined && valid_within !== null){
 
         if (dataLabelIndicesWithin.length === 0){
           dataToAdd = dataToAdd.map(el => null);
-        } 
-
+        }
         else {
           dataLabelIndicesWithin.sort((a, b) => a.diffInDays - b.diffInDays);
-
-          let mergedValidData = dataToAdd;
-
-          // throw new Error("RES ___ " + JSON.stringify({
-          //   dataLabelIndicesWithin,
-          //   dataToAdd,
-          //   mergedValidData
-          // }) + " ___ RES");
-
           for (let dl of dataLabelIndicesWithin) {
             // pick the correct values (sub-ndarray) from SOURCE's ndarray
             const shapeArrayWithNullExceptLabelIndex = dataClone.dimensions.map(
@@ -162,17 +151,14 @@ function resample_cube_temporal(arguments) {
             const pickedNdarray = dataClone.data.pick(...shapeArrayWithNullExceptLabelIndex);
             const flatPickedNdarray = flattenToNativeArray(pickedNdarray, true);
 
-            if (!mergedValidData) {
-              mergedValidData = flatPickedNdarray;
-            }
-            else {
-              for (idx in mergedValidData) {
-                if (mergedValidData[idx] === null) {
-                  mergedValidData[idx] = flatPickedNdarray[idx];
-                }
+            for (idx in dataToAdd) {
+              if (dataToAdd[idx] === null) {
+                dataToAdd[idx] = flatPickedNdarray[idx];
               }
             }
           }
+        }
+      }
 
           dataToAdd = mergedValidData;
         }
