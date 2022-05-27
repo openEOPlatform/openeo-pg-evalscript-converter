@@ -92,6 +92,7 @@ function resample_cube_temporal(arguments) {
       let minDiff = Number.POSITIVE_INFINITY;
       let minDifParsedDataLabel = null;
       let nearestDataLabelIndex = 0;
+      let dataLabelIndicesWithin = [];
 
       // find the nearest SOURCE label (date) for the current TARGET label (date)
       for (let dataLabelIndex in dataDim.labels) {
@@ -114,15 +115,68 @@ function resample_cube_temporal(arguments) {
             nearestDataLabelIndex = dataLabelIndex;
           }
         }
+
+        // if valid_within is set, save all the labels that are within 
+        // the timespan [targetLabel +/- valid_within]
+        // and sort them by distance from targetLabel afterwards
+        if(valid_within !== undefined && valid_within !== null){
+          const diffInDays = diff / (1000 * 60 * 60 * 24);
+          if (diffInDays <= valid_within) {
+            dataLabelIndicesWithin.push({dataLabelIndex, diffInDays})
+          }
+        }
       }
 
       // pick the correct values (sub-ndarray) from SOURCE's ndarray
       const shapeArrayWithNullExceptLabelIndex = dataClone.dimensions.map(
-        (d, i) => i == dataDimIndex ? nearestDataLabelIndex: null
+        (d, i) => i == dataDimIndex ? nearestDataLabelIndex : null
       );
       const pickedNdarray = dataClone.data.pick(...shapeArrayWithNullExceptLabelIndex);
       const flatPickedNdarray = flattenToNativeArray(pickedNdarray, true);
 
+      let dataToAdd = flatPickedNdarray;
+
+
+      if(valid_within !== undefined && valid_within !== null){
+
+        if (dataLabelIndicesWithin.length === 0){
+          dataToAdd = dataToAdd.map(el => null);
+        } 
+
+        else {
+          dataLabelIndicesWithin.sort((a, b) => a.diffInDays - b.diffInDays);
+
+          let mergedValidData = dataToAdd;
+
+          // throw new Error("RES ___ " + JSON.stringify({
+          //   dataLabelIndicesWithin,
+          //   dataToAdd,
+          //   mergedValidData
+          // }) + " ___ RES");
+
+          for (let dl of dataLabelIndicesWithin) {
+            // pick the correct values (sub-ndarray) from SOURCE's ndarray
+            const shapeArrayWithNullExceptLabelIndex = dataClone.dimensions.map(
+              (d, i) => i == dataDimIndex ? dl.dataLabelIndex : null
+            );
+            const pickedNdarray = dataClone.data.pick(...shapeArrayWithNullExceptLabelIndex);
+            const flatPickedNdarray = flattenToNativeArray(pickedNdarray, true);
+
+            if (!mergedValidData) {
+              mergedValidData = flatPickedNdarray;
+            }
+            else {
+              for (idx in mergedValidData) {
+                if (mergedValidData[idx] === null) {
+                  mergedValidData[idx] = flatPickedNdarray[idx];
+                }
+              }
+            }
+          }
+
+          dataToAdd = mergedValidData;
+        }
+      }
       // transpose so that the temporal dimension is the outer-most, so it's easier to add the data
       const numOfDims = resampledData.data.shape.length;
       let swappedDims = [...Array(numOfDims).keys()];
@@ -132,7 +186,7 @@ function resample_cube_temporal(arguments) {
 
       // update the shape and add the data
       resampledData.data.shape[0] = targetDimSize;
-      resampledData.setInDimension(0, flatPickedNdarray, targetLabelIndex);
+      resampledData.setInDimension(0, dataToAdd, targetLabelIndex);
       resampledData.data = ndarray(flattenToNativeArray(resampledData.data, true), resampledData.data.shape);
 
       // transpose back to the original order of the axes

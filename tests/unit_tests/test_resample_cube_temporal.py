@@ -341,7 +341,6 @@ def construct_datacube():
                 },
             ],
         ),
-
         (  # same size of temporal dimension, but different dates; dimension is set
             [1, 2, 3, 11, 12, 13, 21, 22, 23],
             [3, 3],
@@ -376,7 +375,6 @@ def construct_datacube():
                 {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
             ],
         ),
-
         (  # 2 temporal dimensions; dimension is set to t
             [1, 2, 3, 4, 5, 6, 7, 8],
             [2, 2, 2],
@@ -426,7 +424,6 @@ def construct_datacube():
                 },
             ],
         ),
-
         (  # 2 temporal dimensions; dimension is set to additional_t
             [1, 2, 3, 4, 5, 6, 7, 8],
             [2, 2, 2],
@@ -460,7 +457,7 @@ def construct_datacube():
             ],
             "additional_t",
             None,
-            [2,2,6,6,4,4,8,8],
+            [2, 2, 6, 6, 4, 4, 8, 8],
             [2, 2, 2],
             [
                 {
@@ -476,12 +473,118 @@ def construct_datacube():
                 },
             ],
         ),
-
-
-        # add tests where valid_within is set
-
-
-
+        # data shape
+        # bands:  B1, B2
+        # date 1: 1, 11,
+        # date 2: 2, 12,
+        # date 3: 3, 13,
+        (  # valid_within: nearest date has invalid values, but there are valid values within timespan [target label] +/- valid_within
+            [None, None, 3, 11, None, None],
+            [2, 3],
+            [
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-01-02", "2022-01-07", "2022-01-11"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+            [1, 2],
+            [2, 1],
+            [
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-01-08"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+            None,
+            10,
+            [3, 11],
+            [2, 1],
+            [
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-01-08"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+        ),
+        (  # valid_within: no VALID values in the timespan [target label] +/- valid_within
+            [None, None, 3, 11, None, None],
+            [2, 3],
+            [
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-01-02", "2022-01-07", "2022-01-11"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+            [1, 2],
+            [2, 1],
+            [
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-01-08"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+            None,
+            2,
+            [None, None],
+            [2, 1],
+            [
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-01-08"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+        ),
+        # data shape
+        # bands:  B1, B2
+        # date 1: 1, 11,
+        # date 2: 2, 12,
+        (  # valid_within: no VALID or INVALID values in the timespan [target label] +/- valid_within
+            [1, 2, 11, 12],
+            [2, 2],
+            [
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-01-01", "2022-02-01"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+            [1, 2],
+            [2, 1],
+            [
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-01-15"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+            None,
+            7,
+            [None, None],
+            [2, 1],
+            [
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+                {
+                    "labels": ["2022-01-15"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+            ],
+        ),
+        # add tests where labels in data and target are in different order
         (  # 2 temporal dimensions; resample both
             [1, 2, 3, 4, 5, 6, 7, 8],
             [2, 2, 2],
