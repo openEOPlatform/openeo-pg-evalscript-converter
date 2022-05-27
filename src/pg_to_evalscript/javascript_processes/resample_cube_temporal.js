@@ -128,10 +128,10 @@ function resample_cube_temporal(arguments) {
         // if valid_within is set, save all the labels that are within 
         // the timespan [targetLabel +/- valid_within]
         // and sort them by distance from targetLabel afterwards
-        if(valid_within !== undefined && valid_within !== null){
+        if (valid_within !== undefined && valid_within !== null) {
           const diffInDays = diff / (1000 * 60 * 60 * 24);
           if (diffInDays <= valid_within) {
-            dataLabelIndicesWithin.push({dataLabelIndex, diffInDays})
+            dataLabelIndicesWithin.push({ dataLabelIndex, diffInDays })
           }
         }
       }
@@ -147,8 +147,8 @@ function resample_cube_temporal(arguments) {
 
       // if valid_within is set, the values to add might be from the labels (dates) that are
       // outside of the timespan [targetLabel +/- valid_within]
-      if(valid_within !== undefined && valid_within !== null){
-        if (dataLabelIndicesWithin.length === 0){
+      if (valid_within !== undefined && valid_within !== null) {
+        if (dataLabelIndicesWithin.length === 0) {
           dataToAdd = dataToAdd.map(el => null);
         }
         else {
