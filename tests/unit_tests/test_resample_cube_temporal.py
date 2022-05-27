@@ -584,7 +584,40 @@ def construct_datacube():
                 },
             ],
         ),
-        # add tests where labels in data and target are in different order
+        (  # same size of temporal dimension, but different dates; dimension's labels in different orders
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-15", "2022-03-17", "2022-03-22"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            None,
+            None,
+            [21, 22, 23, 21, 22, 23, 1, 2, 3],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-15", "2022-03-17", "2022-03-22"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+        ),
         (  # 2 temporal dimensions; resample both
             [1, 2, 3, 4, 5, 6, 7, 8],
             [2, 2, 2],
