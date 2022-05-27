@@ -74,6 +74,8 @@ function resample_cube_temporal(arguments) {
     }
   }
 
+  let savedData = [];
+
   // go through pairs of matching temporal dimensions
   let resampledData = data.clone();
   for (let pair of temporalDimensionsPairs) {
@@ -136,8 +138,9 @@ function resample_cube_temporal(arguments) {
 
       let dataToAdd = flatPickedNdarray;
 
+      // if valid_within is set, the values to add might be from the labels (dates) that are
+      // outside of the timespan [targetLabel +/- valid_within]
       if(valid_within !== undefined && valid_within !== null){
-
         if (dataLabelIndicesWithin.length === 0){
           dataToAdd = dataToAdd.map(el => null);
         }
@@ -160,9 +163,17 @@ function resample_cube_temporal(arguments) {
         }
       }
 
-          dataToAdd = mergedValidData;
-        }
-      }
+
+      savedData.push({
+        targetLabelIndex,
+        nearestDataLabelIndex,
+        // shapeArrayWithNullExceptLabelIndex,
+        // pickedNdarray,
+        dataToAdd,
+        dataLabelIndicesWithin,
+      })
+
+
       // transpose so that the temporal dimension is the outer-most, so it's easier to add the data
       const numOfDims = resampledData.data.shape.length;
       let swappedDims = [...Array(numOfDims).keys()];
@@ -188,7 +199,17 @@ function resample_cube_temporal(arguments) {
     // update the data for the next pair of temporal dimensions
     dataClone = resampledData.clone();
 
+    savedData.push({
+      vmesna: ndarray(flattenToNativeArray(resampledData.data, true), resampledData.data.shape)
+    })
   }
+
+  // throw new Error("RES ___ " + JSON.stringify({
+  //   savedData,
+  //   resampledData
+
+  // }) + " ___ RES");
+
 
   return resampledData;
 }
