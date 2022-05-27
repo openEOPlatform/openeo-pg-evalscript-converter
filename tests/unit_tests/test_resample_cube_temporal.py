@@ -8,6 +8,7 @@ from tests.utils import (
     load_dependency_processes_code,
     load_datacube_code,
     run_process,
+    run_input_validation,
 )
 
 
@@ -30,7 +31,6 @@ def construct_datacube():
 
 
 @pytest.mark.parametrize(
-    # "example_input, additional_js_code_specific_to_case, expected_output",
     "data_array, data_shape, data_dimensions, target_array, target_shape, target_dimensions, dimension, valid_within, expected_array, expected_shape, expected_dimensions",
     [
         # bands:  B1, B2, B3
@@ -719,7 +719,6 @@ def test_resample_cube_temporal(
 
     process_arguments = f"{{" + arguments + f"}}"
 
-    # try:
     output = run_process(
         additional_js_code_to_run + resample_cube_temporal_process_code,
         "resample_cube_temporal",
@@ -731,7 +730,245 @@ def test_resample_cube_temporal(
     assert output["data"]["shape"] == expected_shape
     assert output["dimensions"] == expected_dimensions
 
-    # except subprocess.CalledProcessError as exc:
-    #     print("ERROR")
-    #     print(exc.stderr)
-    #     assert "OK" in str(exc.stderr)
+
+@pytest.mark.parametrize(
+    "data_array, data_shape, data_dimensions, target_array, target_shape, target_dimensions, dimension, valid_within, error_message",
+    [
+        (  # no data datacube
+            None,
+            None,
+            None,
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "temporal"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            None,
+            None,
+            "MISSING_PARAMETER: Process resample_cube_temporal requires parameter data.",
+        ),
+        (  # no target datacube
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "temporal"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            None,
+            None,
+            None,
+            None,
+            None,
+            "MISSING_PARAMETER: Process resample_cube_temporal requires parameter target.",
+        ),
+        (  # dimension not a string
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "temporal"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "temporal"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            123,
+            None,
+            "WRONG_TYPE: Value for dimension is not a string.",
+        ),
+        (  # valid_within not a number
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "temporal"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "temporal"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            None,
+            "qwe",
+            "WRONG_TYPE: Value for valid_within is not a number.",
+        ),
+        (  # dimension is given, but does not exist in data
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "temporal"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "temp_dim", "type": "temporal"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            "temp_dim",
+            None,
+            "DimensionNotAvailable: A dimension with the specified name does not exist.",
+        ),
+        (  # dimension is given, but does not exist in target
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "temp_dim", "type": "temporal"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "temporal"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            "temp_dim",
+            None,
+            "DimensionNotAvailable: A dimension with the specified name does not exist.",
+        ),
+        (  # dimension is given, but does not exist in data or target
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "temporal"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "temporal"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            "temp_dim",
+            None,
+            "DimensionNotAvailable: A dimension with the specified name does not exist.",
+        ),
+        (  # dimension is given, but is not temporal in data
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "other"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "temporal"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            "t",
+            None,
+            "DimensionMismatch: The temporal dimensions for resampling don't match.",
+        ),
+        (  # dimension is given, but is not temporal in target
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "temporal"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "other"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            "t",
+            None,
+            "DimensionMismatch: The temporal dimensions for resampling don't match.",
+        ),
+        (  # dimension is given, but not temporal in data and target
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "other"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t", "type": "other"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            "t",
+            None,
+            "DimensionMismatch: The temporal dimensions for resampling don't match.",
+        ),
+        (  # dimension not given, no temporal dimensions match by name in data and target
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t1", "type": "other"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            [1],
+            [1],
+            [
+                {"labels": ["2022-03-21"], "name": "t2", "type": "other"},
+                {"labels": ["B01"], "name": "b", "type": "bands"},
+            ],
+            None,
+            None,
+            "DimensionMismatch: The temporal dimensions for resampling don't match.",
+        ),
+    ],
+)
+def test_mask_exceptions(
+    resample_cube_temporal_process_code,
+    construct_datacube,
+    data_array,
+    data_shape,
+    data_dimensions,
+    target_array,
+    target_shape,
+    target_dimensions,
+    dimension,
+    valid_within,
+    error_message,
+):
+
+    additional_js_code_to_run = load_datacube_code()
+    arguments = ""
+
+    if data_array and data_shape and data_dimensions:
+        data_cube = construct_datacube(
+            "dataCube", data_array, data_shape, data_dimensions
+        )
+        additional_js_code_to_run = additional_js_code_to_run + data_cube
+        arguments = arguments + f"'data': dataCube,"
+
+    if target_array and target_shape and target_dimensions:
+        target_cube = construct_datacube(
+            "targetCube", target_array, target_shape, target_dimensions
+        )
+        additional_js_code_to_run = additional_js_code_to_run + target_cube
+        arguments = arguments + f"'target': targetCube,"
+
+    if dimension:
+        additional_js_code_to_run = (
+            additional_js_code_to_run + f"const dimension = {json.dumps(dimension)};"
+        )
+        arguments = arguments + f"'dimension': {json.dumps(dimension)},"
+
+    if valid_within:
+        additional_js_code_to_run = (
+            additional_js_code_to_run
+            + f"const valid_within = {json.dumps(valid_within)};"
+        )
+        arguments = arguments + f"'valid_within': {json.dumps(valid_within)}"
+
+    process_arguments = f"{{" + arguments + f"}}"
+
+    print(arguments)
+
+    run_input_validation(
+        additional_js_code_to_run + resample_cube_temporal_process_code,
+        "resample_cube_temporal",
+        process_arguments,
+        True,
+        error_message=error_message,
+    )
