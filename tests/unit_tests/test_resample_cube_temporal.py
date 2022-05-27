@@ -3,12 +3,19 @@ import json
 import pytest
 import subprocess
 
-from tests.utils import load_process_code, load_datacube_code, run_process
+from tests.utils import (
+    load_process_code,
+    load_dependency_processes_code,
+    load_datacube_code,
+    run_process,
+)
 
 
 @pytest.fixture
 def resample_cube_temporal_process_code():
-    return load_process_code("resample_cube_temporal")
+    process_code = load_process_code("resample_cube_temporal")
+    dependency_processes_code = load_dependency_processes_code(["is_valid"])
+    return process_code + dependency_processes_code
 
 
 @pytest.fixture
@@ -473,6 +480,93 @@ def construct_datacube():
                 },
             ],
         ),
+        (  # same size of temporal dimension, but different dates; dimension's labels in different orders
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            [1, 2, 3, 11, 12, 13, 21, 22, 23],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-15", "2022-03-17", "2022-03-22"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+            None,
+            None,
+            [21, 22, 23, 21, 22, 23, 1, 2, 3],
+            [3, 3],
+            [
+                {
+                    "labels": ["2022-03-15", "2022-03-17", "2022-03-22"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
+            ],
+        ),
+        (  # 2 temporal dimensions; resample both
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            [2, 2, 2],
+            [
+                {
+                    "labels": ["2022-03-21", "2022-03-10"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {
+                    "labels": ["2022-01-01", "2022-02-01"],
+                    "name": "additional_t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+            ],
+            [1, 2, 3, 4, 5, 6, 7, 8],
+            [2, 2, 2],
+            [
+                {
+                    "labels": ["2022-03-22", "2022-03-17"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {
+                    "labels": ["2022-01-25", "2022-02-01"],
+                    "name": "additional_t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+            ],
+            None,
+            None,
+            [3, 4, 3, 4, 3, 4, 3, 4],
+            [2, 2, 2],
+            [
+                {
+                    "labels": ["2022-03-22", "2022-03-17"],
+                    "name": "t",
+                    "type": "temporal",
+                },
+                {
+                    "labels": ["2022-01-25", "2022-02-01"],
+                    "name": "additional_t",
+                    "type": "temporal",
+                },
+                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
+            ],
+        ),
+        # tests for checking resample_cube_temporal process with valid_within param
+        # should be in tests/integration_tests/test_integration.py
+        # because the process needs is_valid process
+        # currently solved by naively loading the additional code for the dependency process
         # data shape
         # bands:  B1, B2
         # date 1: 1, 11,
@@ -584,89 +678,6 @@ def construct_datacube():
                 },
             ],
         ),
-        (  # same size of temporal dimension, but different dates; dimension's labels in different orders
-            [1, 2, 3, 11, 12, 13, 21, 22, 23],
-            [3, 3],
-            [
-                {
-                    "labels": ["2022-03-21", "2022-03-19", "2022-03-16"],
-                    "name": "t",
-                    "type": "temporal",
-                },
-                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
-            ],
-            [1, 2, 3, 11, 12, 13, 21, 22, 23],
-            [3, 3],
-            [
-                {
-                    "labels": ["2022-03-15", "2022-03-17", "2022-03-22"],
-                    "name": "t",
-                    "type": "temporal",
-                },
-                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
-            ],
-            None,
-            None,
-            [21, 22, 23, 21, 22, 23, 1, 2, 3],
-            [3, 3],
-            [
-                {
-                    "labels": ["2022-03-15", "2022-03-17", "2022-03-22"],
-                    "name": "t",
-                    "type": "temporal",
-                },
-                {"labels": ["B01", "B02", "B03"], "name": "b", "type": "bands"},
-            ],
-        ),
-        (  # 2 temporal dimensions; resample both
-            [1, 2, 3, 4, 5, 6, 7, 8],
-            [2, 2, 2],
-            [
-                {
-                    "labels": ["2022-03-21", "2022-03-10"],
-                    "name": "t",
-                    "type": "temporal",
-                },
-                {
-                    "labels": ["2022-01-01", "2022-02-01"],
-                    "name": "additional_t",
-                    "type": "temporal",
-                },
-                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
-            ],
-            [1, 2, 3, 4, 5, 6, 7, 8],
-            [2, 2, 2],
-            [
-                {
-                    "labels": ["2022-03-22", "2022-03-17"],
-                    "name": "t",
-                    "type": "temporal",
-                },
-                {
-                    "labels": ["2022-01-25", "2022-02-01"],
-                    "name": "additional_t",
-                    "type": "temporal",
-                },
-                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
-            ],
-            None,
-            None,
-            [3, 4, 3, 4, 3, 4, 3, 4],
-            [2, 2, 2],
-            [
-                {
-                    "labels": ["2022-03-22", "2022-03-17"],
-                    "name": "t",
-                    "type": "temporal",
-                },
-                {
-                    "labels": ["2022-01-25", "2022-02-01"],
-                    "name": "additional_t",
-                    "type": "temporal",
-                },
-                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
-            ],
-        ),
     ],
 )
 def test_resample_cube_temporal(
@@ -708,19 +719,19 @@ def test_resample_cube_temporal(
 
     process_arguments = f"{{" + arguments + f"}}"
 
-    try:
-        output = run_process(
-            additional_js_code_to_run + resample_cube_temporal_process_code,
-            "resample_cube_temporal",
-            process_arguments,
-        )
-        output = json.loads(output.decode("utf-8"))
+    # try:
+    output = run_process(
+        additional_js_code_to_run + resample_cube_temporal_process_code,
+        "resample_cube_temporal",
+        process_arguments,
+    )
+    output = json.loads(output.decode("utf-8"))
 
-        assert output["data"]["data"] == expected_array
-        assert output["data"]["shape"] == expected_shape
-        assert output["dimensions"] == expected_dimensions
+    assert output["data"]["data"] == expected_array
+    assert output["data"]["shape"] == expected_shape
+    assert output["dimensions"] == expected_dimensions
 
-    except subprocess.CalledProcessError as exc:
-        print("ERROR")
-        print(exc.stderr)
-        assert "OK" in str(exc.stderr)
+    # except subprocess.CalledProcessError as exc:
+    #     print("ERROR")
+    #     print(exc.stderr)
+    #     assert "OK" in str(exc.stderr)

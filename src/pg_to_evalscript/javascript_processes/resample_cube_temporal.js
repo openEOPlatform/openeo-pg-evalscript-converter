@@ -153,7 +153,7 @@ function resample_cube_temporal(arguments) {
             const flatPickedNdarray = flattenToNativeArray(pickedNdarray, true);
 
             for (idx in dataToAdd) {
-              if (dataToAdd[idx] === null) {
+              if (!is_valid({ x: dataToAdd[idx] })) {
                 dataToAdd[idx] = flatPickedNdarray[idx];
               }
             }

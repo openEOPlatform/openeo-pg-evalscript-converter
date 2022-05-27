@@ -71,6 +71,11 @@ def load_process_code(process_id):
     ]
     return "\n".join(source_files)
 
+def load_dependency_processes_code(process_ids):
+    path = "../src/pg_to_evalscript/javascript_processes/"
+    source_files = [ load_script(path , process_id) for process_id in process_ids ]
+    return "\n".join(source_files)
+
 
 def get_defined_processes_from_files():
     return [
