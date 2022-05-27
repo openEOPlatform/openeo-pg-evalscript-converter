@@ -45,11 +45,17 @@ function resample_cube_temporal(arguments) {
 
     // provided dimension not present in one or both datacubes
     if (!dataDim || !targetDim) {
-      throw new Error("DimensionNotAvailable");
+      throw new ProcessError({
+        name: "DimensionNotAvailable",
+        message: "A dimension with the specified name does not exist.",
+      });
     }
 
     if (dataDim.type !== dataClone.TEMPORAL || targetDim.type !== target.TEMPORAL) {
-      throw new Error("DimensionMismatch");
+      throw new ProcessError({
+        name: "DimensionMismatch",
+        message: "The temporal dimensions for resampling don't match.",
+      });
     }
 
     temporalDimensionsPairs.push({ dataDim, dataDimIndex, targetDim, targetDimIndex });
@@ -70,7 +76,10 @@ function resample_cube_temporal(arguments) {
     }
 
     if (temporalDimensionsPairs.length === 0) {
-      throw new Error("DimensionMismatch");
+      throw new ProcessError({
+        name: "DimensionMismatch",
+        message: "The temporal dimensions for resampling don't match.",
+      });
     }
   }
 
