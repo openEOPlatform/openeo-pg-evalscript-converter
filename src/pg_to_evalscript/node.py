@@ -30,7 +30,9 @@ class Node:
         dependents,
         level,
         process_definitions_directory="javascript_processes",
+        user_defined_processes={},
     ):
+        self.user_defined_processes = user_defined_processes
         self.set_appropriate_class(process_id)
         self.variable_wrapper_string = uuid.uuid4().hex
         self.node_id = node_id
@@ -63,23 +65,26 @@ class Node:
         return f"Node {self.node_id} ({self.process_id})\n"
 
     def set_appropriate_class(self, process_id):
-        class_types_for_process = {
-            "reduce_dimension": ReduceDimensionNode,
-            "add_dimension": AddDimensionNode,
-            "load_collection": LoadCollectionNode,
-            "save_result": SaveResultNode,
-            "merge_cubes": MergeCubesNode,
-            "if": IfNode,
-            "apply": ApplyNode,
-            "count": CountNode,
-            "array_apply": ArrayApplyNode,
-            "array_filter": ArrayFilterNode,
-            "aggregate_temporal_period": AggregateTemporalPeriodNode,
-            "apply_dimension": ApplyDimensionNode,
-            "aggregate_temporal": AggregateTemporalNode,
-        }
-        if class_types_for_process.get(process_id):
-            self.__class__ = class_types_for_process[process_id]
+        if process_id in self.user_defined_processes:
+            self.__class__ = UserDefinedProcessNode
+        else:
+            class_types_for_process = {
+                "reduce_dimension": ReduceDimensionNode,
+                "add_dimension": AddDimensionNode,
+                "load_collection": LoadCollectionNode,
+                "save_result": SaveResultNode,
+                "merge_cubes": MergeCubesNode,
+                "if": IfNode,
+                "apply": ApplyNode,
+                "count": CountNode,
+                "array_apply": ArrayApplyNode,
+                "array_filter": ArrayFilterNode,
+                "aggregate_temporal_period": AggregateTemporalPeriodNode,
+                "apply_dimension": ApplyDimensionNode,
+                "aggregate_temporal": AggregateTemporalNode,
+            }
+            if class_types_for_process.get(process_id):
+                self.__class__ = class_types_for_process[process_id]
 
     def is_process_defined(self, process_id):
         try:
@@ -372,5 +377,20 @@ function aggregate_temporal(arguments) {{
 
     {self.load_process_code()}
     return aggregate_temporal({{...arguments, reducer: reducer}});
+}}
+"""
+
+
+class UserDefinedProcessNode(Node):
+    def is_process_defined(self, process_id):
+        return True
+
+    def write_process(self):
+        newline = "\n"
+        return f"""
+function {self.process_id}(arguments) {{  
+{newline.join(node.write_function() for node in self.child_nodes)}
+{newline.join(node.write_call() for node in self.child_nodes)}
+    return {self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id};
 }}
 """

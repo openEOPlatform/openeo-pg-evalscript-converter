@@ -9,6 +9,7 @@ from tests.utils import (
     get_defined_processes_from_files,
     get_evalscript_input_object,
 )
+from tests.integration_tests.fixtures import user_defined_processes
 
 
 @pytest.mark.parametrize(
@@ -228,3 +229,32 @@ def test_set_input_bands(new_bands):
 
     input_object = get_evalscript_input_object(evalscript.write())
     assert input_object["input"] == new_bands
+
+
+@pytest.mark.parametrize(
+    "process_graph,example_input,expected_output",
+    [
+        (
+            "user_defined_process_fahrenheit",
+            [{"B01": -40, "B02": -4}, {"B01": 32, "B02": 50}, {"B01": 68, "B02": 86}, {"B01": 104, "B02": 212}],
+            [-40, -20, 0, 10, 20, 30, 40, 100],
+        ),
+        (
+            # The index of the first no-data element in each temporal series is connverted to celsius
+            "user_defined_process_find_nodata_convert_to_celsius",
+            [{"B01": None, "B02": 2}, {"B01": 3, "B02": 4}, {"B01": 5, "B02": 6}, {"B01": None, "B02": None}],
+            [-17.77778, -16.11111],
+        ),
+    ],
+)
+def test_user_defined_processes(process_graph, example_input, expected_output):
+    process_graph = get_process_graph_json(process_graph)
+    result = convert_from_process_graph(
+        process_graph, user_defined_processes=user_defined_processes, encode_result=False
+    )
+    evalscript = result[0]["evalscript"].write()
+
+    output = run_evalscript(evalscript, example_input)
+    output = json.loads(output)
+
+    assert pytest.approx(output) == expected_output

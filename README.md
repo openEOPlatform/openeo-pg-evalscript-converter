@@ -10,6 +10,7 @@ The motivation behind this library is to reduce the data transfer between the SH
 ```python
 convert_from_process_graph(
     process_graph,
+    user_defined_processes={},
     n_output_bands=1,
     sample_type="FLOAT32",
     units=None,
@@ -24,6 +25,12 @@ convert_from_process_graph(
 * **`process_graph`**: *dict*
 
     OpenEO process graph JSON as Python dict object.
+
+* **`user_defined_processes`**: *dict*
+
+    Dictionary of [user-defined processes](https://open-eo.github.io/openeo-python-client/udp.html) that can be used in the process graph. 
+
+    The format should be: `<user-defined-process-id> : <user-defined-process-graph>`.
 
 * **`n_output_bands`**: *int, optional*. Default: `1`
 
