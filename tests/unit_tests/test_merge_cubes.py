@@ -255,7 +255,7 @@ def construct_datacube():
                 {"labels": ["2022-01-01", "2022-02-01", "2022-03-01"], "name": "t", "type": "temporal"},
                 {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
             ],
-        )
+        ),
     ],
 )
 def test_merge_cubes(
@@ -296,7 +296,7 @@ def test_merge_cubes(
             [
                 {"labels": ["B1"], "name": "b", "type": "bands"},
             ],
-            [2,3],
+            [2, 3],
             [2],
             [
                 {"labels": ["B1", "B2"], "name": "b", "type": "bands"},
