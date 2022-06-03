@@ -6,6 +6,7 @@ function resample_cube_temporal(arguments) {
     parameterName: "data",
     value: data,
     required: true,
+    nullable: false,
   });
 
   validateParameter({
@@ -13,6 +14,7 @@ function resample_cube_temporal(arguments) {
     parameterName: "target",
     value: target,
     required: true,
+    nullable: false,
   });
 
   validateParameter({
