@@ -1,0 +1,50 @@
+{
+   "loadco1":{
+      "process_id":"load_collection",
+      "arguments":{
+         "id":"sentinel-2-l1c",
+         "spatial_extent":null,
+         "temporal_extent":[
+            "2019-08-01",
+            "2019-08-18"
+         ],
+         "bands":[
+            "B01",
+            "B02"
+         ]
+      }
+   },
+   "convertnodataindex":{
+      "process_id":"reduce_dimension",
+      "arguments":{
+         "data":{
+            "from_node":"loadco1"
+         },
+         "dimension": "t",
+         "reducer":{
+            "process_graph":{
+               "converttocelsius": {
+                  "process_id":"find_nodata_convert_to_celsius",
+                  "arguments":{
+                     "x":{
+                        "from_parameter":"data"
+                     }
+                  },
+                  "result":true
+               }
+            }
+         }
+      },
+      "result":true
+   },
+   "result1":{
+      "process_id":"save_result",
+      "arguments":{
+         "data":{
+            "from_node":"convertnodataindex"
+         },
+         "format":"jpeg"
+      },
+      "result":true
+   }
+}

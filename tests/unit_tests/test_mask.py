@@ -22,7 +22,6 @@ def construct_datacube():
     return wrapped
 
 
-scenes_3dates = ["2022-03-21", "2022-03-19", "2022-03-16"]
 @pytest.mark.parametrize(
     "data_array, data_shape, data_dimensions, mask_array, mask_shape, mask_dimensions, replacement, expected_array",
     [
