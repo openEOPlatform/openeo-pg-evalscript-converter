@@ -514,13 +514,48 @@ class DataCube {
             }
         }
 
+        let dimensionSizePreserved = true
+        let newData;
+
         for (let coord of allCoords) {
             const dataToProcess = convert_to_1d_array(data.pick.apply(data, coord));
             dataToProcess.labels = target_dimension ? targetDimensionLabels : labels;
-            this._setArrayAlongAxis(coord, axis, process({
+
+            const result = process({
                 data: dataToProcess,
                 context
-            }));
+            })
+
+            if(!Array.isArray(result)) {
+                throw new ValidationError({
+                  name: VALIDATION_ERRORS.NOT_ARRAY,
+                  message: `"process" in "apply_dimension" doesn't return an array.`,
+                });
+            }
+
+            if (dataToProcess.length !== result.length) {
+                dimensionSizePreserved = false
+                if (!newData) {
+                    const newShape = data.shape.slice()
+                    newShape[axis] = result.length
+                    const newSize = (data.data.length / data.shape[axis]) * result.length
+                    newData = ndarray(new Array(newSize), newShape)
+                }
+            }
+            if (dimensionSizePreserved) {
+                this._setArrayAlongAxis(coord, axis, result);
+            } else {
+                const newCoord = coord.slice()
+                for (let i = 0; i < result.length; i++) {
+                    newCoord[axis] = i
+                    newData.set(...newCoord, result[i])
+                }
+            }
+
+        }
+        if (!dimensionSizePreserved) {
+            this.data = newData
+            this.dimensions[axis].labels = []
         }
     }
 
