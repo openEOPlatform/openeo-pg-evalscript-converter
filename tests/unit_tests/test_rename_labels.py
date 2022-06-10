@@ -104,7 +104,7 @@ def test_rename_labels(rename_labels_process_code, example_input, expected_outpu
         load_datacube_code()
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube}})"
     output = run_process(
         rename_labels_process_code + additional_js_code_to_run,
         "rename_labels",
@@ -221,7 +221,7 @@ def test_rename_labels_exceptions(rename_labels_process_code, example_input, rai
         load_datacube_code()
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube}})"
     run_input_validation(
         rename_labels_process_code + additional_js_code_to_run,
         "rename_labels",

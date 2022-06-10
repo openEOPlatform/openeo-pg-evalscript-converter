@@ -230,7 +230,7 @@ docker run tests
 
 #### Directly
 
-Tests require a NodeJS environment. 
+Tests require a NodeJS environment. Use version =< 8.2.1 to match Sentinel Hub behaviour.
 
 ```
 pipenv install

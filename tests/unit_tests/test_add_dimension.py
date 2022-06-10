@@ -83,7 +83,7 @@ def test_add_dimension(add_dimension_process_code, example_input, expected_outpu
         load_datacube_code()
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube}})"
     output = run_process(
         add_dimension_process_code + additional_js_code_to_run,
         "add_dimension",
@@ -152,7 +152,7 @@ def test_add_dimension_exceptions(add_dimension_process_code, example_input, rai
         load_datacube_code()
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube}})"
     run_input_validation(
         add_dimension_process_code + additional_js_code_to_run,
         "add_dimension",

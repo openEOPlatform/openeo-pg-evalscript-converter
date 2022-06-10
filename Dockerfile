@@ -1,4 +1,4 @@
-FROM nikolaik/python-nodejs:latest
+FROM nikolaik/python-nodejs:python3.7-nodejs6
 
 ADD . .
 
@@ -8,4 +8,4 @@ RUN pip3 install pytest
 
 WORKDIR /tests/
 
-CMD ["pytest"]
+CMD ["pytest", "-x"]

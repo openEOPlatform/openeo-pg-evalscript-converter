@@ -112,7 +112,7 @@ def test_apply(apply_process_code, example_input, process, expected_output):
         load_datacube_code()
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'process':{process}}}"
+    process_arguments = f"Object.assign{json.dumps(example_input)}, {{'data': cube, 'process':{process}}})"
     output = run_process(
         apply_process_code + additional_js_code_to_run,
         "apply",
