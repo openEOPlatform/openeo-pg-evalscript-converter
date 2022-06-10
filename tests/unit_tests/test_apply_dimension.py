@@ -139,6 +139,18 @@ def apply_dimension_process_code():
             },
             [5, 6],
         ),
+        (
+            {
+                "data": [
+                    {"B01": 1, "B02": 2},
+                    {"B01": 3, "B02": 4},
+                    {"B01": 5, "B02": 6},
+                ],
+                "process": "({data}) => {return [data[2], data[0]]}",
+                "dimension": "temporal",
+            },
+            [5, 6, 1, 2],
+        ),
     ],
 )
 def test_apply_dimension(apply_dimension_process_code, example_input, expected_result):

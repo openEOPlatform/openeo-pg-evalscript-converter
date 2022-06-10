@@ -548,14 +548,14 @@ class DataCube {
                 const newCoord = coord.slice()
                 for (let i = 0; i < result.length; i++) {
                     newCoord[axis] = i
-                    newData.set(...newCoord, result[i])
+                    newData.set.apply(newData, newCoord.concat(result[i]))
                 }
             }
 
         }
         if (!dimensionSizePreserved) {
             this.data = newData
-            this.dimensions[axis].labels = []
+            this.dimensions[axis].labels = Array.from(Array(newData.shape[axis]).keys())
         }
     }
 
