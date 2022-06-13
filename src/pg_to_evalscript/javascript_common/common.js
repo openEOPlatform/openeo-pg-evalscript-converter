@@ -1,83 +1,39 @@
-function parse_rfc3339(dt, default_h = 0, default_m = 0, default_s = 0) {
-  const regexDateTime =
-    "^([0-9]{4})-([0-9]{2})-([0-9]{2})([Tt]([0-9]{2}):([0-9]{2}):([0-9]{2})(\\.[0-9]+)?)?(([Zz]|([+-])([0-9]{2}):([0-9]{2})))?";
-  const regexDate = "^([0-9]{4})-([0-9]{2})-([0-9]{2})$";
-
-  let result = null;
-
-  try {
-    const g = dt.match(regexDateTime);
-    if (g) {
-      let date = Date.UTC(
-        parseInt(g[1]), //year
-        parseInt(g[2]) - 1, // month
-        parseInt(g[3]), //day
-        parseInt(g[5] || default_h), //hour
-        parseInt(g[6] || default_m), //minute
-        parseInt(g[7] || default_s), // second
-        parseFloat(g[8]) * 1000 || 0 // milisecond
-      );
-
-      //for date-time strings either time zone or Z should be provided
-      if (g[5] !== undefined && g[9] === undefined) {
-        return null;
-      }
-
-      //check if timezone is provided
-      if (g[9] !== undefined && g[9] !== "Z") {
-        //offset in minutes
-        const offset =
-          (parseInt(g[12] || 0) * 60 + parseInt(g[13] || 0)) *
-          (g[11] === "+" ? -1 : 1);
-        //add offset in miliseconds
-        date = date + offset * 60 * 1000;
-      }
-
-      return {
-        type: dt.match(regexDate) ? "date" : "date-time",
-        value: new Date(date).toISOString(),
-      };
-    }
-  } catch (err) {
-    //
-  }
-
-  return result;
+const DATE_TIME_TYPES = {
+  date: "date",
+  date_time: "date-time",
+  milliseconds_of_day: "milliseconds-of-day",
 }
 
-function parse_rfc3339_time(t) {
-  const regexTime = "(([0-9]{2}):([0-9]{2}):([0-9]{2})(\\.[0-9]+)?)?(([Zz]|([+-])([0-9]{2}):([0-9]{2})))";
+function parse_rfc3339(dateTime, default_h = 0, default_m = 0, default_s = 0) {
+  const regexDateTime =
+    "^([0-9]{4})-([0-9]{2})-([0-9]{2})([Tt]([0-9]{2}):([0-9]{2}):([0-9]{2})(\.[0-9]+)?)([Zz]|([+-])([0-9]{2}):([0-9]{2}))";
+  const regexDate = "^([0-9]{4})-([0-9]{2})-([0-9]{2})$";
+
   try {
-    const g = t.match(regexTime);
-    if (g) {
-      let date = Date.UTC(
-        0, // year
-        0, // month
-        1, // day
-        parseInt(g[2]), // hour
-        parseInt(g[3]), // minute
-        parseInt(g[4]), // second
-        parseFloat(g[5]) * 1000 || 0 // milisecond
-      );
+    const matchDateTime = dateTime.match(regexDateTime);
+    const matchDate = dateTime.match(regexDate);
 
-      // for time strings either time zone or Z should be provided
-      if (g[2] !== undefined && g[6] === undefined) {
-        return null;
-      }
-
-      // check if timezone is provided
-      if (g[6] !== undefined && g[6] !== "Z") {
-        // offset in minutes
-        const offset =
-          (parseInt(g[9] || 0) * 60 + parseInt(g[10] || 0)) *
-          (g[8] === "+" ? -1 : 1);
-        // add offset in miliseconds
-        date = date + offset * 60 * 1000;
-      }
-
+    if (matchDateTime || matchDate) {
       return {
-        type: "time",
-        value: new Date(date).toISOString(),
+        type: matchDate ? DATE_TIME_TYPES.date : DATE_TIME_TYPES.date_time,
+        value: new Date(dateTime).toISOString(),
+      };
+    }
+  } catch (err) {}
+
+  return null;
+}
+
+function extract_milliseconds_of_day(dateTime) {
+  const regexTime = "(([0-9]{2}):([0-9]{2}):([0-9]{2})(\.[0-9]+)?)([Zz]|([+-])([0-9]{2}):([0-9]{2}))";
+
+  try {
+    const matchTime = dateTime.match(regexTime);
+
+    if (matchTime) {
+      return {
+        type: DATE_TIME_TYPES.milliseconds_of_day,
+        value: new Date('1970-01-01T' + matchTime[0]).getTime(),
       };
     }
   } catch (err) {}

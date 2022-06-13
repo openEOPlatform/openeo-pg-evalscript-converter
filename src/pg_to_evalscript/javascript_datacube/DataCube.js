@@ -108,8 +108,8 @@ class DataCube {
         const temporalLabels = this.getDimensionByName(temporalDimension).labels;
         const indices = [];
         for (let i = 0; i < temporalLabels.length; i++) {
-            const date = start && start.type === 'time'
-                ? parse_rfc3339_time(temporalLabels[i])
+            const date = start && start.type === DATE_TIME_TYPES.milliseconds_of_day
+                ? extract_milliseconds_of_day(temporalLabels[i])
                 : parse_rfc3339(temporalLabels[i]);
 
             if (!date) {
@@ -325,8 +325,8 @@ class DataCube {
             throw new Error("Invalid temporal extent. Only one of the boundaries can be null.");
         }
 
-        const start = parse_rfc3339(extent[0]) || parse_rfc3339_time(extent[0]);
-        const end = parse_rfc3339(extent[1]) || parse_rfc3339_time(extent[1]);
+        const start = parse_rfc3339(extent[0]) || extract_milliseconds_of_day(extent[0]);
+        const end = parse_rfc3339(extent[1]) || extract_milliseconds_of_day(extent[1]);
 
         if ((extent[0] !== null && !start) || (extent[1] !== null && !end)) {
             throw new Error("Invalid temporal extent. Boundary must be ISO date string or null.");
