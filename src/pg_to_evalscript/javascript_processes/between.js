@@ -50,7 +50,7 @@ function between(arguments) {
 
     // handle special case where max is interval representing whole day
     // so one day is added and upper limit is excluded
-    if (maxAsISODateString.type === "date" && !exclude_max) {
+    if (maxAsISODateString.type === DATE_TIME_TYPES.date && !exclude_max) {
       const nextDay = new Date(maxAsISODateString.value);
       nextDay.setDate(nextDay.getDate() + 1);
       maxValue = nextDay.toISOString();

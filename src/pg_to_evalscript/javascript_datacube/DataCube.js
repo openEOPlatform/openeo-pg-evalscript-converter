@@ -108,7 +108,7 @@ class DataCube {
         const temporalLabels = this.getDimensionByName(temporalDimension).labels;
         const indices = [];
         for (let i = 0; i < temporalLabels.length; i++) {
-            const date = start && start.type === 'milliseconds-of-day'
+            const date = start && start.type === DATE_TIME_TYPES.milliseconds_of_day
                 ? extract_milliseconds_of_day(temporalLabels[i])
                 : parse_rfc3339(temporalLabels[i]);
 

@@ -1,3 +1,9 @@
+const DATE_TIME_TYPES = {
+  date: "date",
+  date_time: "date-time",
+  milliseconds_of_day: "milliseconds-of-day",
+}
+
 function parse_rfc3339(dateTime, default_h = 0, default_m = 0, default_s = 0) {
   const regexDateTime =
     "^([0-9]{4})-([0-9]{2})-([0-9]{2})([Tt]([0-9]{2}):([0-9]{2}):([0-9]{2})(\.[0-9]+)?)([Zz]|([+-])([0-9]{2}):([0-9]{2}))";
@@ -9,7 +15,7 @@ function parse_rfc3339(dateTime, default_h = 0, default_m = 0, default_s = 0) {
 
     if (matchDateTime || matchDate) {
       return {
-        type: matchDate ? "date" : "date-time",
+        type: matchDate ? DATE_TIME_TYPES.date : DATE_TIME_TYPES.date_time,
         value: new Date(dateTime).toISOString(),
       };
     }
@@ -26,7 +32,7 @@ function extract_milliseconds_of_day(dateTime) {
 
     if (matchTime) {
       return {
-        type: "milliseconds-of-day",
+        type: DATE_TIME_TYPES.milliseconds_of_day,
         value: new Date('1970-01-01T' + matchTime[0]).getTime(),
       };
     }
