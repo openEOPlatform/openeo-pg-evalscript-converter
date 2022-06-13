@@ -49,7 +49,7 @@ def test_array_labels_exceptions(array_labels_process_code, example_input, raise
         if "data" in example_input
         else ""
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': {'d' if 'data' in example_input else 'undefined'}}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': {'d' if 'data' in example_input else 'undefined'}}})"
     run_input_validation(
         array_labels_process_code + additional_js_code_to_run,
         "array_labels",

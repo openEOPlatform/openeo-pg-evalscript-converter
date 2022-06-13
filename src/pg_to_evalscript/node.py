@@ -218,7 +218,8 @@ function overlap_resolver(arguments) {{
 function merge_cubes(arguments) {{
     {overlap_resolver_code}
     {self.load_process_code()}
-    return merge_cubes({{...arguments, overlap_resolver: overlap_resolver }});
+    arguments['overlap_resolver'] = overlap_resolver;
+    return merge_cubes(arguments);
 }}
 """
 
@@ -282,7 +283,8 @@ function apply_dimension(arguments) {{
     }}
 
     {self.load_process_code()}
-    return apply_dimension({{...arguments, process}})
+    arguments['process'] = process;
+    return apply_dimension(arguments)
 }}
 """
 
@@ -376,7 +378,8 @@ function aggregate_temporal(arguments) {{
     }}
 
     {self.load_process_code()}
-    return aggregate_temporal({{...arguments, reducer: reducer}});
+    arguments['reducer'] = reducer;
+    return aggregate_temporal(arguments);
 }}
 """
 

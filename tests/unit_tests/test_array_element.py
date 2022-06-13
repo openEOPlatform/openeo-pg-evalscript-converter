@@ -39,7 +39,7 @@ def test_array_element(array_element_process_code, example_input, expected_outpu
         load_datacube_code()
         + f"const d = {json.dumps(example_input['data'])}; d.labels = {json.dumps(example_input['labels']) if 'labels' in example_input else 'undefined'};"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': d}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': d}})"
     output = run_process(
         array_element_process_code + additional_js_code_to_run,
         "array_element",
@@ -92,7 +92,7 @@ def test_array_element_exceptions(array_element_process_code, example_input, rai
         if "data" in example_input
         else ""
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': {'d' if 'data' in example_input else 'undefined'}}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': {'d' if 'data' in example_input else 'undefined'}}})"
     run_input_validation(
         array_element_process_code + additional_js_code_to_run,
         "array_element",

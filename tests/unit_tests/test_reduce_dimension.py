@@ -89,7 +89,7 @@ def test_reduce_dimension(reduce_dimension_process_code, example_input, expected
     additional_js_code_to_run = (
         load_datacube_code() + f"const cube = new DataCube({example_input['data']}, 'bands', 'temporal', true);"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'reducer':{example_input['reducer']}}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube, 'reducer':{example_input['reducer']}}})"
     output = run_process(
         reduce_dimension_process_code + additional_js_code_to_run,
         "reduce_dimension",
@@ -166,9 +166,9 @@ def test_input_validation(reduce_dimension_process_code, example_input, raises_e
     cube = f"const cube = new DataCube({data}, 'bands', 'temporal', true);" if data else f"const cube=undefined;"
     additional_js_code_to_run = load_datacube_code() + cube
     if reducer:
-        process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'reducer':{reducer}}}"
+        process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube, 'reducer':{reducer}}})"
     else:
-        process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube }}"
+        process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube }})"
 
     run_input_validation(
         reduce_dimension_process_code + additional_js_code_to_run,

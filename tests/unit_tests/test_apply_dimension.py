@@ -157,7 +157,7 @@ def test_apply_dimension(apply_dimension_process_code, example_input, expected_r
     additional_js_code_to_run = (
         load_datacube_code() + f"const cube = new DataCube({example_input['data']}, 'bands', 'temporal', true);"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'process':{example_input['process']}}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube, 'process':{example_input['process']}}})"
     output = run_process(
         apply_dimension_process_code + additional_js_code_to_run,
         "apply_dimension",
@@ -233,9 +233,9 @@ def test_input_validation(apply_dimension_process_code, example_input, raises_ex
     cube = f"const cube = new DataCube({data}, 'bands', 'temporal', true);" if data else f"const cube=undefined;"
     additional_js_code_to_run = load_datacube_code() + cube
     if process:
-        process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'process':{process}}}"
+        process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube, 'process':{process}}})"
     else:
-        process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube }}"
+        process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube }})"
 
     run_input_validation(
         apply_dimension_process_code + additional_js_code_to_run,
