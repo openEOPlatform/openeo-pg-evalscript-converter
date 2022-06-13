@@ -4,7 +4,7 @@ import pytest
 
 from tests.utils import load_process_code, run_process, run_input_validation
 
-1,2,8,5,0,4,7,9,10,6,3
+
 @pytest.fixture
 def order_process_code():
     return load_process_code("order")
