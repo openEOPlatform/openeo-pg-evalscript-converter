@@ -74,7 +74,7 @@ def test_filter_bands(filter_bands_process_code, example_input, expected_output)
         load_datacube_code()
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube}})"
     output = run_process(
         filter_bands_process_code + additional_js_code_to_run,
         "filter_bands",
@@ -130,7 +130,7 @@ def test_filter_bands_exceptions(filter_bands_process_code, example_input, raise
         load_datacube_code()
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true);"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube}})"
     run_input_validation(
         filter_bands_process_code + additional_js_code_to_run,
         "filter_bands",

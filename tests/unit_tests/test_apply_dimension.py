@@ -91,13 +91,73 @@ def apply_dimension_process_code():
             },
             [3, 6, 21, 28, 55, 66],
         ),
+        (
+            {
+                "data": [
+                    {"B01": 1, "B02": 2},
+                    {"B01": 3, "B02": 4},
+                    {"B01": 5, "B02": 6},
+                ],
+                "process": "({data}) => {return [data[0]]}",
+                "dimension": "bands",
+            },
+            [1, 3, 5],
+        ),
+        (
+            {
+                "data": [
+                    {"B01": 1, "B02": 2},
+                    {"B01": 3, "B02": 4},
+                    {"B01": 5, "B02": 6},
+                ],
+                "process": "({data}) => {return [data[0]]}",
+                "dimension": "temporal",
+            },
+            [1, 2],
+        ),
+        (
+            {
+                "data": [
+                    {"B01": 1, "B02": 2},
+                    {"B01": 3, "B02": 4},
+                    {"B01": 5, "B02": 6},
+                ],
+                "process": "({data}) => {return [data[1]]}",
+                "dimension": "bands",
+            },
+            [2, 4, 6],
+        ),
+        (
+            {
+                "data": [
+                    {"B01": 1, "B02": 2},
+                    {"B01": 3, "B02": 4},
+                    {"B01": 5, "B02": 6},
+                ],
+                "process": "({data}) => {return [data[2]]}",
+                "dimension": "temporal",
+            },
+            [5, 6],
+        ),
+        (
+            {
+                "data": [
+                    {"B01": 1, "B02": 2},
+                    {"B01": 3, "B02": 4},
+                    {"B01": 5, "B02": 6},
+                ],
+                "process": "({data}) => {return [data[2], data[0]]}",
+                "dimension": "temporal",
+            },
+            [5, 6, 1, 2],
+        ),
     ],
 )
 def test_apply_dimension(apply_dimension_process_code, example_input, expected_result):
     additional_js_code_to_run = (
         load_datacube_code() + f"const cube = new DataCube({example_input['data']}, 'bands', 'temporal', true);"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'process':{example_input['process']}}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube, 'process':{example_input['process']}}})"
     output = run_process(
         apply_dimension_process_code + additional_js_code_to_run,
         "apply_dimension",
@@ -117,8 +177,8 @@ def test_apply_dimension(apply_dimension_process_code, example_input, expected_r
                 "process": "({data})=>1",
                 "dimension": "bands",
             },
-            False,
-            None,
+            True,
+            "NOT_ARRAY",
         ),
         (
             {
@@ -173,9 +233,9 @@ def test_input_validation(apply_dimension_process_code, example_input, raises_ex
     cube = f"const cube = new DataCube({data}, 'bands', 'temporal', true);" if data else f"const cube=undefined;"
     additional_js_code_to_run = load_datacube_code() + cube
     if process:
-        process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'process':{process}}}"
+        process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube, 'process':{process}}})"
     else:
-        process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube }}"
+        process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube }})"
 
     run_input_validation(
         apply_dimension_process_code + additional_js_code_to_run,

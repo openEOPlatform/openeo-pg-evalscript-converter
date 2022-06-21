@@ -252,7 +252,7 @@ def test_ndvi(ndvi_code, example_input, expected_output):
         load_datacube_code()
         + f"const cube = new DataCube({example_input['data']}, 'bands', 't', true, {bands_metadata});"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube}})"
     output = run_process(ndvi_code + js_code, "ndvi", process_arguments)
     output = json.loads(output)
     assert output == expected_output
@@ -429,5 +429,5 @@ def test_input_validation(ndvi_code, example_input, additional_js_code_specific_
         + f"let cube = new DataCube({example_input['data']}, 'bands', 't', true, {bands_metadata});"
         + (additional_js_code_specific_to_case or "")
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube}})"
     run_input_validation(ndvi_code + js_code, "ndvi", process_arguments, raises_exception, error_name)

@@ -260,7 +260,7 @@ def test_filter_temporal(filter_temporal_process_code, data, scenes, example_inp
     additional_js_code_to_run = (
         load_datacube_code() + f"const cube = new DataCube({data}, 'bands_name', 'temporal_name', true, [], {scenes});"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube, 'scenes': {scenes}}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube, 'scenes': {scenes}}})"
     output = run_process(
         filter_temporal_process_code + additional_js_code_to_run,
         "filter_temporal",
@@ -460,7 +460,7 @@ def test_filter_temporal_exceptions(filter_temporal_process_code, example_input,
         load_datacube_code()
         + f"const cube = new DataCube({example_input['data']}, 'bands_name', 'temporal_name', true, [], {example_input['scenes']});"
     )
-    process_arguments = f"{{...{json.dumps(example_input)}, 'data': cube}}"
+    process_arguments = f"Object.assign({json.dumps(example_input)}, {{'data': cube}})"
     run_input_validation(
         filter_temporal_process_code + additional_js_code_to_run,
         "filter_temporal",
