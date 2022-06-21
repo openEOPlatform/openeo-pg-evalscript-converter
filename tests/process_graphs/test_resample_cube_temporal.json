@@ -14,7 +14,7 @@
         "2022-02-01"
       ],
       "bands": [
-        "B01"
+        "B01", "B02"
       ]
     }
   },
@@ -63,6 +63,19 @@
       "dimension": "t"
     }
   },
+  "rename_labels1": {
+    "process_id": "rename_labels",
+    "arguments": {
+      "data": {
+        "from_node": "filter_every_second"
+      },
+      "dimension": "t",
+      "target": [
+        "2022-01-03",
+        "2022-01-20"
+      ]
+    }
+  },
   "resample": {
     "process_id": "resample_cube_temporal",
     "arguments": {
@@ -70,8 +83,9 @@
         "from_node": "loadco1"
       },
       "target": {
-        "from_node": "filter_every_second"
-      }
+        "from_node": "rename_labels1"
+      },
+      "valid_within": 4
     }
   },
   "saveresult1": {
