@@ -171,6 +171,22 @@ def test_convertable_process_graphs(pg_name, example_input, expected_output):
             ],
             [3, 3, 3, None, None, None, None, None, None, 1, 1, 1],
         ),
+        (
+            "test_resample_cube_temporal",
+            [
+                {"B01": 0, "B02": 9},
+                {"B01": 1, "B02": 8},
+                {"B01": 2, "B02": 7},
+                {"B01": 3, "B02": 6},
+            ],
+            [
+                {"date": "2022-01-01T00:00:00.000Z"},
+                {"date": "2022-01-07T00:00:00.000Z"},
+                {"date": "2022-01-15T00:00:00.000Z"},
+                {"date": "2022-01-28T00:00:00.000Z"},
+            ],
+            [0, 9, None, None],
+        ),
     ],
 )
 def test_process_graphs_with_scenes(pg_name, example_input, scenes, expected_output):
