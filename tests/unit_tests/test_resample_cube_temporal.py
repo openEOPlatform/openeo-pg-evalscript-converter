@@ -963,8 +963,6 @@ def test_mask_exceptions(
 
     process_arguments = f"{{" + arguments + f"}}"
 
-    print(arguments)
-
     run_input_validation(
         additional_js_code_to_run + resample_cube_temporal_process_code,
         "resample_cube_temporal",
