@@ -171,7 +171,9 @@ def test_convertable_process_graphs(pg_name, example_input, expected_output):
             ],
             [3, 3, 3, None, None, None, None, None, None, 1, 1, 1],
         ),
-        (
+        (  # resample_cube_temporal: tests for valid_within argument
+            # first pair in expected_output: VALID values from nearest date in the timespan [targetLabel +/- valid_within]
+            # second pair in expected_output: no VALID or INVALID values in the timespan [targetLabel +/- valid_within], return null
             "test_resample_cube_temporal",
             [
                 {"B01": 0, "B02": 9},
@@ -186,6 +188,24 @@ def test_convertable_process_graphs(pg_name, example_input, expected_output):
                 {"date": "2022-01-28T00:00:00.000Z"},
             ],
             [0, 9, None, None],
+        ),
+        (  # resample_cube_temporal: tests for valid_within argument
+            # first pair in expected_output: nearest date has invalid values, use second nearest in the timespan [targetLabel +/- valid_within]
+            # second pair in expected_output: no VALID values in the timespan [targetLabel +/- valid_within], return null
+            "test_resample_cube_temporal",
+            [
+                {"B01": None, "B02": None},
+                {"B01": 1, "B02": 8},
+                {"B01": None, "B02": None},
+                {"B01": None, "B02": None},
+            ],
+            [
+                {"date": "2022-01-01T00:00:00.000Z"},
+                {"date": "2022-01-07T00:00:00.000Z"},
+                {"date": "2022-01-18T00:00:00.000Z"},
+                {"date": "2022-01-22T00:00:00.000Z"},
+            ],
+            [1, 8, None, None],
         ),
     ],
 )

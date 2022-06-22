@@ -1,11 +1,9 @@
 import json
 
 import pytest
-import subprocess
 
 from tests.utils import (
     load_process_code,
-    load_dependency_processes_code,
     load_datacube_code,
     run_process,
     run_input_validation,
@@ -14,9 +12,7 @@ from tests.utils import (
 
 @pytest.fixture
 def resample_cube_temporal_process_code():
-    process_code = load_process_code("resample_cube_temporal")
-    dependency_processes_code = load_dependency_processes_code(["is_valid"])
-    return process_code + dependency_processes_code
+    return load_process_code("resample_cube_temporal")
 
 
 @pytest.fixture
@@ -563,121 +559,8 @@ def construct_datacube():
                 {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
             ],
         ),
-        # tests for checking resample_cube_temporal process with valid_within param
-        # should be in tests/integration_tests/test_integration.py
-        # because the process needs is_valid process
-        # currently solved by naively loading the additional code for the dependency process
-        # data shape
-        # bands:  B1, B2
-        # date 1: 1, 11,
-        # date 2: 2, 12,
-        # date 3: 3, 13,
-        (  # valid_within: nearest date has invalid values, but there are valid values within timespan [targetLabel +/- valid_within]
-            [None, None, 3, 11, None, None],
-            [2, 3],
-            [
-                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
-                {
-                    "labels": ["2022-01-02", "2022-01-07", "2022-01-11"],
-                    "name": "t",
-                    "type": "temporal",
-                },
-            ],
-            [1, 2],
-            [2, 1],
-            [
-                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
-                {
-                    "labels": ["2022-01-08"],
-                    "name": "t",
-                    "type": "temporal",
-                },
-            ],
-            None,
-            10,
-            [3, 11],
-            [2, 1],
-            [
-                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
-                {
-                    "labels": ["2022-01-08"],
-                    "name": "t",
-                    "type": "temporal",
-                },
-            ],
-        ),
-        (  # valid_within: no VALID values in the timespan [targetLabel +/- valid_within]
-            [None, None, 3, 11, None, None],
-            [2, 3],
-            [
-                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
-                {
-                    "labels": ["2022-01-02", "2022-01-07", "2022-01-11"],
-                    "name": "t",
-                    "type": "temporal",
-                },
-            ],
-            [1, 2],
-            [2, 1],
-            [
-                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
-                {
-                    "labels": ["2022-01-08"],
-                    "name": "t",
-                    "type": "temporal",
-                },
-            ],
-            None,
-            2,
-            [None, None],
-            [2, 1],
-            [
-                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
-                {
-                    "labels": ["2022-01-08"],
-                    "name": "t",
-                    "type": "temporal",
-                },
-            ],
-        ),
-        # data shape
-        # bands:  B1, B2
-        # date 1: 1, 11,
-        # date 2: 2, 12,
-        (  # valid_within: no VALID or INVALID values in the timespan [targetLabel +/- valid_within]
-            [1, 2, 11, 12],
-            [2, 2],
-            [
-                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
-                {
-                    "labels": ["2022-01-01", "2022-02-01"],
-                    "name": "t",
-                    "type": "temporal",
-                },
-            ],
-            [1, 2],
-            [2, 1],
-            [
-                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
-                {
-                    "labels": ["2022-01-15"],
-                    "name": "t",
-                    "type": "temporal",
-                },
-            ],
-            None,
-            7,
-            [None, None],
-            [2, 1],
-            [
-                {"labels": ["B01", "B02"], "name": "b", "type": "bands"},
-                {
-                    "labels": ["2022-01-15"],
-                    "name": "t",
-                    "type": "temporal",
-                },
-            ],
-        ),
+        # tests for checking resample_cube_temporal process with valid_within argument are
+        # in tests/integration_tests/test_integration.py because the process needs is_valid process
     ],
 )
 def test_resample_cube_temporal(
