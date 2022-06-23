@@ -82,6 +82,7 @@ class Node:
                 "aggregate_temporal_period": AggregateTemporalPeriodNode,
                 "apply_dimension": ApplyDimensionNode,
                 "aggregate_temporal": AggregateTemporalNode,
+                "resample_cube_temporal": ResampleCubeTemporalNode,
             }
             if class_types_for_process.get(process_id):
                 self.__class__ = class_types_for_process[process_id]
@@ -381,6 +382,20 @@ function aggregate_temporal(arguments) {{
     arguments['reducer'] = reducer;
     return aggregate_temporal(arguments);
 }}
+"""
+
+
+class ResampleCubeTemporalNode(Node):
+    def write_process(self):
+        newline = "\n"
+        tab = "\t"
+        return f"""
+function resample_cube_temporal(arguments) {{
+    {pkgutil.get_data("pg_to_evalscript", f"{self.process_definitions_directory}/is_valid.js").decode("utf-8")}
+
+    {self.load_process_code()}
+    return resample_cube_temporal(arguments);
+    }}
 """
 
 

@@ -3,6 +3,8 @@ class DataCube {
     // bands_dimension_name: name  to use for the default bands dimension
     // temporal_dimension_name: name to use for the default temporal dimension
     // fromSamples: boolean, if true `data` is expected to be in format as argument `samples` passed to `evaluatePixel` in an evalscript, else ndarray
+    // bands_metadata:
+    // scenes: `scenes` argument from `evaluatePixel` 
     constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples, bands_metadata, scenes) {
         this.TEMPORAL = "temporal"
         this.BANDS = "bands"
@@ -26,7 +28,7 @@ class DataCube {
         if (scenes) {
             let dates = [];
             for (let scene of scenes) {
-                dates.push(scene.date);
+                dates.push(typeof scene.date === 'string' ? scene.date : scene.date.toISOString());
             }
             this.setDimensionLabels(this.temporal_dimension_name, dates);
         }
