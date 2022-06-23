@@ -1,6 +1,8 @@
 import json
 from collections import defaultdict
 
+from pg_to_evalscript.utils import convert_defaultdict_to_dict
+
 
 def iterate(obj):
     if isinstance(obj, list):
@@ -29,7 +31,7 @@ def get_dependencies(process_graph):
     for node_id, node in process_graph.items():
         node_references = get_referenced_nodes(node["arguments"])
         dependency_graph[node_id].update(node_references)
-    return dependency_graph
+    return convert_defaultdict_to_dict(dependency_graph)
 
 
 def get_entry_points(dependencies):
@@ -53,7 +55,7 @@ def get_dependents(dependencies):
     for node, node_dependencies in dependencies.items():
         for node_dependency in node_dependencies:
             dependents[node_dependency].add(node)
-    return dependents
+    return convert_defaultdict_to_dict(dependents)
 
 
 def get_execution_order(dependencies, dependents):
