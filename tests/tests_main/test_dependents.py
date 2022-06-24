@@ -3,7 +3,6 @@ from collections import defaultdict
 import pytest
 
 from pg_to_evalscript.process_graph_utils import get_execution_order
-from tests.utils import get_process_graph_json
 
 
 def generate_default_dict_from_dict(d):
