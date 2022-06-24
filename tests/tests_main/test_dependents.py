@@ -13,7 +13,7 @@ def generate_default_dict_from_dict(d):
 
 
 @pytest.mark.parametrize(
-    "dependency_graph,dependents,expected_exection_order",
+    "dependency_graph,dependents,possible_exection_orders",
     [
         (
             generate_default_dict_from_dict(
@@ -33,7 +33,7 @@ def generate_default_dict_from_dict(d):
                     "resample": {"saveresult1"},
                 }
             ),
-            ["loadco1", "filter_every_second", "rename_labels1", "resample", "saveresult1"],
+            [["loadco1", "filter_every_second", "rename_labels1", "resample", "saveresult1"]],
         ),
         (
             generate_default_dict_from_dict(
@@ -53,10 +53,35 @@ def generate_default_dict_from_dict(d):
                     "resample": {"saveresult1"},
                 }
             ),
-            ["loadco1", "filter_every_second", "rename_labels1", "resample", "saveresult1"],
+            [["loadco1", "filter_every_second", "rename_labels1", "resample", "saveresult1"]],
+        ),
+        (
+            generate_default_dict_from_dict(
+                {
+                    "loadco1": set(),
+                    "filter_every_second": {"loadco1"},
+                    "filter_labels": {"loadco1"},
+                    "rename_labels1": {"filter_every_second", "filter_labels"},
+                    "resample": {"rename_labels1", "loadco1"},
+                    "saveresult1": {"resample"},
+                }
+            ),
+            generate_default_dict_from_dict(
+                {
+                    "loadco1": {"filter_every_second", "resample", "filter_labels"},
+                    "filter_every_second": {"rename_labels1"},
+                    "filter_labels": {"rename_labels1"},
+                    "rename_labels1": {"resample"},
+                    "resample": {"saveresult1"},
+                }
+            ),
+            [
+                ["loadco1", "filter_every_second", "filter_labels", "rename_labels1", "resample", "saveresult1"],
+                ["loadco1", "filter_labels", "filter_every_second", "rename_labels1", "resample", "saveresult1"],
+            ],
         ),
     ],
 )
-def test_execution_order(dependency_graph, dependents, expected_exection_order):
+def test_execution_order(dependency_graph, dependents, possible_exection_orders):
     execution_order = get_execution_order(dependency_graph, dependents)
-    assert execution_order == expected_exection_order
+    assert execution_order in possible_exection_orders
