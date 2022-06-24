@@ -61,12 +61,7 @@ def get_execution_order(dependencies, dependents):
     execution_order = [entry_point for entry_point in entry_points]
     remaining_nodes = set(dependencies.keys()).difference(execution_order)
 
-    i = 0
-
     while len(remaining_nodes) > 0:
-        if i > 20:
-            break
-        i += 1
         for node in execution_order:
             for node_dependency in dependents[node]:
                 if node_dependency in execution_order:
@@ -76,9 +71,6 @@ def get_execution_order(dependencies, dependents):
                 if can_be_executed:
                     execution_order.append(node_dependency)
                     remaining_nodes.remove(node_dependency)
-
-                else:
-                    break
     return execution_order
 
 
