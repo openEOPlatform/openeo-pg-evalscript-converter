@@ -7,10 +7,18 @@ from tests.utils import load_datacube_code, with_stdout_call, run_javascript
 
 @pytest.fixture
 def datacube_code():
-    def wrapped(samples, bands_dimension_name="b", temporal_dimension_name="t", from_samples=True, json_samples=True):
+    def wrapped(
+        samples,
+        bands_dimension_name="b",
+        temporal_dimension_name="t",
+        from_samples=True,
+        json_samples=True,
+        bands_metadata=[],
+        scenes=[],
+    ):
         return (
             load_datacube_code()
-            + f"\nconst datacube = new DataCube({json.dumps(samples) if json_samples else samples}, '{bands_dimension_name}', '{temporal_dimension_name}', {json.dumps(from_samples)})"
+            + f"\nconst datacube = new DataCube({json.dumps(samples) if json_samples else samples}, '{bands_dimension_name}', '{temporal_dimension_name}', {json.dumps(from_samples)}, {json.dumps(bands_metadata)}, {json.dumps(scenes)})"
         )
 
     return wrapped
@@ -389,3 +397,46 @@ def test_set_in_dimension(datacube_code, example_data, example_data_shape, axis,
     output = json.loads(output)
     assert output["data"]["data"] == expected_data
     assert output["data"].get("shape") == example_data_shape
+
+
+@pytest.mark.parametrize(
+    "scenes,expected_temporal_labels",
+    [
+        ({"bandBuffers": []}, []),
+        (
+            [
+                {
+                    "date": "2022-07-04T10:09:39.000Z",
+                    "tileId": 21257937,
+                    "tileOriginalId": "S2A_OPER_MSI_L2A_TL_ATOS_20220704T141618_A036727_T32TQL_N04.00",
+                    "orbitId": 66338,
+                    "productId": "S2A_MSIL2A_20220704T100041_N0400_R122_T32TQL_20220704T141618",
+                    "__idx": 0,
+                    "bandBuffers": [{}, {}, {}, {}],
+                },
+                {
+                    "date": "2022-07-04T10:09:39.000Z",
+                    "tileId": 21257552,
+                    "tileOriginalId": "S2A_OPER_MSI_L2A_TL_ATOS_20220704T141618_A036727_T33TTF_N04.00",
+                    "orbitId": 66338,
+                    "productId": "S2A_MSIL2A_20220704T100041_N0400_R122_T33TTF_20220704T141618",
+                    "__idx": 1,
+                    "bandBuffers": [{}, {}, {}, {}],
+                },
+            ],
+            ["2022-07-04T10:09:39.000Z", "2022-07-04T10:09:39.000Z"],
+        ),
+        (
+            [{"date": "2022-07-04T00:00:00.000Z", "__idx": 0, "bandBuffers": [{}, {}, {}, {}]}],
+            ["2022-07-04T00:00:00.000Z"],
+        ),
+    ],
+)
+def test_scenes(datacube_code, scenes, expected_temporal_labels):
+    testing_code = datacube_code(
+        f"ndarray([1, 2, 3, 4, 5, 6, 7, 8],[2, 2, 2])", from_samples=False, json_samples=False, scenes=scenes
+    ) + with_stdout_call("datacube")
+
+    output = run_javascript(testing_code)
+    output = json.loads(output)
+    assert next(dim for dim in output["dimensions"] if dim["name"] == "t")["labels"] == expected_temporal_labels
