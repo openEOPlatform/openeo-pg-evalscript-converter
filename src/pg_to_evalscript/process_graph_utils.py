@@ -61,7 +61,15 @@ def get_execution_order(dependencies, dependents):
     execution_order = [entry_point for entry_point in entry_points]
     remaining_nodes = set(dependencies.keys()).difference(execution_order)
 
+    prev_n_remaining_nodes = None
+
     while len(remaining_nodes) > 0:
+        if len(remaining_nodes) == prev_n_remaining_nodes:
+            raise RuntimeError(
+                f"Execution order of process graph nodes cannot be constructed. Make sure the process graph is valid. Nodes that cannot be placed in the execution order: {remaining_nodes}."
+            )
+        prev_n_remaining_nodes = len(remaining_nodes)
+
         for node in execution_order:
             for node_dependency in dependents[node]:
                 if node_dependency in execution_order:
