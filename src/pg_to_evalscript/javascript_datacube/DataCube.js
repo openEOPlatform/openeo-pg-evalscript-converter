@@ -25,7 +25,7 @@ class DataCube {
         } else {
             this.data = data;
         }
-        if (scenes) {
+        if (Array.isArray(scenes)) {
             let dates = [];
             for (let scene of scenes) {
                 dates.push(typeof scene.date === 'string' ? scene.date : scene.date.toISOString());
