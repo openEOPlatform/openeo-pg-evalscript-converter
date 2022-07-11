@@ -85,3 +85,37 @@ def generate_default_dict_from_dict(d):
 def test_execution_order(dependency_graph, dependents, possible_exection_orders):
     execution_order = get_execution_order(dependency_graph, dependents)
     assert execution_order in possible_exection_orders
+
+
+@pytest.mark.parametrize(
+    "dependency_graph,dependents,error",
+    [
+        (
+            generate_default_dict_from_dict(
+                {
+                    "loadco1": set(),
+                    "filterbbox1": {"loadco1"},
+                    "ndv1": {"filterbbox1"},
+                    "filterbbox2": {"ndvi1"},
+                    "saveres1": {"filterbbox2"},
+                }
+            ),
+            generate_default_dict_from_dict(
+                {
+                    "loadco1": {"filterbbox1"},
+                    "filterbbox1": {"ndv1"},
+                    "ndvi1": {"filterbbox2"},
+                    "filterbbox2": {"saveres1"},
+                }
+            ),
+            "Execution order of process graph nodes cannot be constructed.",
+        )
+    ],
+)
+def test_execution_order_error(dependency_graph, dependents, error):
+    try:
+        execution_order = get_execution_order(dependency_graph, dependents)
+    except Exception as e:
+        assert error in str(e)
+    else:
+        assert False, "Test expected an error, but no exception was raised."
