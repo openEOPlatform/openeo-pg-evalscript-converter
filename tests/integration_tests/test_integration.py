@@ -338,7 +338,7 @@ def test_ndvi(process_graph,expected_n_output_bands):
     """
     process_graph = get_process_graph_json(process_graph)
     result = convert_from_process_graph(
-        process_graph, bands_metadata=bands_metadata, encode_result=False
+        process_graph, encode_result=False
     )
     evalscript = result[0]["evalscript"].write()
     try:
