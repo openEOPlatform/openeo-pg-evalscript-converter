@@ -44,6 +44,8 @@ def validate_nodes(
                 dependents[node_id],
                 0,
                 user_defined_processes=user_defined_processes,
+                temporal_dimension_name=temporal_dimension_name,
+                bands_dimension_name=bands_dimension_name,
             )
         except ProcessDefinitionMissing as e:
             valid = False
@@ -251,6 +253,8 @@ def generate_nodes_from_process_graph(
             dependents[node_id],
             level,
             user_defined_processes=user_defined_processes,
+            temporal_dimension_name=temporal_dimension_name,
+            bands_dimension_name=bands_dimension_name,
         )
         nodes.append(node)
     return nodes, input_bands, initial_data_name

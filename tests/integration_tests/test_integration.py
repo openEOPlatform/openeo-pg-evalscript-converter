@@ -8,6 +8,7 @@ from tests.utils import (
     run_evalscript,
     get_defined_processes_from_files,
     get_evalscript_input_object,
+    get_n_output_bands
 )
 from tests.integration_tests.fixtures import user_defined_processes
 
@@ -316,3 +317,32 @@ def test_user_defined_processes(process_graph, example_input, expected_output):
     output = json.loads(output)
 
     assert pytest.approx(output) == expected_output
+
+
+@pytest.mark.parametrize(
+    "process_graph,expected_n_output_bands",
+    [
+        (
+            "test_ndvi_with_target_band",
+            3,
+        ),
+        (
+            "test_ndvi_without_target_band",
+            1,
+        )
+    ],
+)
+def test_ndvi(process_graph,expected_n_output_bands):
+    """
+    Sentinel Hub Batch runs pre-processing analysis on empty input. Evalscripts should therefore pass without error
+    """
+    process_graph = get_process_graph_json(process_graph)
+    result = convert_from_process_graph(
+        process_graph, bands_metadata=bands_metadata, encode_result=False
+    )
+    evalscript = result[0]["evalscript"].write()
+    try:
+        output = get_n_output_bands(evalscript)
+        assert output["bands"] == expected_n_output_bands
+    except Exception as e:
+        raise Exception(e.stderr)
