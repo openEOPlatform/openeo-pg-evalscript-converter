@@ -444,7 +444,7 @@ class DataCube {
     }
 
     clone() {
-        const copy = new DataCube(ndarray(this.data.data.slice(), this.data.shape), this.bands_dimension_name, this.temporal_dimension_name)
+        const copy = new DataCube(ndarray(this.data.data.slice(), this.data.shape), this.bands_dimension_name, this.temporal_dimension_name, false, this.bands_metadata)
         const newDimensions = []
         for (let dim of this.dimensions) {
             newDimensions.push({
