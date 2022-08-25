@@ -37,6 +37,13 @@ def run_process(process_code, process_name, example_input):
 def get_evalscript_input_object(evalscript):
     return json.loads(run_javascript(evalscript + with_stdout_call("setup()")))
 
+def get_n_output_bands(evalscript,n_scenes=1):
+    return json.loads(run_javascript(evalscript + f"""
+const outputs={{'default':{{'bands':1}}}};
+const collections = {{"scenes": {{"length":{n_scenes}}}}};
+updateOutput(outputs,collections);\n"""
+    + with_stdout_call("outputs ['default']")
+    ))
 
 def run_javascript(javascript_code):
     if platform.system() == "Windows":
