@@ -31,8 +31,12 @@ class Node:
         level,
         process_definitions_directory="javascript_processes",
         user_defined_processes={},
+        temporal_dimension_name="bands",
+        bands_dimension_name="t",
     ):
         self.user_defined_processes = user_defined_processes
+        self.temporal_dimension_name = temporal_dimension_name
+        self.bands_dimension_name = bands_dimension_name
         self.set_appropriate_class(process_id)
         self.variable_wrapper_string = uuid.uuid4().hex
         self.node_id = node_id
@@ -83,6 +87,7 @@ class Node:
                 "apply_dimension": ApplyDimensionNode,
                 "aggregate_temporal": AggregateTemporalNode,
                 "resample_cube_temporal": ResampleCubeTemporalNode,
+                "ndvi": NDVINode,
             }
             if class_types_for_process.get(process_id):
                 self.__class__ = class_types_for_process[process_id]
@@ -412,3 +417,24 @@ function {self.process_id}(arguments) {{
     return {self.child_nodes[-1].node_varname_prefix + self.child_nodes[-1].node_id};
 }}
 """
+
+
+class NDVINode(Node):
+    def get_dimensions_change(self, dimensions_of_inputs):
+        """
+        If `target_band` is not set, bands dimension is dropped.
+        If `target_band` is set, the size of bands dimension increased by 1
+        https://docs.openeo.cloud/processes/#ndvi
+        """
+        is_target_band_set = bool(self._original_arguments.get("target_band"))
+        output_dimensions = []
+
+        for dim in dimensions_of_inputs[0]:
+            if dim["name"] == self.bands_dimension_name:
+                if is_target_band_set:
+                    dim["size"] += 1
+                else:
+                    continue
+            output_dimensions.append(dim)
+
+        return output_dimensions
