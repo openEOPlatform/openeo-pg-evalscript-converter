@@ -1,0 +1,77 @@
+{
+  "1": {
+    "process_id": "load_collection",
+    "arguments": {
+      "bands": [
+        "B04",
+        "B08"
+      ],
+      "id": "SENTINEL2_L2A_SENTINELHUB",
+      "spatial_extent": {
+        "west": 14.565337060618148,
+        "east": 14.578437275398315,
+        "south": 45.98989222284456,
+        "north": 45.9986689172122
+      },
+      "temporal_extent": [
+        "2022-03-01T00:00:00Z",
+        "2022-03-31T00:00:00Z"
+      ],
+      "properties": {}
+    }
+  },
+  "2": {
+    "process_id": "save_result",
+    "arguments": {
+      "data": {
+        "from_node": "filter3"
+      },
+      "format": "GTIFF"
+    },
+    "result": true
+  },
+  "ndvi4": {
+    "process_id": "ndvi",
+    "arguments": {
+      "data": {
+        "from_node": "reduce4"
+      },
+      "nir": "B08",
+      "red": "B04",
+      "target_band": "NDVI"
+    }
+  },
+  "filter3": {
+    "process_id": "filter_bands",
+    "arguments": {
+      "data": {
+        "from_node": "ndvi4"
+      },
+      "bands": [
+        "NDVI"
+      ]
+    }
+  },
+  "reduce4": {
+    "process_id": "reduce_dimension",
+    "arguments": {
+      "data": {
+        "from_node": "1"
+      },
+      "reducer": {
+        "process_graph": {
+          "mean1": {
+            "process_id": "mean",
+            "arguments": {
+              "data": {
+                "from_parameter": "data"
+              }
+            },
+            "result": true
+          }
+        }
+      },
+      "dimension": "t"
+    }
+  }
+}

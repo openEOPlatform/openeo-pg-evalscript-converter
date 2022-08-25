@@ -26,6 +26,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {"labels": ["2020-005"], "name": "t", "type": "temporal"},
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
@@ -46,6 +47,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {"labels": ["2020-005", "2020-006", "2020-007"], "name": "t", "type": "temporal"},
                     {"labels": ["B01", "B02"], "name": "bands", "type": "bands"},
@@ -66,6 +68,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2020-01-05-00", "2020-01-05-01", "2020-01-05-02", "2020-01-05-03", "2020-01-05-04"],
@@ -111,6 +114,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2020-01-05-00", "2020-01-05-01"],
@@ -140,6 +144,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2020-01", "2020-02", "2020-03", "2020-04", "2020-05", "2020-06", "2020-07"],
@@ -169,6 +174,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2020-01", "2020-02", "2020-03", "2020-04", "2020-05"],
@@ -198,6 +204,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2020-01", "2020-02"],
@@ -227,6 +234,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2020-djf"],
@@ -256,6 +264,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2020-djf", "2020-mam"],
@@ -285,6 +294,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2020-djf", "2020-mam"],
@@ -314,6 +324,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2020-ndjfma"],
@@ -343,6 +354,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2020-ndjfma"],
@@ -372,6 +384,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2020-ndjfma", "2020-mjjaso"],
@@ -401,6 +414,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2020-03"],
@@ -430,6 +444,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2020-02"],
@@ -459,6 +474,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2020-01"],
@@ -488,6 +504,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2020"],
@@ -517,6 +534,7 @@ def aggregate_temporal_period_process_code():
                 "TEMPORAL": "temporal",
                 "bands_dimension_name": "bands",
                 "temporal_dimension_name": "t",
+                "bands_metadata": [],
                 "dimensions": [
                     {
                         "labels": ["2021"],

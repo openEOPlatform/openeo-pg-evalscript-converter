@@ -73,6 +73,7 @@ class DataCube {
     makeArrayFromSamples(samples) {
         if (Array.isArray(samples)) {
             if (samples.length === 0) {
+                this._setDimensionLabelsIfEmpty(this.bands_dimension_name, INPUT_BANDS) // INPUT_BANDS is the default global var with all input band names
                 return ndarray([], [0, 0])
             }
             this._setDimensionLabelsIfEmpty(this.bands_dimension_name, Object.keys(samples[0]))
@@ -443,7 +444,7 @@ class DataCube {
     }
 
     clone() {
-        const copy = new DataCube(ndarray(this.data.data.slice(), this.data.shape), this.bands_dimension_name, this.temporal_dimension_name)
+        const copy = new DataCube(ndarray(this.data.data.slice(), this.data.shape), this.bands_dimension_name, this.temporal_dimension_name, false, this.bands_metadata)
         const newDimensions = []
         for (let dim of this.dimensions) {
             newDimensions.push({

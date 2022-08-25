@@ -8,63 +8,76 @@ from tests.utils import (
     run_evalscript,
     get_defined_processes_from_files,
     get_evalscript_input_object,
-    get_n_output_bands
+    get_n_output_bands,
 )
-from tests.integration_tests.fixtures import user_defined_processes
+from tests.integration_tests.fixtures import user_defined_processes, bands_metadata
 
 
 @pytest.mark.parametrize(
-    "pg_name,example_input,expected_output",
+    "pg_name,example_input,bands_metadata,expected_output",
     [
-        ("test_graph_1", [{"B01": 3, "B02": 3}, {"B01": 5, "B02": 1}], [4, 2]),
-        ("reduce_mean_one_band", [{"B01": 3}, {"B01": 5}], [4]),
-        ("reduce_mean_one_band", [{"B01": 3}], [3]),
-        ("reduce_mean_one_band", [{"B01": 3}, {"B01": 5}, {"B01": 10}, {"B01": 6}], [6]),
-        ("test_short_graph", [{"B01": 3, "B02": 2}, {"B01": 5, "B02": 1}], [3, 2, 5, 1]),
-        ("test_apply_absolute", [{"B01": 0.1, "B02": -0.15}, {"B01": 0, "B02": 2}], [0.1, 0.15, 0, 2]),
+        ("test_graph_1", [{"B01": 3, "B02": 3}, {"B01": 5, "B02": 1}], None, [4, 2]),
+        ("reduce_mean_one_band", [{"B01": 3}, {"B01": 5}], None, [4]),
+        ("reduce_mean_one_band", [{"B01": 3}], None, [3]),
+        ("reduce_mean_one_band", [{"B01": 3}, {"B01": 5}, {"B01": 10}, {"B01": 6}], None, [6]),
+        ("test_short_graph", [{"B01": 3, "B02": 2}, {"B01": 5, "B02": 1}], None, [3, 2, 5, 1]),
+        ("test_apply_absolute", [{"B01": 0.1, "B02": -0.15}, {"B01": 0, "B02": 2}], None, [0.1, 0.15, 0, 2]),
         (
             "test_apply_math",
             [{"B01": 0, "B02": 1}, {"B01": -1, "B02": 0.5}, {"B01": None, "B02": None}],
+            None,
             [-0.75, 0, -1.5, -0.375, None, None],
         ),
         (
             "test_apply_linear_scale_range",
             [{"B01": 0.5, "B02": 0.75}, {"B01": 0, "B02": 1}, {"B01": -3, "B02": 4}, {"B01": None, "B02": None}],
+            None,
             [1, 1.5, 0, 2, 0, 2, None, None],
         ),
-        ("test_graph_1", [], []),
+        ("test_graph_1", [], None, []),
         (
             "test_mean_of_mean",
             [{"B04": 0, "B08": 1}, {"B04": 2, "B08": 3}, {"B04": 3, "B08": 5}, {"B04": 1, "B08": 4}],
+            None,
             [2.375],
         ),
         (
             "test_count_with_condition",
             [{"B01": 0, "B02": 1}, {"B01": 2, "B02": 3}, {"B01": 4, "B02": 5}, {"B01": None, "B02": None}],
+            None,
             [1, 2],
         ),
         (
             "test_count_without_condition",
             [{"B01": 0, "B02": 1}, {"B01": 2, "B02": 3}, {"B01": 4, "B02": 5}, {"B01": None, "B02": 3}],
+            None,
             [3, 4],
         ),
         (
             "test_array_apply_add",
             [{"B01": 0, "B02": 1, "B03": 2, "B04": 3, "B05": 4, "B06": 5}],
+            None,
             [10, 11, 12, 13, 14, 15],
         ),
-        ("test_array_filter", [{"B01": 0}, {"B01": 1}, {"B01": 2}, {"B01": 4}, {"B01": 5}], [11]),
+        ("test_array_filter", [{"B01": 0}, {"B01": 1}, {"B01": 2}, {"B01": 4}, {"B01": 5}], None, [11]),
         (
             "test_apply_dimension_absolute",
             [{"B01": -0.1, "B02": 0.15}, {"B01": 0, "B02": 2}, {"B01": -1, "B02": -2}],
+            None,
             [0.1, 0.15, 0, 2, 1, 2],
         ),
-        ("gee_uc1_pol", [{"VV": 0, "VH": 1}, {"VV": 2, "VH": 3}, {"VV": 4, "VH": 5}, {"VV": 6, "VH": 7}], [3, 4, 1]),
+        (
+            "gee_uc1_pol",
+            [{"VV": 0, "VH": 1}, {"VV": 2, "VH": 3}, {"VV": 4, "VH": 5}, {"VV": 6, "VH": 7}],
+            None,
+            [3, 4, 1],
+        ),
+        ("test_mean_ndvi", [{"B04": 3, "B08": 9}, {"B04": 1, "B08": 7}], bands_metadata, [0.6]),
     ],
 )
-def test_convertable_process_graphs(pg_name, example_input, expected_output):
+def test_convertable_process_graphs(pg_name, example_input, bands_metadata, expected_output):
     process_graph = get_process_graph_json(pg_name)
-    result = convert_from_process_graph(process_graph, encode_result=False)
+    result = convert_from_process_graph(process_graph, bands_metadata=bands_metadata, encode_result=False)
 
     assert len(result) == 1 and result[0]["invalid_node_id"] is None
 
@@ -216,9 +229,9 @@ def test_convertable_process_graphs(pg_name, example_input, expected_output):
             "test_resample_cube_temporal_upsample",
             [
                 # these are used here for target, values for data are at the even indices (filter_temporal)
-                {"B01": 0, "B02": 9}, # used for data
+                {"B01": 0, "B02": 9},  # used for data
                 {"B01": 1, "B02": 8},
-                {"B01": 2, "B02": 7}, # used for data
+                {"B01": 2, "B02": 7},  # used for data
                 {"B01": 3, "B02": 6},
             ],
             [
@@ -320,6 +333,33 @@ def test_user_defined_processes(process_graph, example_input, expected_output):
 
 
 @pytest.mark.parametrize(
+    "process_graph,expected_output",
+    [
+        (
+            "test_ndvi_s2l2a",
+            [],
+        )
+    ],
+)
+def test_empty_input(process_graph, expected_output):
+    """
+    Sentinel Hub Batch runs pre-processing analysis on empty input. Evalscripts should therefore pass without error
+    """
+    process_graph = get_process_graph_json(process_graph)
+    result = convert_from_process_graph(
+        process_graph, user_defined_processes=user_defined_processes, bands_metadata=bands_metadata, encode_result=False
+    )
+    evalscript = result[0]["evalscript"].write()
+    try:
+        output = run_evalscript(evalscript, [], scenes=[])
+        output = json.loads(output)
+
+        assert pytest.approx(output) == expected_output
+    except Exception as e:
+        raise Exception(e.stderr)
+
+
+@pytest.mark.parametrize(
     "process_graph,expected_n_output_bands",
     [
         (
@@ -329,17 +369,12 @@ def test_user_defined_processes(process_graph, example_input, expected_output):
         (
             "test_ndvi_without_target_band",
             1,
-        )
+        ),
     ],
 )
-def test_ndvi(process_graph,expected_n_output_bands):
-    """
-    Sentinel Hub Batch runs pre-processing analysis on empty input. Evalscripts should therefore pass without error
-    """
+def test_ndvi(process_graph, expected_n_output_bands):
     process_graph = get_process_graph_json(process_graph)
-    result = convert_from_process_graph(
-        process_graph, encode_result=False
-    )
+    result = convert_from_process_graph(process_graph, encode_result=False)
     evalscript = result[0]["evalscript"].write()
     try:
         output = get_n_output_bands(evalscript)

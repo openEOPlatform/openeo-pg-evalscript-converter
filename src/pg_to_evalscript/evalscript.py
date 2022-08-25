@@ -61,6 +61,7 @@ function setup() {{
   }};
 }}
 {self.write_update_output()}
+{self.write_runtime_global_constants()}
 {self.write_common_definition()}
 {self.write_ndarray_definition()}
 {self.write_datacube_definition()}
@@ -84,6 +85,9 @@ function evaluatePixel(samples, scenes) {{
 
     def write_datacube_creation(self):
         return f"let {self.initial_data_name} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {json.dumps(self.bands_metadata)}, scenes)"
+
+    def write_runtime_global_constants(self):
+        return f"const INPUT_BANDS = {self.input_bands};"
 
     def write_update_output(self):
         if self._output_dimensions is None:

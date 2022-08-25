@@ -59,7 +59,7 @@ def test_makeArrayFromSamples(datacube_code, example_samples, expected_data, exp
 )
 def test_iterateCoords(datacube_code, shape, null_axes, expected_coords):
     testing_code = (
-        datacube_code([])
+        datacube_code([], from_samples=False)
         + f"\nfor(let c of datacube._iterateCoords({json.dumps(shape)}, {json.dumps(null_axes)})) {{console.log(c)}}"
     )
     output = run_javascript(testing_code).decode("utf-8")
