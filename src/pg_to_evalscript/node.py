@@ -237,6 +237,7 @@ function merge_cubes(arguments) {{
         So we set new sizes to the sums for *all* dimensions
         """
         dim_size_sums = defaultdict(int)
+        original_temporal_dimensions = []
 
         for dimensions_of_input in dimensions_of_inputs:
             for dim in dimensions_of_input:
@@ -245,9 +246,14 @@ function merge_cubes(arguments) {{
                 else:
                     dim_size_sums[dim["name"]] = None
 
+                if dim.get("original_temporal"):
+                    original_temporal_dimensions.append(dim["name"])
+
         output_dimensions = []
         for dim in dim_size_sums:
-            output_dimensions.append({"name": dim, "size": dim_size_sums[dim]})
+            output_dimensions.append(
+                {"name": dim, "size": dim_size_sums[dim], "original_temporal": dim in original_temporal_dimensions}
+            )
 
         return output_dimensions
 

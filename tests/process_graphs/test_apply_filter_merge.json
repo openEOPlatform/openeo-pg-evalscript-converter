@@ -1,0 +1,89 @@
+{
+  "apply1": {
+    "arguments": {
+      "data": {
+        "from_node": "loadcollection1"
+      },
+      "process": {
+        "process_graph": {
+          "eq1": {
+            "arguments": {
+              "x": {
+                "from_parameter": "x"
+              },
+              "y": 34
+            },
+            "process_id": "eq",
+            "result": true
+          }
+        }
+      }
+    },
+    "process_id": "apply"
+  },
+  "filtertemporal1": {
+    "arguments": {
+      "data": {
+        "from_node": "apply1"
+      },
+      "extent": [
+        "2000-01-01",
+        "2000-01-02"
+      ]
+    },
+    "process_id": "filter_temporal"
+  },
+  "filtertemporal2": {
+    "arguments": {
+      "data": {
+        "from_node": "apply1"
+      },
+      "extent": [
+        "2018-01-01",
+        "2018-01-02"
+      ]
+    },
+    "process_id": "filter_temporal"
+  },
+  "loadcollection1": {
+    "arguments": {
+      "bands": [
+        "CLC"
+      ],
+      "id": "CORINE_LAND_COVER",
+      "spatial_extent": {
+        "east": 13.396453857421877,
+        "north": 47.19344533938292,
+        "south": 47.00647991252098,
+        "west": 12.284088134765625
+      },
+      "temporal_extent": [
+        "2000-01-01",
+        "2019-04-30"
+      ]
+    },
+    "process_id": "load_collection"
+  },
+  "mergecubes1": {
+    "arguments": {
+      "cube1": {
+        "from_node": "filtertemporal1"
+      },
+      "cube2": {
+        "from_node": "filtertemporal2"
+      }
+    },
+    "process_id": "merge_cubes"
+  },
+  "saveresult1": {
+    "arguments": {
+      "data": {
+        "from_node": "mergecubes1"
+      },
+      "format": "GTiff",
+      "options": {}
+    },
+    "process_id": "save_result",
+    "result": true
+  }
+}
