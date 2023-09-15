@@ -74,16 +74,16 @@ let forUserData = {{}};
 function evaluatePixel(samples, scenes) {{
     {self.write_datacube_creation()}
     {(newline + tab).join([node.write_call() for node in self.nodes])}
-    
+
     forUserData = {{
-        outputDimensions: node_load1.dimensions,
+        outputDimensions: {self.write_output_variable()}.dimensions,
         outputDatacubeMetadata: {{
-            shape: node_load1.data.shape, 
-            stride: node_load1.data.stride, 
-            offset: node_load1.data.offset
+            shape: {self.write_output_variable()}.data.shape, 
+            stride: {self.write_output_variable()}.data.stride, 
+            offset: {self.write_output_variable()}.data.offset
         }}
     }}
-    
+
     const finalOutput = {self.write_output_variable()}{".encodeData()" if self.encode_result else '.flattenToArray()'}
     return Array.isArray(finalOutput) ? finalOutput : [finalOutput];
 }}
