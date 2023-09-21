@@ -66,11 +66,30 @@ function setup() {{
 {self.write_ndarray_definition()}
 {self.write_datacube_definition()}
 {newline.join([node.write_function() for node in self.nodes])}
+
+// this var gets metadata about the dimensions of the datacube for postprocessing
+// it is saved as userdata.json 
+let forUserData = {{}};
+
 function evaluatePixel(samples, scenes) {{
     {self.write_datacube_creation()}
     {(newline + tab).join([node.write_call() for node in self.nodes])}
+
+    forUserData = {{
+        outputDimensions: {self.write_output_variable()}.dimensions,
+        outputDatacubeMetadata: {{
+            shape: {self.write_output_variable()}.data.shape, 
+            stride: {self.write_output_variable()}.data.stride, 
+            offset: {self.write_output_variable()}.data.offset
+        }}
+    }}
+
     const finalOutput = {self.write_output_variable()}{".encodeData()" if self.encode_result else '.flattenToArray()'}
     return Array.isArray(finalOutput) ? finalOutput : [finalOutput];
+}}
+
+function updateOutputMetadata(scenes, inputMetadata, outputMetadata) {{
+  outputMetadata.userData = forUserData;
 }}
 """
 
