@@ -8,4 +8,5 @@ def list_supported_processes():
     supported_processes_with_files = [
         process_definition_file.replace(".js", "") for process_definition_file in process_definition_files
     ]
-    return [*implicitly_supported_processes, *supported_processes_with_files]
+    unique_supported_processes = list(set([*implicitly_supported_processes, *supported_processes_with_files]))
+    return unique_supported_processes
