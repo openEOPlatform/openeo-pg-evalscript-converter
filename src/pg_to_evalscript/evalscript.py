@@ -20,7 +20,7 @@ class Evalscript:
         self,
         input_bands,
         nodes,
-        initial_data_name,
+        initial_data_names,
         n_output_bands=1,
         sample_type="AUTO",
         units=None,
@@ -30,11 +30,11 @@ class Evalscript:
         datacube_definition_directory="javascript_datacube",
         output_dimensions=None,
         encode_result=True,
-        bands_metadata=[],
+        bands_metadata={},
     ):
         self.input_bands = input_bands
         self.nodes = nodes
-        self.initial_data_name = initial_data_name
+        self.initial_data_names = initial_data_names
         self.n_output_bands = n_output_bands
         self.sample_type = sample_type
         self.units = units
@@ -55,7 +55,7 @@ class Evalscript:
 //VERSION=3
 function setup() {{
   return {{
-    input: [{",".join([f"'{band}'" for band in self.input_bands])}],
+    input: [{",".join([f"{datasource_with_bands}" for datasource_with_bands in self.input_bands])}],
     output: {{ bands: {self.n_output_bands}, sampleType: "{self.sample_type}"{f", units: '{self.units}'" if self.units is not None else ''} }},
     mosaicking: "{self.mosaicking}"
   }};
@@ -103,10 +103,14 @@ function updateOutputMetadata(scenes, inputMetadata, outputMetadata) {{
         return pkgutil.get_data("pg_to_evalscript", f"javascript_datacube/ndarray.js").decode("utf-8")
 
     def write_datacube_creation(self):
-        return f"let {self.initial_data_name} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {json.dumps(self.bands_metadata)}, scenes)"
+        datacube_creation = ""
+        for node_id, bands_metadata_for_node in self.bands_metadata.items():
+            datacube_creation += f"let {self.initial_data_names[node_id]} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {json.dumps(bands_metadata_for_node)}, scenes)\n\t"
 
+        return datacube_creation
+    
     def write_runtime_global_constants(self):
-        return f"const INPUT_BANDS = {self.input_bands};"
+        return f"const INPUT_BANDS = {self.input_bands};" # fix this
 
     def write_update_output(self):
         if self._output_dimensions is None:
@@ -131,13 +135,13 @@ function updateOutput(outputs, collection) {{
 
     def write_output_variable(self):
         if len(self.nodes) == 0:
-            return self.initial_data_name
+            return self.initial_data_names.values()[0] # ???
         return self.nodes[-1].node_varname_prefix + self.nodes[-1].node_id
 
     def determine_output_dimensions(self):
         dimensions_of_inputs_per_node = defaultdict(list)
         initial_output_dimensions = [
-            {"name": self.bands_dimension_name, "size": len(self.input_bands) if self.input_bands is not None else 0},
+            {"name": self.bands_dimension_name, "size": len(self.input_bands) if self.input_bands is not None else 0}, # fix this
             {"name": self.temporal_dimension_name, "size": None, "original_temporal": True},
         ]
 
@@ -157,7 +161,7 @@ function updateOutput(outputs, collection) {{
         self._output_dimensions = output_dimensions
 
     def set_input_bands(self, input_bands):
-        self.input_bands = input_bands
+        self.input_bands = input_bands # fix this when no input bands are set from driver's side
         output_dimensions = self.determine_output_dimensions()
         self.set_output_dimensions(output_dimensions)
 
