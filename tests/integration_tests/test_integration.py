@@ -2,6 +2,7 @@ import json
 
 import pytest
 from pg_to_evalscript import convert_from_process_graph, list_supported_processes
+from pg_to_evalscript.utils import implicitly_supported_processes
 
 from tests.utils import (
     get_process_graph_json,
@@ -260,13 +261,10 @@ def test_process_graphs_with_scenes(pg_name, example_input, scenes, expected_out
 
 
 def test_list_supported_processes():
-    known_supported_processes = [
-        "load_collection",
-        "save_result",
-        "reduce_dimension",
-        "apply",
+    known_supported_processes = list(set([
+        *implicitly_supported_processes,
         *get_defined_processes_from_files(),
-    ]
+    ]))
     supported_processes = list_supported_processes()
     assert len(known_supported_processes) == len(supported_processes)
     assert set(known_supported_processes) == set(supported_processes)
