@@ -112,7 +112,7 @@ function updateOutputMetadata(scenes, inputMetadata, outputMetadata) {{
     def write_runtime_global_constants(self):
         all_bands = []
         for datasource_with_bands in self.input_bands:
-            all_bands.extend(datasource_with_bands.bands)
+            all_bands.extend(datasource_with_bands["bands"])
 
         return f"const INPUT_BANDS = {list(set(all_bands))};"
 
@@ -146,7 +146,7 @@ function updateOutput(outputs, collection) {{
         dimensions_of_inputs_per_node = defaultdict(list)
         all_bands = []
         for datasource_with_bands in self.input_bands:
-            all_bands.extend(datasource_with_bands.bands)
+            all_bands.extend(datasource_with_bands["bands"])
 
         initial_output_dimensions = [
             {"name": self.bands_dimension_name, "size": len(set(all_bands)) if self.input_bands is not None else 0},
