@@ -139,7 +139,7 @@ function updateOutput(outputs, collection) {{
 
     def write_output_variable(self):
         if len(self.nodes) == 0:
-            return self.initial_data_names.values()[0] # fix this ???
+            return self.initial_data_names.values().join("_")
         return self.nodes[-1].node_varname_prefix + self.nodes[-1].node_id
 
     def determine_output_dimensions(self):
