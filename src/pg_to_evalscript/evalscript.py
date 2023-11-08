@@ -110,7 +110,11 @@ function updateOutputMetadata(scenes, inputMetadata, outputMetadata) {{
         return datacube_creation
     
     def write_runtime_global_constants(self):
-        return f"const INPUT_BANDS = {self.input_bands};" # fix this
+        all_bands = []
+        for datasource_with_bands in self.input_bands:
+            all_bands.extend(datasource_with_bands.bands)
+
+        return f"const INPUT_BANDS = {list(set(all_bands))};"
 
     def write_update_output(self):
         if self._output_dimensions is None:
@@ -135,13 +139,17 @@ function updateOutput(outputs, collection) {{
 
     def write_output_variable(self):
         if len(self.nodes) == 0:
-            return self.initial_data_names.values()[0] # ???
+            return self.initial_data_names.values()[0] # fix this ???
         return self.nodes[-1].node_varname_prefix + self.nodes[-1].node_id
 
     def determine_output_dimensions(self):
         dimensions_of_inputs_per_node = defaultdict(list)
+        all_bands = []
+        for datasource_with_bands in self.input_bands:
+            all_bands.extend(datasource_with_bands.bands)
+
         initial_output_dimensions = [
-            {"name": self.bands_dimension_name, "size": len(self.input_bands) if self.input_bands is not None else 0}, # fix this
+            {"name": self.bands_dimension_name, "size": len(set(all_bands)) if self.input_bands is not None else 0},
             {"name": self.temporal_dimension_name, "size": None, "original_temporal": True},
         ]
 
@@ -161,7 +169,7 @@ function updateOutput(outputs, collection) {{
         self._output_dimensions = output_dimensions
 
     def set_input_bands(self, input_bands):
-        self.input_bands = input_bands # fix this when no input bands are set from driver's side
+        self.input_bands = input_bands
         output_dimensions = self.determine_output_dimensions()
         self.set_output_dimensions(output_dimensions)
 

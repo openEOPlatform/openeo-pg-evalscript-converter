@@ -73,7 +73,6 @@ class DataCube {
     makeArrayFromSamples(samples) {
         if (Array.isArray(samples)) {
             if (samples.length === 0) {
-                 // fix this
                 this._setDimensionLabelsIfEmpty(this.bands_dimension_name, INPUT_BANDS) // INPUT_BANDS is the default global var with all input band names
                 return ndarray([], [0, 0])
             }
