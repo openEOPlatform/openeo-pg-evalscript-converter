@@ -108,7 +108,7 @@ function updateOutputMetadata(scenes, inputMetadata, outputMetadata) {{
             datacube_creation += f"let {self.initial_data_names[node_id]} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {json.dumps(bands_metadata_for_node)}, scenes)\n\t"
 
         return datacube_creation
-    
+
     def write_runtime_global_constants(self):
         all_bands = []
         for datasource_with_bands in self.input_bands:

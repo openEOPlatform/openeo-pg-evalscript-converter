@@ -175,7 +175,7 @@ def generate_nodes_from_process_graph(
 
         if process_id == "load_collection":
             bands_for_datasource = arguments.get("bands")
-            initial_data_name = "node_" + node_id 
+            initial_data_name = "node_" + node_id
             input_bands.append({"datasource": initial_data_name, "bands": bands_for_datasource})
             initial_data_names[node_id] = initial_data_name
             continue
