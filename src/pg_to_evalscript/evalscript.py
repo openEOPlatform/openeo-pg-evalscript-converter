@@ -130,8 +130,12 @@ function updateOutputMetadata(scenes, inputMetadata, outputMetadata) {{
         )
         collection_scenes_length = "* collection.scenes.length" * number_of_original_temporal_dimensions
         number_of_final_dimensions = len(self._output_dimensions) + 1 if self.encode_result else 0
+        # check that this is correct, how should the output be updated in this case or what is wrong that this doesn't execute (collection.scenes === undefined)
         return f"""
 function updateOutput(outputs, collection) {{
+    if (!collection.scenes) {{
+        return;
+    }}
     Object.values(outputs).forEach((output) => {{
         output.bands = {number_of_final_dimensions} + {size_without_original_temporal_dimensions} {collection_scenes_length};
     }});
