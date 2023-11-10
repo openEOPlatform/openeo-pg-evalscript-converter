@@ -130,7 +130,7 @@ function updateOutputMetadata(scenes, inputMetadata, outputMetadata) {{
         )
         collection_scenes_length = "* collection.scenes.length" * number_of_original_temporal_dimensions
         number_of_final_dimensions = len(self._output_dimensions) + 1 if self.encode_result else 0
-        # check that this is correct, how should the output be updated in this case or what is wrong that this doesn't execute (collection.scenes === undefined)
+        # fix this (collection.scenes === undefined when multiple collections are used) https://docs.sentinel-hub.com/api/latest/evalscript/v3/#updateoutput-function-optional
         return f"""
 function updateOutput(outputs, collection) {{
     if (!collection.scenes) {{
@@ -150,7 +150,11 @@ function updateOutput(outputs, collection) {{
         dimensions_of_inputs_per_node = defaultdict(list)
         all_bands = []
         for datasource_with_bands in self.input_bands:
-            all_bands.extend(datasource_with_bands["bands"] if datasource_with_bands is not None and datasource_with_bands["bands"] is not None else [])
+            all_bands.extend(
+                datasource_with_bands["bands"]
+                if datasource_with_bands is not None and datasource_with_bands["bands"] is not None
+                else []
+            )
 
         initial_output_dimensions = [
             {"name": self.bands_dimension_name, "size": len(set(all_bands)) if self.input_bands is not None else 0},
