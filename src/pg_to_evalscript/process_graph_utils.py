@@ -56,7 +56,7 @@ def get_dependents(dependencies):
     return dependents
 
 
-def get_execution_order(dependencies, dependents):
+def get_execution_order(dependencies, dependents): # fix this probably for more advanced PGs?
     entry_points = get_entry_points(dependencies)
     execution_order = [entry_point for entry_point in entry_points]
     remaining_nodes = set(dependencies.keys()).difference(execution_order)
