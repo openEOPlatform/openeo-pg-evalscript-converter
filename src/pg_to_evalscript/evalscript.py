@@ -129,10 +129,13 @@ function updateOutputMetadata(scenes, inputMetadata, outputMetadata) {{
             lambda x, y: x * y, sizes_without_original_temporal_dimensions, 1
         )
         if len(self.input_bands) > 1:
-            collection_scenes_length = "* Object.values(collection).reduce((acc, val) => acc + val.scenes.length, 0)" * number_of_original_temporal_dimensions
+            collection_scenes_length = (
+                "* Object.values(collection).reduce((acc, val) => acc + val.scenes.length, 0)"
+                * number_of_original_temporal_dimensions
+            )
         else:
             collection_scenes_length = "* collection.scenes.length" * number_of_original_temporal_dimensions
-        number_of_final_dimensions = len(self._output_dimensions) + 1 if self.encode_result else 0 # 3
+        number_of_final_dimensions = len(self._output_dimensions) + 1 if self.encode_result else 0  # 3
         return f"""
 function updateOutput(outputs, collection) {{
     Object.values(outputs).forEach((output) => {{
