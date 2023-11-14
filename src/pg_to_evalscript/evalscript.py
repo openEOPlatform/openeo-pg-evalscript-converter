@@ -128,14 +128,13 @@ function updateOutputMetadata(scenes, inputMetadata, outputMetadata) {{
         size_without_original_temporal_dimensions = reduce(
             lambda x, y: x * y, sizes_without_original_temporal_dimensions, 1
         )
-        collection_scenes_length = "* collection.scenes.length" * number_of_original_temporal_dimensions
-        number_of_final_dimensions = len(self._output_dimensions) + 1 if self.encode_result else 0
-        # fix this (collection.scenes === undefined when multiple collections are used) https://docs.sentinel-hub.com/api/latest/evalscript/v3/#updateoutput-function-optional
+        if len(self.input_bands) > 1:
+            collection_scenes_length = "* Object.values(collection).reduce((acc, val) => acc + val.scenes.length, 0)" * number_of_original_temporal_dimensions
+        else:
+            collection_scenes_length = "* collection.scenes.length" * number_of_original_temporal_dimensions
+        number_of_final_dimensions = len(self._output_dimensions) + 1 if self.encode_result else 0 # 3
         return f"""
 function updateOutput(outputs, collection) {{
-    if (!collection.scenes) {{
-        return;
-    }}
     Object.values(outputs).forEach((output) => {{
         output.bands = {number_of_final_dimensions} + {size_without_original_temporal_dimensions} {collection_scenes_length};
     }});
