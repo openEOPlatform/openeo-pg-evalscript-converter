@@ -104,9 +104,13 @@ function updateOutputMetadata(scenes, inputMetadata, outputMetadata) {{
 
     def write_datacube_creation(self):
         datacube_creation = ""
-        for node_id, bands_metadata_for_node in self.bands_metadata.items():
-            datacube_creation += f"let {self.initial_data_names[node_id]} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {json.dumps(bands_metadata_for_node)}, scenes)\n\t"
-
+        if len(self.bands_metadata) > 1:
+            for node_id, bands_metadata_for_node in self.bands_metadata.items():
+                datacube_creation += f"let {self.initial_data_names[node_id]} = new DataCube(samples.node_{node_id}, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {json.dumps(bands_metadata_for_node)}, scenes)\n\t"
+        else: 
+            for node_id, bands_metadata_for_node in self.bands_metadata.items():
+                datacube_creation += f"let {self.initial_data_names[node_id]} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {json.dumps(bands_metadata_for_node)}, scenes)\n\t"
+        
         return datacube_creation
 
     def write_runtime_global_constants(self):
