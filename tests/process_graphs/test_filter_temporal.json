@@ -1,5 +1,5 @@
 {
-  "loadcollection": {
+  "1": {
     "process_id": "load_collection",
     "arguments": {
       "spatial_extent": null,
@@ -12,7 +12,7 @@
     "process_id": "filter_temporal",
     "arguments": {
       "data": {
-        "from_node": "loadcollection"
+        "from_node": "1"
       },
       "extent": [
         "2022-03-10T00:00:00.000Z",
