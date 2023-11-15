@@ -104,13 +104,15 @@ function updateOutputMetadata(scenes, inputMetadata, outputMetadata) {{
 
     def write_datacube_creation(self):
         datacube_creation = ""
-        if len(self.bands_metadata) > 1:
-            for node_id, bands_metadata_for_node in self.bands_metadata.items():
-                datacube_creation += f"let {self.initial_data_names[node_id]} = new DataCube(samples.node_{node_id}, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {json.dumps(bands_metadata_for_node)}, scenes)\n\t"
-        else: 
-            for node_id, bands_metadata_for_node in self.bands_metadata.items():
-                datacube_creation += f"let {self.initial_data_names[node_id]} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {json.dumps(bands_metadata_for_node)}, scenes)\n\t"
-        
+        if len(self.input_bands) > 1:
+            for datasource_with_bands in self.input_bands:
+                datasource_name = datasource_with_bands["datasource"]
+                datacube_creation += f"let {datasource_name} = new DataCube(samples.node_{datasource_name}, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {json.dumps(self.bands_metadata[datasource_name] if self.bands_metadata is not None and len(self.bands_metadata) > 0 else None)}, scenes)\n\t"
+        else:
+            datasource_with_bands = self.input_bands[0]
+            datasource_name = datasource_with_bands["datasource"]
+            datacube_creation += f"let {datasource_name} = new DataCube(samples, '{self.bands_dimension_name}', '{self.temporal_dimension_name}', true, {json.dumps(self.bands_metadata[datasource_name] if self.bands_metadata is not None and len(self.bands_metadata) > 0 else None)}, scenes)\n\t"
+
         return datacube_creation
 
     def write_runtime_global_constants(self):
