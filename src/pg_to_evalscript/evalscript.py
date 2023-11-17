@@ -175,7 +175,7 @@ function updateOutput(outputs, collection) {{
         dimensions_of_inputs_per_node[self.nodes[0].node_id].append(initial_output_dimensions)
 
         for node in self.nodes:
-            output_dimensions = node.get_dimensions_change(dimensions_of_inputs_per_node[node.node_id])
+            output_dimensions = node.get_dimensions_change(dimensions_of_inputs_per_node[node.node_id] if len(dimensions_of_inputs_per_node[node.node_id]) > 0 else [initial_output_dimensions])
             for dependent in node.dependents:
                 dimensions_of_inputs_per_node[dependent].append(output_dimensions)
 
