@@ -1,4 +1,5 @@
 function ndvi(arguments) {
+  const startTime = Date.now();
   const { data, nir = "nir", red = "red", target_band = null } = arguments;
 
   validateParameter({
@@ -95,5 +96,7 @@ function ndvi(arguments) {
     ({ data }) => (data[nirIdx] - data[redIdx]) / (data[nirIdx] + data[redIdx]),
     bandsDim.name
   );
+  const endTime = Date.now();
+  executionTimes.push({ fun: "ndvi.js", params: {}, success: true, time: endTime - startTime });
   return clonedData;
 }

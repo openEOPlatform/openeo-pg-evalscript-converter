@@ -1,4 +1,5 @@
 function sd(arguments) {
+  const startTime = Date.now();
   const { data, ignore_nodata = true } = arguments;
 
   validateParameter({
@@ -30,6 +31,8 @@ function sd(arguments) {
 
     if (x === null) {
       if (!ignore_nodata) {
+        const endTime = Date.now();
+        executionTimes.push({ fun: "sd.js", params: {}, success: true, time: endTime - startTime });
         return null;
       } else {
         continue;
@@ -41,10 +44,14 @@ function sd(arguments) {
   }
 
   if (count === 0) {
+    const endTime = Date.now();
+    executionTimes.push({ fun: "sd.js", params: {}, success: true, time: endTime - startTime });
     return null;
   }
 
   if (count === 1) {
+    const endTime = Date.now();
+    executionTimes.push({ fun: "sd.js", params: {}, success: true, time: endTime - startTime });
     return 0;
   }
 
@@ -58,5 +65,7 @@ function sd(arguments) {
     sumOfSquares += Math.pow(x - mean, 2);
   }
 
+  const endTime = Date.now();
+  executionTimes.push({ fun: "sd.js", params: {}, success: true, time: endTime - startTime });
   return Math.sqrt(sumOfSquares / (count - 1));
 }

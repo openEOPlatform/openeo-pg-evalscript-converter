@@ -1,4 +1,5 @@
 function min(arguments) {
+const startTime = Date.now();
   const { data, ignore_nodata = true } = arguments;
 
   validateParameter({
@@ -45,5 +46,9 @@ function min(arguments) {
     }
   }
 
+const endTime = Date.now();
+executionTimes.push({ fun: "min.js", params: {}, success: true, time: endTime - startTime });
   return minVal;
 }
+
+// similar to max.js

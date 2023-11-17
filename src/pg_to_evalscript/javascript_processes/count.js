@@ -1,4 +1,5 @@
 function count(arguments) {
+  const startTime = Date.now();
   const { data, condition: cond = null } = arguments;
 
   validateParameter({
@@ -41,5 +42,7 @@ function count(arguments) {
     }
   }
 
+  const endTime = Date.now();
+  executionTimes.push({ fun: "count.js", params: {}, success: true, time: endTime - startTime });
   return count;
 }

@@ -1,4 +1,5 @@
 function rename_labels(arguments) {
+  const startTime = Date.now();
   const { data, dimension, target, source = [] } = arguments;
 
   if (data === undefined) {
@@ -67,5 +68,7 @@ function rename_labels(arguments) {
 
     data.getDimensionByName(dimension).labels[ind] = target[i];
   }
+  const endTime = Date.now();
+  executionTimes.push({ fun: "rename_labels.js", params: {}, success: true, time: endTime - startTime });
   return data;
 }

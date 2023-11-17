@@ -1,4 +1,5 @@
 function apply(arguments) {
+  const startTime = Date.now();
   const { data, process, context = null } = arguments;
 
   validateParameter({
@@ -19,5 +20,7 @@ function apply(arguments) {
 
   const newData = data.clone();
   newData.apply(process, context);
+  const endTime = Date.now();
+  executionTimes.push({ fun: "apply.js", params: {}, success: true, time: endTime - startTime });
   return newData;
 }

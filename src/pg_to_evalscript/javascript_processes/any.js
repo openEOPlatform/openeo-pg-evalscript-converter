@@ -1,4 +1,5 @@
 function any(arguments) {
+  const startTime = Date.now();
   const { data, ignore_nodata = true } = arguments;
 
   validateParameter({
@@ -31,6 +32,8 @@ function any(arguments) {
       returnVal = false;
     }
 
+    const endTime = Date.now();
+    executionTimes.push({ fun: "any.js", params: {}, success: true, time: endTime - startTime });
     return returnVal;
   }
 
@@ -54,11 +57,17 @@ function any(arguments) {
     });
 
     if (x === true || y === true) {
+      const endTime = Date.now();
+      executionTimes.push({ fun: "any.js", params: {}, success: true, time: endTime - startTime });
       return true;
     }
     if (x === false && y === false) {
+      const endTime = Date.now();
+      executionTimes.push({ fun: "any.js", params: {}, success: true, time: endTime - startTime });
       return false;
     }
+    const endTime = Date.now();
+    executionTimes.push({ fun: "any.js", params: {}, success: true, time: endTime - startTime });
     return null;
   }, null);
 }

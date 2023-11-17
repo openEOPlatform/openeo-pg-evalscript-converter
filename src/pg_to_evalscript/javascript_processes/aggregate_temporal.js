@@ -1,4 +1,5 @@
 function aggregate_temporal(arguments) {
+  const startTime = Date.now();
   const { data, intervals, reducer, labels = [], dimension = null, context = null } = arguments;
 
   validateParameter({
@@ -54,5 +55,7 @@ function aggregate_temporal(arguments) {
 
   const newData = data.clone();
   newData.aggregateTemporal(intervals, reducer, labels, dimension, context);
+  const endTime = Date.now();
+  executionTimes.push({ fun: "aggregate_temporal.js", params: {intervals, dimension, labels}, success: true, time: endTime - startTime });
   return newData;
 }

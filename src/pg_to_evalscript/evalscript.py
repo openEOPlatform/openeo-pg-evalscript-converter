@@ -53,6 +53,9 @@ class Evalscript:
         tab = "\t"
         return f"""
 //VERSION=3
+
+const executionTimes = [];
+
 function setup() {{
   return {{
     input: [{",".join([f"'{band}'" for band in self.input_bands])}],
@@ -85,6 +88,8 @@ function evaluatePixel(samples, scenes) {{
     }}
 
     const finalOutput = {self.write_output_variable()}{".encodeData()" if self.encode_result else '.flattenToArray()'}
+    
+    throw new Error(JSON.stringify(executionTimes));
     return Array.isArray(finalOutput) ? finalOutput : [finalOutput];
 }}
 

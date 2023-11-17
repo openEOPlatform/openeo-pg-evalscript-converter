@@ -1,4 +1,5 @@
 function between(arguments) {
+  const startTime = Date.now();
   const isBetween = (x, min, max, exclude_max) => {
     let result = x >= min && x <= max;
     if (exclude_max) {
@@ -57,6 +58,8 @@ function between(arguments) {
       excludeMax = true;
     }
 
+    const endTime = Date.now();
+    executionTimes.push({ fun: "between.js", params: {}, success: true, time: endTime - startTime });
     return isBetween(
       xAsISODateString.value,
       minAsISODateString.value,
@@ -64,6 +67,8 @@ function between(arguments) {
       excludeMax
     );
   } else {
+    const endTime = Date.now();
+    executionTimes.push({ fun: "between.js", params: {}, success: true, time: endTime - startTime });
     return isBetween(x, min, max, exclude_max);
   }
 }

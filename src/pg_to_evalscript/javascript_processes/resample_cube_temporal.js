@@ -1,4 +1,5 @@
 function resample_cube_temporal(arguments) {
+  const startTime = Date.now();
   const { data, target, dimension = null, valid_within = null } = arguments;
 
   validateParameter({
@@ -198,5 +199,7 @@ function resample_cube_temporal(arguments) {
     dataClone = resampledData.clone();
   }
 
+  const endTime = Date.now();
+  executionTimes.push({ fun: "resample_cube_temporal.js", params: {}, success: true, time: endTime - startTime });
   return resampledData;
 }

@@ -6,6 +6,8 @@ class DataCube {
     // bands_metadata:
     // scenes: `scenes` argument from `evaluatePixel` 
     constructor(data, bands_dimension_name, temporal_dimension_name, fromSamples, bands_metadata, scenes) {
+        const startTime = Date.now();
+        
         this.TEMPORAL = "temporal"
         this.BANDS = "bands"
         this.OTHER = "other"
@@ -33,6 +35,9 @@ class DataCube {
             this.setDimensionLabels(this.temporal_dimension_name, dates);
         }
         this.bands_metadata = bands_metadata
+        
+        const endTime = Date.now();
+        executionTimes.push({ fun: "DataCube constructor", params: { dataLength: data.length, bands_dimension_name, temporal_dimension_name, fromSamples, scenes }, success: true, time: endTime - startTime });
     }
 
     getDimensionByName(name) {
@@ -71,9 +76,15 @@ class DataCube {
     // `samples` is eqivalent to the first argument of `evaluatePixel` method in an evalscript
     // Either object or array of objects (non-temporal and temporal scripts respectively)
     makeArrayFromSamples(samples) {
+        const startTime = Date.now();
+        
         if (Array.isArray(samples)) {
             if (samples.length === 0) {
                 this._setDimensionLabelsIfEmpty(this.bands_dimension_name, INPUT_BANDS) // INPUT_BANDS is the default global var with all input band names
+               
+                const endTime = Date.now();
+                executionTimes.push({ fun: "makeArrayFromSamples", params: { samplesLength: samples.length }, success: true, time: endTime - startTime });
+               
                 return ndarray([], [0, 0])
             }
             this._setDimensionLabelsIfEmpty(this.bands_dimension_name, Object.keys(samples[0]))
@@ -81,10 +92,18 @@ class DataCube {
             for (let entry of samples) {
                 newData = newData.concat(extractValues(entry))
             }
+            
+            const endTime = Date.now();
+            executionTimes.push({ fun: "makeArrayFromSamples", params: { samplesLength: samples.length }, success: true, time: endTime - startTime });
+            
             return ndarray(newData, [samples.length, extractValues(samples[0]).length])
         } else {
             this._setDimensionLabelsIfEmpty(this.bands_dimension_name, Object.keys(samples))
             const newData = Object.values(samples)
+            const endTime = Date.now();
+            
+            executionTimes.push({ fun: "makeArrayFromSamples", params: { }, success: true, time: endTime - startTime });
+        
             return ndarray(newData, [1, newData.length])
         }
     }
@@ -108,6 +127,8 @@ class DataCube {
     }
 
     getFilteredTemporalIndices(temporalDimension, start, end) {
+        const startTime = Date.now();
+        
         const temporalLabels = this.getDimensionByName(temporalDimension).labels;
         const indices = [];
         for (let i = 0; i < temporalLabels.length; i++) {
@@ -116,6 +137,10 @@ class DataCube {
                 : parse_rfc3339(temporalLabels[i]);
 
             if (!date) {
+            
+                const endTime = Date.now();
+                executionTimes.push({ fun: "getFilteredTemporalIndices", params: { temporalDimension, start, end }, success: false, time: endTime - startTime });
+            
                 throw new Error("Invalid ISO date string in temporal dimension label.");
             }
 
@@ -123,6 +148,10 @@ class DataCube {
                 indices.push(i);
             }
         }
+
+        const endTime = Date.now();
+        executionTimes.push({ fun: "getFilteredTemporalIndices", params: { temporalDimension, start, end }, success: true, time: endTime - startTime });
+        
         return indices;
     }
 
@@ -143,6 +172,8 @@ class DataCube {
     }
 
     filterBands(bands) {
+        const startTime = Date.now();
+
         const indices = this.getBandIndices(bands);
         const axis = this.dimensions.findIndex((e) => e.name === this.bands_dimension_name);
         this._filter(axis, indices);
@@ -150,17 +181,25 @@ class DataCube {
             this.getDimensionByName(this.bands_dimension_name).labels.filter((lab) =>
                 bands.includes(lab)
             );
+
+        const endTime = Date.now();
+        executionTimes.push({ fun: "filterBands", params: { bands }, success: true, time: endTime - startTime });
     }
 
     filterTemporal(extent, dimensionName) {
+        const startTime = Date.now();
         if (dimensionName) {
             const dimension = this.getDimensionByName(dimensionName);
 
             if (dimension === undefined) {
+                const endTime = Date.now();
+                executionTimes.push({ fun: "filterTemporal", params: { extent, dimensionName }, success: false, time: endTime - startTime });
                 throw new Error(`Dimension not available.`);
             }
 
             if (dimension.type !== this.TEMPORAL) {
+                const endTime = Date.now();
+                executionTimes.push({ fun: "filterTemporal", params: { extent, dimensionName }, success: false, time: endTime - startTime });
                 throw new Error(`Dimension is not of type temporal.`);
             }
 
@@ -172,9 +211,12 @@ class DataCube {
                 this._filterTemporalByDimension(extent, dimension);
             }
         }
+        const endTime = Date.now();
+        executionTimes.push({ fun: "filterTemporal", params: { extent, dimensionName }, success: true, time: endTime - startTime });
     }
 
     _filterTemporalByDimension(extent, dimension) {
+        const startTime = Date.now();
         const axis = this.dimensions.findIndex((e) => e.name === dimension.name);
         const temporalLabels = dimension.labels;
 
@@ -183,14 +225,26 @@ class DataCube {
 
         this._filter(axis, indices);
         dimension.labels = indices.map(i => temporalLabels[i]);
+        const endTime = Date.now();
+        executionTimes.push({ fun: "_filterTemporalByDimension", params: { extent, dimension }, success: true, time: endTime - startTime });
     }
 
     aggregateTemporal(intervals, reducer, labels, dimensionName, context) {
+        const startTime = Date.now();
+
         const dimension = dimensionName ? this.getDimensionByName(dimensionName) : this.getTemporalDimension();
         if (dimension === undefined) {
+
+            const endTime = Date.now();
+            executionTimes.push({ fun: "aggregateTemporal", params: { intervals, labels, dimensionName }, success: false, time: endTime - startTime });
+           
             throw new Error(`Dimension not available.`);
         }
         if (dimension.type !== this.TEMPORAL) {
+
+            const endTime = Date.now();
+            executionTimes.push({ fun: "aggregateTemporal", params: { intervals, labels, dimensionName }, success: false, time: endTime - startTime });
+            
             throw new Error(`Dimension is not of type temporal.`);
         }
 
@@ -200,11 +254,19 @@ class DataCube {
         const computedLabels = [];
 
         if (labels && labels.length > 0 && labels.length !== intervals.length) {
+            
+            const endTime = Date.now();
+            executionTimes.push({ fun: "aggregateTemporal", params: { intervals, labels, dimensionName }, success: false, time: endTime - startTime });
+            
             throw new Error('Number of labels must match number of intervals');
         }
 
         for (let interval of intervals) {
             if ((!labels || labels.length === 0) && computedLabels.includes(interval[0])) {
+                
+                const endTime = Date.now();
+                executionTimes.push({ fun: "aggregateTemporal", params: { intervals, labels, dimensionName }, success: false, time: endTime - startTime });
+                
                 throw new Error('Distinct dimension labels required');
             }
             computedLabels.push(interval[0]);
@@ -232,11 +294,21 @@ class DataCube {
         newShape[axis] = intervals.length;
         this.data = ndarray(newValues, newShape);
         dimension.labels = labels && labels.length > 0 ? labels : computedLabels;
+
+        const endTime = Date.now();
+        executionTimes.push({ fun: "aggregateTemporal", params: { intervals, labels, dimensionName }, success: true, time: endTime - startTime });
     }
 
     aggregateTemporalPeriod(period, reducer, dimension, context) {
+
+        const startTime = Date.now();
+        
         const temporalDimensions = this.getTemporalDimensions();
         if (!dimension && temporalDimensions.length > 1) {
+
+            const endTime = Date.now();
+            executionTimes.push({ fun: "aggregateTemporalPeriod", params: { period, dimension }, success: false, time: endTime - startTime });
+
           throw new ProcessError({
             name: "TooManyDimensions",
             message:
@@ -246,6 +318,10 @@ class DataCube {
       
         const temporalDimensionToAggregate = dimension ? this.getDimensionByName(dimension) : temporalDimensions[0];
         if (!temporalDimensionToAggregate) {
+
+            const endTime = Date.now();
+            executionTimes.push({ fun: "aggregateTemporalPeriod", params: { period, dimension }, success: false, time: endTime - startTime });
+
           throw new ProcessError({
             name: "DimensionNotAvailable",
             message: "A dimension with the specified name does not exist.",
@@ -317,6 +393,10 @@ class DataCube {
         newShape[axis] = newLabels.length;
         this.data = ndarray(newValues, newShape);
         this.setDimensionLabels(temporalDimensionToAggregate.name, newLabels);
+
+        const endTime = Date.now();
+        executionTimes.push({ fun: "aggregateTemporalPeriod", params: { period, dimension }, success: true, time: endTime - startTime });
+
     }
 
     parseTemporalExtent(extent) {
@@ -342,23 +422,40 @@ class DataCube {
     }
 
     removeDimension(dimension) {
+
+        const startTime = Date.now();
+        
         const idx = this.dimensions.findIndex(d => d.name === dimension);
         this.dimensions = this.dimensions.filter(d => d.name !== dimension);
         const newDataShape = this.data.shape;
         newDataShape.splice(idx, 1);
         this.data = ndarray(this.data.data, newDataShape)
+
+        const endTime = Date.now();
+        executionTimes.push({ fun: "removeDimension", params: { dimension }, success: true, time: endTime - startTime });
+
     }
 
     addDimension(name, label, type) {
+
+        const startTime = Date.now();
+        
         this._addDimension(0)
         this.dimensions.unshift({
             name: name,
             labels: [label],
             type: type
         })
+
+        const endTime = Date.now();
+        executionTimes.push({ fun: "addDimension", params: { name, label, type }, success: true, time: endTime - startTime });
+
     }
 
     extendDimensionWithData(axis, dataToAdd) {
+
+        const startTime = Date.now();
+
         const finalShape = this.getDataShape()
 
         let locationToInsert = 1;
@@ -392,12 +489,19 @@ class DataCube {
 
         finalShape[axis]++;
         this.data = ndarray(dataArr, finalShape)
+
+        const endTime = Date.now();
+        executionTimes.push({ fun: "extendDimensionWithData", params: { axis }, success: true, time: endTime - startTime });
+
     }
 
     // axis: integer, dimension axis
     // dataToAdd: array, values to insert in dimension.
     // locationInDimension: integer, offset from start of dimension, max length of dimension. Default 0.
     insertIntoDimension(axis, dataToAdd, locationInDimension = 0) {
+
+        const startTime = Date.now();
+
         const newShape = this.getDataShape().slice()
         newShape[axis] += 1
 
@@ -429,9 +533,15 @@ class DataCube {
         }
 
         this.data = newData
+
+        const endTime = Date.now();
+        executionTimes.push({ fun: "insertIntoDimension", params: { axis, locationInDimension }, success: true, time: endTime - startTime });
+
     }
 
     setInDimension(axis, dataToSet, index) {
+        const startTime = Date.now();
+        
         const allCoords = this._iterateCoords(this.data.shape.slice());
         let dataToSetInd = 0;
 
@@ -441,9 +551,15 @@ class DataCube {
                 dataToSetInd++
             }
         }
+
+        const endTime = Date.now();
+        executionTimes.push({ fun: "setInDimension", params: { axis, index }, success: true, time: endTime - startTime });
+
     }
 
     clone() {
+        const startTime = Date.now();
+
         const copy = new DataCube(ndarray(this.data.data.slice(), this.data.shape), this.bands_dimension_name, this.temporal_dimension_name, false, this.bands_metadata)
         const newDimensions = []
         for (let dim of this.dimensions) {
@@ -454,14 +570,23 @@ class DataCube {
             })
         }
         copy.dimensions = newDimensions
+        
+        const endTime = Date.now();
+        executionTimes.push({ fun: "clone", params: {}, success: true, time: endTime - startTime });
+
         return copy
     }
 
     flattenToArray() {
+        const startTime = Date.now();
         if ((!this.data.shape || this.data.shape.length === 0) && this.data.data.length === 1) {
+            const endTime = Date.now();
+            executionTimes.push({ fun: "flattenToArray", params: {}, success: true, time: endTime - startTime });
             // We have a scalar.
             return this.data.data[0]
         }
+        const endTime = Date.now();
+        executionTimes.push({ fun: "flattenToArray", params: {}, success: true, time: endTime - startTime });
         return flattenToNativeArray(this.data)
     }
 
@@ -474,6 +599,9 @@ class DataCube {
     // reducer: function, accepts `data` (labeled array) and `context` (any)
     // dimension: string, name of one of the existing dimensions
     reduceByDimension(reducer, dimension, context) {
+
+        const startTime = Date.now();
+        
         const data = this.data
         const axis = this.dimensions.findIndex(e => e.name === dimension)
         const labels = this.dimensions[axis].labels
@@ -494,9 +622,16 @@ class DataCube {
         newShape.splice(axis, 1) // The selected dimension is removed
         this.data = ndarray(newValues, newShape)
         this.dimensions.splice(axis, 1) // Remove dimension information
+
+        const endTime = Date.now();
+        executionTimes.push({ fun: "reduceByDimension", params: { dimension }, success: true, time: endTime - startTime });
+
     }
 
     applyDimension(process, dimension, target_dimension, context) {
+
+        const startTime = Date.now();
+
         const data = this.data;
         const axis = this.dimensions.findIndex(e => e.name === dimension);
         const labels = this.dimensions[axis].labels;
@@ -505,6 +640,10 @@ class DataCube {
 
         if (target_dimension) {
             if (this.getDimensionByName(target_dimension)) {
+
+                const endTime = Date.now();
+                executionTimes.push({ fun: "applyDimension", params: { dimension, target_dimension }, success: false, time: endTime - startTime });
+
                 throw new Error("Dimension `target_dimension` already exists and cannot replace dimension `dimension`.");
             }
 
@@ -530,6 +669,10 @@ class DataCube {
             })
 
             if(!Array.isArray(result)) {
+
+                const endTime = Date.now();
+                executionTimes.push({ fun: "applyDimension", params: { dimension, target_dimension }, success: false, time: endTime - startTime });
+
                 throw new ValidationError({
                   name: VALIDATION_ERRORS.NOT_ARRAY,
                   message: `"process" in "apply_dimension" doesn't return an array.`,
@@ -560,6 +703,10 @@ class DataCube {
             this.data = newData
             this.dimensions[axis].labels = Array.from(Array(newData.shape[axis]).keys())
         }
+
+        const endTime = Date.now();
+        executionTimes.push({ fun: "applyDimension", params: { dimension, target_dimension }, success: true, time: endTime - startTime });
+
     }
 
     getDataShape() {
@@ -602,6 +749,7 @@ class DataCube {
 
     // process: function, accepts `data` (labeled array) and `context` (any)
     apply(process, context) {
+        const startTime = Date.now();
         const allCoords = this._iterateCoords(this.data.shape)
         for (let coords of allCoords) {
             this.data.set(...coords, process({
@@ -609,12 +757,17 @@ class DataCube {
                 context: context
             }))
         }
+        const endTime = Date.now();
+        executionTimes.push({ fun: "apply", params: {}, success: true, time: endTime - startTime });
     }
 
     // Generator that visits all coordinates of array with `shape`, keeping nullAxes `null`
     // shape: sizes of dimensions
     // nullAxes: array with axes that should be kept null
     * _iterateCoords(shape, nullAxes = []) {
+
+        const startTime = Date.now();
+        
         const cumulatives = fill(shape.slice(), 0);
         const coords = shape.slice();
         for (let axis of nullAxes) {
@@ -635,6 +788,10 @@ class DataCube {
             }
             yield coords
         }
+
+        const endTime = Date.now();
+        executionTimes.push({ fun: "_iterateCoords", params: { shape }, success: true, time: endTime - startTime });
+    
     }
 
     _merge_matching_cube(cube2, overlap_resolver) {
@@ -750,6 +907,9 @@ class DataCube {
     }
 
     merge(cube2, overlap_resolver) {
+
+        const startTime = Date.now();
+
         const cube1SpecificDimensions = []
         const cube2SpecificDimensions = []
 
@@ -776,6 +936,10 @@ class DataCube {
 
 
             if (labelsEqual) {
+
+                const endTime = Date.now();
+                executionTimes.push({ fun: "merge", params: {}, success: false, time: endTime - startTime });
+
                 throw new ProcessError({
                     name: "Internal",
                     message: "Shared dimensions have to have the same name and type in 'merge_cubes'."
@@ -783,6 +947,10 @@ class DataCube {
             }
 
             if (dimensionWithDifferentLabels) {
+
+                const endTime = Date.now();
+                executionTimes.push({ fun: "merge", params: {}, success: false, time: endTime - startTime });
+
                 throw new ProcessError({
                     name: "Internal",
                     message: "Only one of the dimensions can have different labels in 'merge_cubes'."
@@ -813,15 +981,27 @@ class DataCube {
         }
 
         if (allDimensionsEqual && !dimensionWithDifferentLabels && overlap_resolver) {
+
+            const endTime = Date.now();
+            executionTimes.push({ fun: "merge", params: {}, success: true, time: endTime - startTime });
+
             return this._merge_matching_cube(cube2, overlap_resolver)
         }
         if (allDimensionsEqual && !dimensionWithDifferentLabels && !overlap_resolver) {
+
+            const endTime = Date.now();
+            executionTimes.push({ fun: "merge", params: {}, success: true, time: endTime - startTime });
+
             return this._join_cubes_in_big_cube(cube2)
         }
 
         const isCube2Subcube = !dimensionWithDifferentLabels && cube2SpecificDimensions.length === 0 && cube1SpecificDimensions.length > 0;
 
         if (isCube2Subcube) {
+
+            const endTime = Date.now();
+            executionTimes.push({ fun: "merge", params: {}, success: true, time: endTime - startTime });
+
             return this._merge_subcube(cube2, overlap_resolver)
         }
 
@@ -831,6 +1011,10 @@ class DataCube {
             cube2._merge_subcube(this, overlap_resolver)
             this.data = cube2.data;
             this.dimensions = cube2.dimensions
+
+            const endTime = Date.now();
+            executionTimes.push({ fun: "merge", params: {}, success: true, time: endTime - startTime });
+
             return
         }
 
@@ -846,5 +1030,8 @@ class DataCube {
                 this._merge_dimension_with_different_labels(cube2, cube2.dimensions[i], i, overlap_resolver, dimensionWithDifferentLabelsOverlaps)
             }
         }
+
+        const endTime = Date.now();
+        executionTimes.push({ fun: "merge", params: {}, success: true, time: endTime - startTime });
     }
 }

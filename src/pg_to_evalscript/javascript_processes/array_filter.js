@@ -1,4 +1,5 @@
 function array_filter(arguments) {
+  const startTime = Date.now();
   const { data, condition: cond, context } = arguments;
 
   validateParameter({
@@ -24,5 +25,7 @@ function array_filter(arguments) {
     }
   }
 
+  const endTime = Date.now();
+  executionTimes.push({ fun: "array_filter.js", params: {}, success: true, time: endTime - startTime });
   return filteredData;
 }

@@ -1,4 +1,5 @@
 function filter_bands(arguments) {
+  const startTime = Date.now();
   const { data, bands = [], wavelengths = [] } = arguments;
 
   if (data === undefined) {
@@ -29,5 +30,7 @@ function filter_bands(arguments) {
 
   const newData = data.clone();
   newData.filterBands(bands);
+  const endTime = Date.now();
+  executionTimes.push({ fun: "filter_bands.js", params: {}, success: true, time: endTime - startTime });
   return newData;
 }

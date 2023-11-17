@@ -1,4 +1,5 @@
 function sum(arguments) {
+  const startTime = Date.now();
   const { data, ignore_nodata = true } = arguments;
 
   validateParameter({
@@ -43,5 +44,7 @@ function sum(arguments) {
     }
   }
 
+  const endTime = Date.now();
+  executionTimes.push({ fun: "sum.js", params: {}, success: true, time: endTime - startTime });
   return sum;
 }

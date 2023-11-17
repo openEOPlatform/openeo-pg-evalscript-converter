@@ -1,4 +1,5 @@
 function rearrange(arguments) {
+  const startTime = Date.now();
   const { data, order } = arguments;
 
   validateParameter({
@@ -39,5 +40,7 @@ function rearrange(arguments) {
     newData.push(data[el]);
   }
 
+  const endTime = Date.now();
+  executionTimes.push({ fun: "rearrange.js", params: {}, success: true, time: endTime - startTime });
   return newData;
 }

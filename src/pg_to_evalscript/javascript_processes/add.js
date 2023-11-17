@@ -1,4 +1,5 @@
 function add(arguments) {
+  const startTime = Date.now();
   const { x, y } = arguments;
 
   validateParameter({
@@ -21,5 +22,7 @@ function add(arguments) {
     return null;
   }
 
+  const endTime = Date.now();
+  executionTimes.push({ fun: "add.js", params: {x,y}, success: true, time: endTime - startTime });
   return x + y;
 }

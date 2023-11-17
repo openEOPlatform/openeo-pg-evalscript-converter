@@ -143,7 +143,12 @@ class Node:
 
     def write_call(self):
         return self.indent_by_level(
-            f"let {self.node_varname_prefix}{self.node_id} = {self.process_function_name}({self.arguments})"
+            f"""
+const startTime{self.process_function_name} = Date.now();
+let {self.node_varname_prefix}{self.node_id} = {self.process_function_name}({self.arguments})
+const endTime{self.process_function_name} = Date.now();
+executionTimes.push({{ fun: \"{self.process_function_name}\", params: {{}}, success: true, time: endTime{self.process_function_name} - startTime{self.process_function_name} }});
+            """
         )
 
     def write_function(self):

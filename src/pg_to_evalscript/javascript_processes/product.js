@@ -1,4 +1,5 @@
 function product(arguments) {
+  const startTime = Date.now();
   const { data, ignore_nodata = true } = arguments;
 
   validateParameter({
@@ -42,5 +43,7 @@ function product(arguments) {
     product = null;
   }
 
+  const endTime = Date.now();
+  executionTimes.push({ fun: "product.js", params: {}, success: true, time: endTime - startTime });
   return product;
 }

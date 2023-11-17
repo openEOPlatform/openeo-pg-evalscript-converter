@@ -5,6 +5,8 @@ const DATE_TIME_TYPES = {
 }
 
 function parse_rfc3339(dateTime, default_h = 0, default_m = 0, default_s = 0) {
+  const startTime = Date.now()
+
   const regexDateTime =
     "^([0-9]{4})-([0-9]{2})-([0-9]{2})([Tt]([0-9]{2}):([0-9]{2}):([0-9]{2})(\.[0-9]+)?)([Zz]|([+-])([0-9]{2}):([0-9]{2}))";
   const regexDate = "^([0-9]{4})-([0-9]{2})-([0-9]{2})$";
@@ -14,6 +16,10 @@ function parse_rfc3339(dateTime, default_h = 0, default_m = 0, default_s = 0) {
     const matchDate = dateTime.match(regexDate);
 
     if (matchDateTime || matchDate) {
+      const endTime = Date.now()
+
+      executionTimes.push({ fun: "parse_rfc3339", params: {dateTime}, success: true, time: endTime - startTime });
+
       return {
         type: matchDate ? DATE_TIME_TYPES.date : DATE_TIME_TYPES.date_time,
         value: new Date(dateTime).toISOString(),
@@ -21,6 +27,8 @@ function parse_rfc3339(dateTime, default_h = 0, default_m = 0, default_s = 0) {
     }
   } catch (err) {}
 
+  const endTime = Date.now()
+  executionTimes.push({ fun: "parse_rfc3339", params: { dateTime }, success: false, time: endTime - startTime });
   return null;
 }
 
@@ -125,6 +133,8 @@ const formatLabelByPeriod = (period, label) => {
 };
 
 const generateDatesInRangeByPeriod = (minDate, maxDate, period) => {
+  const startTime = Date.now();
+  
   const addPeriodToDate = (currentDate, period) => {
     let newDate = new Date(currentDate);
     switch (period) {
@@ -178,6 +188,9 @@ const generateDatesInRangeByPeriod = (minDate, maxDate, period) => {
     dates.push(currentDate);
     currentDate = addPeriodToDate(currentDate, period);
   }
+
+  const endTime = Date.now();
+  executionTimes.push({ fun: "generateDatesInRangeByPeriod", params: { minDate, maxDate, period }, success: true, time: endTime - startTime });
 
   return dates;
 };
