@@ -158,11 +158,8 @@ function updateOutput(outputs, collection) {{
         dimensions_of_inputs_per_node = defaultdict(list)
         all_bands = []
         for datasource_with_bands in self.input_bands:
-            all_bands.extend(
-                datasource_with_bands["bands"]
-                if datasource_with_bands is not None and datasource_with_bands["bands"] is not None
-                else []
-            )
+            if datasource_with_bands is not None and datasource_with_bands["bands"] is not None:
+                all_bands.extend(datasource_with_bands["bands"])
 
         initial_output_dimensions = [
             {"name": self.bands_dimension_name, "size": len(set(all_bands)) if self.input_bands is not None else 0},
