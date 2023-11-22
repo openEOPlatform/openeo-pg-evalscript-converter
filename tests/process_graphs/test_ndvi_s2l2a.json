@@ -1,5 +1,5 @@
 {
-   "1":{
+   "loadcollection":{
       "process_id":"load_collection",
       "arguments":{
          "id":"SENTINEL2_L2A_SENTINELHUB",
@@ -33,7 +33,7 @@
       "process_id":"ndvi",
       "arguments":{
          "data":{
-            "from_node":"1"
+            "from_node":"loadcollection"
          },
          "target_band":"NDVI",
          "nir":"B08",

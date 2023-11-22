@@ -48,7 +48,7 @@ user_defined_processes = {
 
 
 bands_metadata = {
-    "node_1": [
+    "node_loadcollection": [
         {
             "name": "B01",
             "common_name": "coastal",

@@ -274,7 +274,7 @@ def test_list_supported_processes():
 
 @pytest.mark.parametrize(
     "new_bands",
-    [[{"datasource": "node_1", "bands": ["B01", "B02", "B03"]}]],
+    [[{"datasource": "node_loadcollection", "bands": ["B01", "B02", "B03"]}]],
 )
 def test_set_input_bands(new_bands):
     process_graph = get_process_graph_json("bands_null_graph")

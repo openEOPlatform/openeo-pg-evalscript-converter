@@ -1,5 +1,5 @@
 {
-   "1":{
+   "loadcollection":{
       "process_id":"load_collection",
       "arguments":{
          "id":"BYOC",
@@ -23,7 +23,7 @@
       "process_id":"reduce_dimension",
       "arguments":{
          "data":{
-            "from_node":"1"
+            "from_node":"loadcollection"
          },
          "dimension":"t",
          "reducer":{
