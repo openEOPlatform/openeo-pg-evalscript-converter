@@ -1,5 +1,5 @@
 {
-  "loadco1": {
+  "loadcollection": {
     "process_id": "load_collection",
     "arguments": {
       "id": "S2L1C",
@@ -22,7 +22,7 @@
     "process_id": "apply_dimension",
     "arguments": {
       "data": {
-        "from_node": "loadco1"
+        "from_node": "loadcollection"
       },
       "process": {
         "process_graph": {
@@ -83,7 +83,7 @@
         "from_node": "rename_labels1"
       },
       "target": {
-        "from_node": "loadco1"
+        "from_node": "loadcollection"
       },
       "valid_within": 7
     }

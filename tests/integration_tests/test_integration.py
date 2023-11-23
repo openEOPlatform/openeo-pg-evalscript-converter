@@ -272,7 +272,7 @@ def test_list_supported_processes():
 
 @pytest.mark.parametrize(
     "new_bands",
-    [["B01", "B02", "B03"]],
+    [[{"datasource": "node_loadcollection", "bands": ["B01", "B02", "B03"]}]],
 )
 def test_set_input_bands(new_bands):
     process_graph = get_process_graph_json("bands_null_graph")
@@ -280,7 +280,7 @@ def test_set_input_bands(new_bands):
     result = convert_from_process_graph(process_graph, bands_dimension_name=bands_dimension_name, encode_result=False)
     evalscript = result[0]["evalscript"]
 
-    assert evalscript.input_bands is None
+    assert evalscript.input_bands[0]["bands"] is None
     assert (
         evalscript._output_dimensions[0]["name"] == bands_dimension_name
         and evalscript._output_dimensions[0]["size"] == 0
@@ -295,7 +295,7 @@ def test_set_input_bands(new_bands):
     assert evalscript.input_bands == new_bands
     assert evalscript._output_dimensions[0]["name"] == bands_dimension_name and evalscript._output_dimensions[0][
         "size"
-    ] == len(new_bands)
+    ] == len(new_bands[0]["bands"])
 
     input_object = get_evalscript_input_object(evalscript.write())
     assert input_object["input"] == new_bands

@@ -86,13 +86,13 @@ def convert_from_process_graph(
     bands_dimension_name="bands",
     temporal_dimension_name="t",
     encode_result=True,
-    bands_metadata=[],
+    bands_metadata={},
 ):
     all_nodes_valid, subgraphs = check_validity_and_subgraphs(
         process_graph, temporal_dimension_name, bands_dimension_name, user_defined_processes=user_defined_processes
     )
     if all_nodes_valid:
-        nodes, input_bands, initial_data_name = generate_nodes_from_process_graph(
+        nodes, input_bands, initial_data_names = generate_nodes_from_process_graph(
             process_graph,
             bands_dimension_name,
             temporal_dimension_name,
@@ -102,7 +102,7 @@ def convert_from_process_graph(
         evalscript = Evalscript(
             input_bands,
             nodes,
-            initial_data_name,
+            initial_data_names,
             n_output_bands=n_output_bands,
             sample_type=sample_type,
             units=units,
@@ -165,8 +165,8 @@ def generate_nodes_from_process_graph(
     )
 
     nodes = []
-    input_bands = None
-    initial_data_name = None
+    input_bands = []
+    initial_data_names = {}
 
     for node_id in execution_order:
         process_id = process_graph[node_id]["process_id"]
@@ -174,8 +174,10 @@ def generate_nodes_from_process_graph(
         child_nodes = None
 
         if process_id == "load_collection":
-            input_bands = arguments.get("bands")
+            bands_for_datasource = arguments.get("bands")
             initial_data_name = "node_" + node_id
+            input_bands.append({"datasource": initial_data_name, "bands": bands_for_datasource})
+            initial_data_names[node_id] = initial_data_name
             continue
         elif process_id == "save_result":
             continue
@@ -257,4 +259,4 @@ def generate_nodes_from_process_graph(
             bands_dimension_name=bands_dimension_name,
         )
         nodes.append(node)
-    return nodes, input_bands, initial_data_name
+    return nodes, input_bands, initial_data_names
