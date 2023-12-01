@@ -1,4 +1,5 @@
 function filter_temporal(arguments) {
+  const startTime = Date.now();
   const { data, extent, dimension } = arguments;
 
   validateParameter({
@@ -29,5 +30,7 @@ function filter_temporal(arguments) {
 
   const newData = data.clone();
   newData.filterTemporal(extent, dimension);
+  const endTime = Date.now();
+  executionTimes.push({ fun: "filter_temporal.js", params: {}, success: true, time: endTime - startTime });
   return newData;
 }

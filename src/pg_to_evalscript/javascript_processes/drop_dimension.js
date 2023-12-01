@@ -1,4 +1,5 @@
 function drop_dimension(arguments) {
+  const startTime = Date.now();
   const { data, name } = arguments;
 
   validateParameter({
@@ -38,5 +39,7 @@ function drop_dimension(arguments) {
 
   let newData = data.clone();
   newData.removeDimension(name);
+  const endTime = Date.now();
+  executionTimes.push({ fun: "drop_dimension.js", params: {}, success: true, time: endTime - startTime });
   return newData;
 }

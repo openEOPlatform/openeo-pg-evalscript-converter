@@ -1,4 +1,5 @@
 function extrema(arguments) {
+  const startTime = Date.now();
   const { data, ignore_nodata = true } = arguments;
 
   validateParameter({
@@ -55,5 +56,7 @@ function extrema(arguments) {
     }
   }
 
+  const endTime = Date.now();
+  executionTimes.push({ fun: "extrema.js", params: {}, success: true, time: endTime - startTime });
   return [minVal, maxVal];
 }

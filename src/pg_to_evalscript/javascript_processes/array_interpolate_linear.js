@@ -1,4 +1,5 @@
 function array_interpolate_linear(arguments) {
+  const startTime = Date.now();
   const { data } = arguments;
 
   validateParameter({
@@ -47,5 +48,7 @@ function array_interpolate_linear(arguments) {
     nullIndices = [];
   }
 
+  const endTime = Date.now();
+  executionTimes.push({ fun: "array_interpolate_linear.js", params: {}, success: true, time: endTime - startTime });
   return newData;
 }

@@ -1,4 +1,5 @@
 function sort(arguments) {
+  const startTime = Date.now();
   const { data, asc = true, nodata = null } = arguments;
 
   validateParameter({
@@ -57,6 +58,8 @@ function sort(arguments) {
     newData = [...arr_of_nulls, ...newData];
   }
 
+  const endTime = Date.now();
+  executionTimes.push({ fun: "sort.js", params: {}, success: true, time: endTime - startTime });
   return newData;
 }
 

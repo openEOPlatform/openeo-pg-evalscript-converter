@@ -1,4 +1,5 @@
 function apply_dimension(arguments) {
+  const startTime = Date.now();
   const { data, process, dimension, target_dimension = null, context = null } = arguments;
 
   validateParameter({
@@ -45,5 +46,7 @@ function apply_dimension(arguments) {
 
   const newData = data.clone();
   newData.applyDimension(process, dimension, target_dimension, context);
+  const endTime = Date.now();
+  executionTimes.push({ fun: "apply_dimension.js", params: {}, success: true, time: endTime - startTime });
   return newData;
 }

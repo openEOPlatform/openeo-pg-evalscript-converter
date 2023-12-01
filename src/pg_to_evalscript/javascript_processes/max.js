@@ -1,4 +1,5 @@
 function max(arguments) {
+const startTime = Date.now();
   const { data, ignore_nodata = true } = arguments;
 
   validateParameter({
@@ -45,5 +46,13 @@ function max(arguments) {
     }
   }
 
+const endTime = Date.now();
+executionTimes.push({ fun: "max.js", params: {}, success: true, time: endTime - startTime });
   return maxVal;
 }
+
+
+// x = [1, 2, 10, null, 39, 23, null, 4, 4, null, 6, 2, 1]
+// x.sort((a, b) => b - a) // add value validation
+// x[0] : MAX
+// x[x.length - 1] : IF NULL -> no_data exists in data

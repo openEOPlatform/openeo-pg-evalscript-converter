@@ -1,4 +1,5 @@
 function mean(arguments) {
+const startTime = Date.now();
   const { data, ignore_nodata = true } = arguments;
 
   validateParameter({
@@ -44,5 +45,7 @@ function mean(arguments) {
     return null;
   }
 
+const endTime = Date.now();
+executionTimes.push({ fun: "mean.js", params: {}, success: true, time: endTime - startTime });
   return sum / el_num;
 }

@@ -1,4 +1,5 @@
 function mask(arguments) {
+  const startTime = Date.now();
   const { data, mask, replacement = null } = arguments;
 
   validateParameter({
@@ -80,5 +81,7 @@ function mask(arguments) {
   }
   
   newData.data.data = newDataFlat;
+  const endTime = Date.now();
+  executionTimes.push({ fun: "mask.js", params: {}, success: true, time: endTime - startTime });
   return newData;
 }

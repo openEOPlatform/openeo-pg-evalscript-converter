@@ -1,4 +1,5 @@
 function median(arguments) {
+const startTime = Date.now();
   const { data, ignore_nodata = true } = arguments;
 
   validateParameter({
@@ -48,5 +49,7 @@ function median(arguments) {
     return (newData[bottomHalfIdx - 1] + newData[bottomHalfIdx]) / 2;
   }
 
+const endTime = Date.now();
+executionTimes.push({ fun: "median.js", params: {}, success: true, time: endTime - startTime });
   return newData[bottomHalfIdx];
 }

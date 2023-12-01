@@ -1,4 +1,5 @@
 function reduce_dimension(arguments) {
+  const startTime = Date.now();
   const { data, dimension, reducer, context = null } = arguments;
 
   validateParameter({
@@ -28,5 +29,7 @@ function reduce_dimension(arguments) {
 
   const newData = data.clone();
   newData.reduceByDimension(reducer, dimension, context);
+  const endTime = Date.now();
+  executionTimes.push({ fun: "reduce_dimension.js", params: {}, success: true, time: endTime - startTime });
   return newData;
 }

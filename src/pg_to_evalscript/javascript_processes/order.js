@@ -1,5 +1,6 @@
 function order(arguments) {
-  const { data, asc = true, nodata = null} = arguments;
+  const startTime = Date.now();
+  const { data, asc = true, nodata = null } = arguments;
 
   validateParameter({
     processName: "order",
@@ -58,5 +59,7 @@ function order(arguments) {
     }
   }
 
+  const endTime = Date.now();
+  executionTimes.push({ fun: "order.js", params: {}, success: true, time: endTime - startTime });
   return sortedIndexes;
 }

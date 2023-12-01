@@ -1,4 +1,5 @@
 function quantiles(arguments) {
+  const startTime = Date.now();
   const { data, probabilities, q, ignore_nodata = true } = arguments;
 
   validateParameter({
@@ -100,5 +101,7 @@ function quantiles(arguments) {
     }
   }
 
+  const endTime = Date.now();
+  executionTimes.push({ fun: "quantiles.js", params: {}, success: true, time: endTime - startTime });
   return quantiles;
 }

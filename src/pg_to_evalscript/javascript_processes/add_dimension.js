@@ -1,4 +1,5 @@
 function add_dimension(arguments) {
+  const startTime = Date.now();
   const { data, name, label, type = "other" } = arguments;
 
   validateParameter({
@@ -37,5 +38,7 @@ function add_dimension(arguments) {
 
   let newData = data.clone();
   newData.addDimension(name, label, type);
+  const endTime = Date.now();
+  executionTimes.push({ fun: "add_dimension.js", params: {name, label, type}, success: true, time: endTime - startTime });
   return newData;
 }

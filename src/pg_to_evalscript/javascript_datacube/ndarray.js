@@ -21,10 +21,13 @@
 // THE SOFTWARE.
 
 function iota(n) {
+  const startTime = Date.now();
   var result = new Array(n)
   for(var i=0; i<n; ++i) {
     result[i] = i
   }
+  const endTime = Date.now();
+  executionTimes.push({ fun: "iota", params: { n }, success: true, time: endTime - startTime });
   return result
 }
 function isBuffer (obj) {
@@ -39,6 +42,7 @@ function compare1st(a, b) {
 }
 
 function order() {
+  const startTime = Date.now();
   var stride = this.stride
   var terms = new Array(stride.length)
   var i
@@ -50,10 +54,14 @@ function order() {
   for(i=0; i<result.length; ++i) {
     result[i] = terms[i][1]
   }
+  const endTime = Date.now();
+  executionTimes.push({ fun: "order", params: { }, success: true, time: endTime - startTime });
   return result
 }
 
 function compileConstructor(dtype, dimension) {
+  const startTime = Date.now();
+  
   var className = ["View", dimension, "d", dtype].join("")
   if(dimension < 0) {
     className = "View_Nil" + dtype
@@ -76,6 +84,8 @@ proto.get=proto.set=function(){};\
 proto.pick=function(){return null};\
 return function construct_"+className+"(a){return new "+className+"(a);}"
     var procedure = new Function(code)
+    const endTime = Date.now();
+    executionTimes.push({ fun: "compileConstructor", params: { dtype, dimension }, success: true, time: endTime - startTime });
     return procedure()
   } else if(dimension === 0) {
     //Special case for 0d arrays
@@ -109,6 +119,8 @@ return "+(useGetters ? "this.data.set(this.offset,v)" : "this.data[this.offset]=
 };\
 return function construct_"+className+"(a,b,c,d){return new "+className+"(a,d)}"
     var procedure = new Function("TrivialArray", code)
+    const endTime = Date.now();
+    executionTimes.push({ fun: "compileConstructor", params: { dtype, dimension }, success: true, time: endTime - startTime });
     return procedure(CACHED_CONSTRUCTORS[dtype][0])
   }
 
@@ -280,6 +292,8 @@ b"+i+"*=d\
 
   //Compile procedure
   var procedure = new Function("CTOR_LIST", "ORDER", code.join("\n"))
+  const endTime = Date.now();
+  executionTimes.push({ fun: "compileConstructor", params: { dtype, dimension }, success: true, time: endTime - startTime });
   return procedure(CACHED_CONSTRUCTORS[dtype], order)
 }
 
@@ -343,6 +357,8 @@ var CACHED_CONSTRUCTORS = {
 });
 
 function ndarray(data, shape, stride, offset) {
+  const startTime = Date.now();
+  
   if(data === undefined) {
     var ctor = CACHED_CONSTRUCTORS.array[0]
     return ctor([])
@@ -374,47 +390,66 @@ function ndarray(data, shape, stride, offset) {
     ctor_list.push(compileConstructor(dtype, ctor_list.length-1))
   }
   var ctor = ctor_list[d+1]
+  const endTime = Date.now();
+  executionTimes.push({ fun: "ndarray", params: { shape, stride, offset }, success: true, time: endTime - startTime });
   return ctor(data, shape, stride, offset)
 }
 
 // ------------------------------------------------------------------------------------------------------
 
 function convert_to_1d_array(ndarray) {
+  const startTime = Date.now();
     const arr = []
     for (let i = 0; i < ndarray.shape[0]; i++) {
         arr.push(ndarray.get(i))
     }
+  const endTime = Date.now();
+  executionTimes.push({ fun: "convert_to_1d_array", params: { ndarrayLength: ndarray.length }, success: true, time: endTime - startTime });
     return arr
 }
 
 function extractValues(obj) {
+  const startTime = Date.now();
     const values = [];
     for (var key in obj) {
         values.push(obj[key]);
-    }
+  }
+  const endTime = Date.now();
+  executionTimes.push({ fun: "extractValues", params: { obj }, success: true, time: endTime - startTime });
     return values;
 }
 
 function fill(arr, val) {
+  const startTime = Date.now();
     const size = arr.length
     for (let i = 0; i < size; i++) {
         arr[i] = val
-    }
+  }
+  const endTime = Date.now();
+  executionTimes.push({ fun: "fill", params: { arrLength: arr.length, val }, success: true, time: endTime - startTime });
     return arr
 }
 
 function isNotSubarray(ndarray, shape) {
+  const startTime = Date.now();
     let length = 1;
     for (let i = 0; i < shape.length; i++) {
         length *= shape[i]
     }
+
+  const endTime = Date.now();
+  executionTimes.push({ fun: "isNotSubarray", params: { ndarrayLength: ndarray.length, shape }, success: true, time: endTime - startTime });
     return length === ndarray.data.length
 }
 
 function flattenToNativeArray(ndarray, useAllNdarrayProperties = false) {
+  const startTime = Date.now();
     const shape = ndarray.shape
 
     if (!useAllNdarrayProperties && isNotSubarray(ndarray, shape)) {
+
+      const endTime = Date.now();
+      executionTimes.push({ fun: "flattenToNativeArray", params: { ndarrayLength: ndarray.length, useAllNdarrayProperties }, success: true, time: endTime - startTime });
       return ndarray.data.slice();
     }
   
@@ -433,6 +468,9 @@ function flattenToNativeArray(ndarray, useAllNdarrayProperties = false) {
         }
         arr.push(ndarray.get.apply(ndarray, coord))
     }
+
+  const endTime = Date.now();
+  executionTimes.push({ fun: "flattenToNativeArray", params: { ndarrayLength: ndarray.length, useAllNdarrayProperties }, success: true, time: endTime - startTime });
     return arr
 }
 
@@ -455,11 +493,16 @@ function flattenToNativeArray(ndarray, useAllNdarrayProperties = false) {
 */
 
 function broadcastNdarray(inputArray, targetShape) {
+  const startTime = Date.now();
+
   
   const targetNumOfDimensions = targetShape.length;
   const inputArrayNumOfDimensions = inputArray.shape.length;
 
   if (targetNumOfDimensions < inputArrayNumOfDimensions) {
+
+    const endTime = Date.now();
+    executionTimes.push({ fun: "broadcastNdarray", params: { inputArrayLength: inputArray.shape, targetShape }, success: false, time: endTime - startTime });
     throw new Error('invalid argument. Cannot broadcast an array to a shape having fewer dimensions. Arrays can only be broadcasted to shapes having the same or more dimensions.');
   }
 
@@ -482,6 +525,9 @@ function broadcastNdarray(inputArray, targetShape) {
     }
     
     if (currentDim !== 0 && currentDim < inputArrayDim) {
+
+      const endTime = Date.now();
+      executionTimes.push({ fun: "broadcastNdarray", params: { inputArrayLength: inputArray.shape, targetShape }, success: false, time: endTime - startTime });
       throw new Error(format('invalid argument. Input array cannot be broadcast to the specified shape, as the specified shape has a dimension whose size is less than the size of the corresponding dimension in the input array. Array shape: (%s). Desired shape: (%s). Dimension: %u.', inputArray.shape.slice().join(', '), targetShape.slice().join(', '), i));
     }
     if (inputArrayDim === currentDim) {
@@ -490,10 +536,16 @@ function broadcastNdarray(inputArray, targetShape) {
       // In order to broadcast dimensions, we set the stride for that dimension to zero...
       generatedStrides[i] = 0;
     } else {
+
+      const endTime = Date.now();
+      executionTimes.push({ fun: "broadcastNdarray", params: { inputArrayLength: inputArray.shape, targetShape }, success: false, time: endTime - startTime });
       // At this point, we know that `dim > d` and that `d` does not equal `1` (e.g., `dim=3` and `d=2`); in which case, the shapes are considered incompatible (even for desired shapes which are multiples of array dimensions, as might be desired when "tiling" an array; e.g., `dim=4` and `d=2`)...
       throw new Error(format('invalid argument. Input array and the specified shape are broadcast incompatible. Array shape: (%s). Desired shape: (%s). Dimension: %u.', inputArray.shape.slice().join(', '), targetShape.slice().join(', '), i));
     }
   }
   const newArr = ndarray(inputArray.data, targetShape.slice(), generatedStrides, inputArray.offset);
+
+  const endTime = Date.now();
+  executionTimes.push({ fun: "broadcastNdarray", params: { inputArrayLength: inputArray.shape, targetShape }, success: true, time: endTime - startTime });
   return newArr;
 }

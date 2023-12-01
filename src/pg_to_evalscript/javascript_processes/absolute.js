@@ -1,4 +1,5 @@
 function absolute(arguments) {
+  const startTime = Date.now();
   const { x } = arguments;
 
   validateParameter({
@@ -13,5 +14,7 @@ function absolute(arguments) {
     return null;
   }
 
+  const endTime = Date.now();
+  executionTimes.push({ fun: "absolute.js", params: { x }, success: true, time: endTime - startTime });
   return Math.abs(x);
 }

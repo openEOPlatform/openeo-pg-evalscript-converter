@@ -1,4 +1,5 @@
 function array_apply(arguments) {
+  const startTime = Date.now();
   const { data, process, context = null } = arguments;
 
   validateParameter({
@@ -29,5 +30,7 @@ function array_apply(arguments) {
     });
   }
 
+  const endTime = Date.now();
+  executionTimes.push({ fun: "array_apply.js", params: {}, success: true, time: endTime - startTime });
   return newData;
 }
